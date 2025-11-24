@@ -1,20 +1,47 @@
+import { useToast } from "@/hook/use-toast";
+import { login } from "@/store/slices/auth.slice";
 import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 
 
 function Login() {
   const navigate = useNavigate();
+  const dispatch=useDispatch()
   const [loading, setIsLoading] = useState(false);
+  const {toast}=useToast()
   // const [isLoading, setLoading] = useState(false);
 
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors: errorLog },
+  } = useForm({
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
 
   const handleLogin = async () => {
     setIsLoading(true);
+    const body = watch();
     try {
-
+      await dispatch(login(body)).unwrap();
+      toast({
+        title: "Connexion reussie",
+        description: "Bienvenue",
+      });
+      navigate("/admin/tableau-de-bord");
     } catch (error) {
-   
+      toast({
+        title: "Connexion echouée",
+        description: error?.toString(),
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -26,20 +53,22 @@ function Login() {
         <div className="w-full flex flex-col gap-4 items-center">
           <div className="bg-white w-full items-center shadow-sm flex flex-col gap-8 px-9 py-8 rounded-[10px] border-2">
             <img className="w-[200px]" src={'/images/FullLogo.png'} alt="logo_citygo" />
-            <form
+            <form onSubmit={handleSubmit(handleLogin)}
               className="flex w-full text-[.85rem] flex-col gap-4"
             >
               <div className="flex flex-col gap-0.5">
                 <input
+                {...register('username')}
                   type="text"
-                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary w-full px-3 py-3.5 rounded-[5px] outline-0"
+                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary w-full px-3 py-3 rounded-[5px] outline-0"
                   placeholder="Nom d'utilisateur ou Email *"
                 />
               </div>
               <div className="flex flex-col gap-0.5">
                 <input
+                {...register('password')}
                   type="password"
-                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary w-full px-3 py-3.5 rounded-[5px] outline-0"
+                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary w-full px-3 py-3 rounded-[5px] outline-0"
                   placeholder="Password *"
                 />
               </div>

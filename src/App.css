@@ -1,1 +1,48 @@
 
+.big-overlay {
+	display: none;
+}
+.side-ccca {
+	/* width: 20.5%; */
+	z-index: 50;
+	transform: translateX(0);
+}
+
+.corps-admin {
+	margin-left: 18%;
+}
+
+.side-ccca.active {
+	transform: translateX(-100%);
+}
+
+.corps-admin.active {
+	margin-left: 0;
+}
+
+.rbc-header {
+	padding: 10px 3px;
+}
+
+@media screen and (max-width:999px) {
+	.side-ccca {
+		/* width: 65%; */
+		transform: translateX(-100%);
+	}
+
+	.big-overlay.active {
+		display: block;
+	}
+
+	.corps-admin {
+		margin-left: 0;
+	}
+
+	.side-ccca.active {
+		transform: translateX(0);
+	}
+
+	.corps-admin.active {
+		margin-left: 0;
+	}
+}
