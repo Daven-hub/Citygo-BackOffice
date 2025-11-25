@@ -1,4 +1,7 @@
-
+body{
+    font-family: 'Poppins','Inter',sans-serif;
+    /* font-size: medium; */
+}
 .big-overlay {
 	display: none;
 }
@@ -46,3 +49,30 @@
 		margin-left: 0;
 	}
 }
+
+.sidebb,
+.corps-admin,
+.sidebd {
+	overflow: hidden;
+	flex: 1;
+	flex-basis: 0.000000001px;
+	overflow-y: auto;
+	scrollbar-color: transparent transparent;
+	scrollbar-width: thin;
+}
+
+.sidebb:hover,
+.corps-admin:hover {
+	scrollbar-color: var(--yt-spec-icon-disabled) transparent;
+	/* background-color: #8383852b; */
+}
+
+.sidebare-admin a{
+    color: gray;
+}
+
+.sidebare-admin a.active{
+    background-color: blue;
+    color: white;
+}
+

@@ -1,16 +1,16 @@
 // AuthContext.js
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "@/store/slices/user.slice";
 import { logout } from "@/store/slices/auth.slice";
+import { useAppDispatch, useAppSelector } from "@/store/hook";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const { users } = useSelector((state) => state.users);
-  const { user } = useSelector((state) => state.auth);
+  const { users } = useAppSelector((state) => state.users);
+  const { user } = useAppSelector((state) => state.auth);
 
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);

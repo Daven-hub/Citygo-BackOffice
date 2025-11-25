@@ -1,4 +1,5 @@
 import { useToast } from "@/hook/use-toast";
+import { useAppDispatch } from "@/store/hook";
 import { login } from "@/store/slices/auth.slice";
 import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
@@ -9,10 +10,9 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
-  const dispatch=useDispatch()
+  const dispatch=useAppDispatch()
   const [loading, setIsLoading] = useState(false);
   const {toast}=useToast()
-  // const [isLoading, setLoading] = useState(false);
 
   const {
     register,
@@ -26,16 +26,15 @@ function Login() {
     },
   });
 
-  const handleLogin = async () => {
+  const handleLogin = async (data) => {
     setIsLoading(true);
-    const body = watch();
     try {
-      await dispatch(login(body)).unwrap();
+      await dispatch(login(data)).unwrap();
       toast({
         title: "Connexion reussie",
         description: "Bienvenue",
       });
-      navigate("/admin/tableau-de-bord");
+      navigate("/");
     } catch (error) {
       toast({
         title: "Connexion echouée",
@@ -49,18 +48,19 @@ function Login() {
 
 
   return (
-    <div className="flex px-[34.5%] bg-gray-300 items-center min-h-screen">
-        <div className="w-full flex flex-col gap-4 items-center">
-          <div className="bg-white w-full items-center shadow-sm flex flex-col gap-8 px-9 py-8 rounded-[10px] border-2">
-            <img className="w-[200px]" src={'/images/FullLogo.png'} alt="logo_citygo" />
+    <div className="flex px-[34.5%] bg-gray-200 items-center min-h-screen">
+        <div className="w-full flex flex-col gap-2.5 items-center">
+          {/* <img className="w-[95px]" src={'/images/shortLogo.png'} alt="logo_citygo" /> */}
+          <div className="bg-white w-full items-center shadow-sm shadow-gray-300 border-gray-300/85 flex flex-col gap-7 px-9 py-8 rounded-[10px] border">
+            <img className="w-[190px]" src={'/images/FullLogo.png'} alt="logo_citygo" />
             <form onSubmit={handleSubmit(handleLogin)}
-              className="flex w-full text-[.85rem] flex-col gap-4"
+              className="flex w-full text-[.85rem] flex-col gap-3"
             >
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-0">
                 <input
                 {...register('username')}
                   type="text"
-                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary w-full px-3 py-3 rounded-[5px] outline-0"
+                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary/60 w-full px-3 py-3 rounded-[5px] outline-0"
                   placeholder="Nom d'utilisateur ou Email *"
                 />
               </div>
@@ -68,7 +68,7 @@ function Login() {
                 <input
                 {...register('password')}
                   type="password"
-                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary w-full px-3 py-3 rounded-[5px] outline-0"
+                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary/60 w-full px-3 py-3 rounded-[5px] outline-0"
                   placeholder="Password *"
                 />
               </div>

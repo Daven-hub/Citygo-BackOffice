@@ -18,7 +18,7 @@ export const registerApp = createAsyncThunk (
   'auth/register',
   async (datas, thunkAPI) => {
     try {
-      const response= await authService.register (datas);
+      const response= await authService.register(datas);
       if (!response.success) {
         return thunkAPI.rejectWithValue(response.error);
       }else{
@@ -103,7 +103,7 @@ export const authSlice = createSlice({
       })
       .addCase(login.rejected, (state, action) => {
         state.authStatus = "error";
-        state.error = action.payload.error || action.error.message || "Erreur de connexion";
+        state.error = action.payload || action.error.message || "Erreur de connexion";
       });
   },
 });

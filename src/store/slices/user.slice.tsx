@@ -2,17 +2,21 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import userService from "../../services/userService";
 // import authService from '../../services/authService';
 
+interface paramsType{
+  id:Number,
+  datas:Object
+}
+
 const initialState = {
   users: [],
   usersId: null,
-  // registerSuccess: false,
   userStatus: "idle",
   userError: null,
 };
 
 export const updateUser = createAsyncThunk(
   "user/updatye",
-  async ({ id, datas }, thunkAPI) => {
+  async ({ id, datas }:paramsType, thunkAPI) => {
     try {
       const response = await userService.updateUser(id, datas);
       if (!response.success) {
@@ -125,8 +129,7 @@ export const userSlice = createSlice({
       })
       .addCase(getAllUsers.rejected, (state, action) => {
         state.userStatus = "error";
-        state.userError =
-          action.payload || "Impossible de charger les utilisateurs";
+        state.userError = action.payload || "Impossible de charger les utilisateurs";
       })
       .addCase(getUserById.pending, (state) => {
         state.userStatus = "loading";

@@ -4,7 +4,6 @@ import axios from 'axios';
 
 // 👉 Crée une instance
 const axiosInstance = axios.create({
-  // baseURL: 'https://centrale-achat.cc-ca.ca/api',
   baseURL: '/api'
   // baseURL: 'http://localhost:83/api'
   // headers: {

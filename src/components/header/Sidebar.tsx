@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import $ from 'jquery'
 // import { roleChange } from '../../pages/Admin/Dashboard';
-import { ArrowRight, Grid, Settings, ShoppingCart, SidebarClose } from 'lucide-react';
+import { ArrowRight, Grid, Settings, ShoppingCart, SidebarClose, User } from 'lucide-react';
 import { useAuth } from '@/context/authContext';
 
 function Sidebar({setIsSidebarOpen}) {
@@ -29,7 +29,8 @@ function Sidebar({setIsSidebarOpen}) {
         group: '',
         alowed:['fournisseur','admin','acheteur'],
         corps: [
-          { title: 'Tableau de Bord', icon: <Grid size={18} />, path: '/admin/tableau-de-bord', children: [] },
+          { title: 'Tableau de Bord', icon: <Grid size={18} />, path: '/', children: [] },
+          { title: 'Utilisateurs', icon: <User size={18} />, path: '/utilisateurs', children: [] },
         ]
       },
       {
@@ -38,7 +39,7 @@ function Sidebar({setIsSidebarOpen}) {
         corps: [
           // { title: 'Rapport', icon: <FiFileText size={18} />, path: '/admin/rapport', children: [] },
           // { title: 'Profile', icon: <UserIcon size={18} />, path: '/admin/profile', children: [] },
-          { title: 'Paramètres', icon: <Settings size={18} />, path: '/admin/parametres/securite', children: [] },
+          { title: 'Paramètres', icon: <Settings size={18} />, path: '/parametre', children: [] },
         ]
       },
     ];
@@ -46,16 +47,12 @@ function Sidebar({setIsSidebarOpen}) {
 
   return (
     <div
-      className={`fixed h-[100vh] left-0 side-ccca w-[18%] max-md:w-[60%] max-sm:w-[80%] bg-secondary shadow-sm transform transition-transform duration-500`}
+      className={`fixed border h-[100vh] left-0 side-ccca w-[18%] max-md:w-[60%] max-sm:w-[80%] bg-white transform transition-transform duration-500`}
     >
       {/* Sidebar Header */}
-      <div className="flex items-center bg-white/40 justify-between py-[.95rem] max-md:py-[.85rem] border-b border-white/20 shadow-sm px-[7%]">
+      <div className="flex items-center justify-between py-1.5 max-md:py-[.85rem] border-b border-white/20 shadow-sm px-[7%]">
         <div className="flex items-center justify-center max-md:justify-start gap-1.5 w-full">
-          <img src={'/images/FullLogo.png'} alt="Logo" className="w-full object-contain max-md:w-7 max-md:h-7 h-[2.2rem]" />
-          {/* <div className='flex flex-col font-semibold text-[.9rem] max-md:text-[.8rem] text-white leading-[1.1rem]'>
-            <span>Chambre de Commerce</span>
-            <span>Canada Afrique</span>
-          </div> */}
+          <img src={'/images/FullLogo.png'} alt="Logo" className="w-full object-contain max-md:w-7 max-md:h-7 h-[2.9rem]" />
         </div>
         <div className='menu-close hidden cursor-pointer max-md:block'><SidebarClose size={25} color='white' /></div>
       </div>
@@ -65,18 +62,21 @@ function Sidebar({setIsSidebarOpen}) {
           {sideLink?.map((x, indexi) => (
             x.alowed?.includes(userConnected?.role) &&
             <div key={indexi}>
-              <p className={`text-[.85rem] font-medium text-white text-opacity-30 mb-1`}>{x.group}</p>
+              <p className={`text-[.85rem] font-medium text-gray-400 text-opacity-30 mb-1`}>{x.group}</p>
               <div className='flex flex-col gap-0.5'>
                 {x?.corps.map((item, index) => (
                   item.children.length <= 0 ?
                     <NavLink
                       key={index}
                       to={item.path}
-                      className={`flex items-center nav-items gap-3 w-full px-4 py-2.5 text-white text-opacity-60 font-medium transition-all duration-200 hover:bg-white hover:text-opacity-100 hover:bg-opacity-20 rounded-md`}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 w-full px-4 py-2.5 rounded-lg text-[0.91rem] font-medium transition-colors duration-200 
+                        ${isActive ? 'bg-blue-100 !text-blue-600' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'}`
+                      }
                       onClick={() => setIsSidebarOpen(false)}
                     >
                       <span className="text-xl">{item.icon}</span>
-                      <span className="text-[.91rem]">{item.title}</span>
+                      {item.title}
                     </NavLink> :
                     <div
                       key={index}

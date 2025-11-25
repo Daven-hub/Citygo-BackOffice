@@ -48,6 +48,8 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "dayjs": "^1.11.19",
+    "echarts-for-react": "^3.0.5",
     "embla-carousel-react": "^8.3.0",
     "i18next": "^25.5.2",
     "i18next-browser-languagedetector": "^8.2.0",
