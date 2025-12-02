@@ -4,8 +4,8 @@ import axios from 'axios';
 
 // 👉 Crée une instance
 const axiosInstance = axios.create({
-  baseURL: '/api'
-  // baseURL: 'http://localhost:83/api'
+  // baseURL: '/api'
+  baseURL: 'https://cng-ngc.org/api'
   // headers: {
   //   'Content-Type': 'application/json',
   // },

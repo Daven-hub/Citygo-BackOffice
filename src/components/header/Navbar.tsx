@@ -2,12 +2,8 @@ import { Menu } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import UserMenu from '../UserMenu'
 import { useAuth } from '@/context/authContext'
-// import { Menu01Icon } from 'hugeicons-react'
-// import { FlagIcon } from 'react-flag-kit'
-// import { useAuth } from '../../context/authContext'
 
-
-function Navbar ({ toggleSidebar }) {
+function Navbar () {
   const [open, setOpen] = useState(false)
   const popoverRef = useRef(null)
 
@@ -24,17 +20,13 @@ function Navbar ({ toggleSidebar }) {
   const { isLoading } = useAuth()
 
   return (
-    <nav className='w-full sticky top-0 bg-white z-[2] border-gray-200 shadow-lg shadow-slate-100 flex items-center justify-between px-6 max-md:px-[4%] py-3 max-md:py-2.5 border-b'>
-      <div className='flex items-center gap-3 w-[55%]'>
-        <div className='cursor-pointer flex-shrink-0 btn-menu'>
-          <Menu size={30} />
+    <nav className='w-full sticky top-0 bg-white z-[2] flex items-center justify-between px-4 py-3.5 max-md:px-[4%] max-md:py-2.5 border-b'>
+      <div className='flex relative items-center gap-3'>
+        <div className='flex items-center gap-20'>
+          <div className='cursor-pointer flex-shrink-0 btn-menu'>
+            <Menu size={30} />
+          </div>
         </div>
-        {/* <input
-          id='recherche'
-          className='bg-gray-50 border border-black/10 text-[.85rem] rounded-full max-md:hidden px-5 w-[60%] py-2.5 focus:outline-none'
-          type='text'
-          placeholder='Rechercher ...'
-        /> */}
       </div>
       <div className='flex gap-4 items-center'>
         <div className='pl-4 border-l border-gray-200'>

@@ -1,18 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
 import {
-  Package,
   ChevronDown,
   Edit,
   Trash2,
   DownloadCloud,
   Plus,
-  User
+  User,
+  Eye
 } from 'lucide-react'
-import { useDispatch, useSelector } from 'react-redux'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { useToast } from '@/hook/use-toast'
-import { getAllUsers, updateUser } from '@/store/slices/user.slice'
+import { deleteuser, getAllUsers, updateUser } from '@/store/slices/user.slice'
 import LoaderUltra from '@/components/ui/loaderUltra'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -22,6 +21,9 @@ import { Button } from '@/components/ui/button'
 import dayjs from "dayjs";
 import Breadcrumb from '@/components/Breadcrumb'
 import UserModal from '@/components/modal/UserModal'
+// import useDeviceInfo from '@/hook/useDeviceInfo'
+import { useNavigate } from 'react-router-dom'
+import { Switch } from '@/components/ui/switch'
 
 // export function ClientStats ({ data }) {
 //   const formatted = data.map(item => {
@@ -80,7 +82,7 @@ import UserModal from '@/components/modal/UserModal'
 //   )
 // }
 
-function Utilisateurs () {
+function UsersAdministration () {
   const dispatch = useAppDispatch()
   const { users } = useAppSelector(state => state.users)
   const [isLoading, setIsLoading] = useState(true)
@@ -88,10 +90,10 @@ function Utilisateurs () {
   const [search, setSearch] = useState('')
   const [open, setOpen]=useState(false)
   const { toast } = useToast()
+  const navigate= useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
-      // setIsLoading(true)
       const start = performance.now()
       try {
         await Promise.all([dispatch(getAllUsers()).unwrap()])
@@ -119,30 +121,6 @@ function Utilisateurs () {
     }, [users, search])
 
 
-//   const data = [
-//     {
-//       title: 'Tous les acheteurs',
-//       nbre: vendeurs?.length,
-//       previousNbre: 10,
-//       icon: UsersIcon,
-//       color: 'bg-primary-light'
-//     },
-//     {
-//       title: 'acheteurs actifs',
-//       nbre: vendeurActif,
-//       previousNbre: 18,
-//       icon: UserCheckIcon,
-//       color: 'bg-accent'
-//     },
-//     {
-//       title: 'acheteur désactivés',
-//       nbre: vendeurOff,
-//       previousNbre: 11,
-//       icon: UserXIcon,
-//       color: 'bg-red-500'
-//     }
-//   ]
-
   const handleUpdateStatus = async (id, x) => {
     try {
       const datas = { status: x }
@@ -159,21 +137,37 @@ function Utilisateurs () {
     }
   }
 
+  const handleDelete = async (id) => {
+    try {
+      await dispatch(deleteuser(id)).unwrap()
+      toast({
+        title: 'Supprimer',
+        description: `Utilisateur supprimé`
+      })
+    } catch (error) {
+      toast({
+        title: error?.toString(),
+        variant: 'destructive'
+      })
+    }
+  }
+
   if (isLoading) {
     return <LoaderUltra loading={isLoading} duration={loadTime} />
   }
 
   return (
-    <div className='flex flex-col gap-6'>
-      <div className='flex px-5 py-2 rounded-[10px] bg-white justify-between items-center'>
-        <h1 className='flex items-center text-gray-700 md:text-[1.4rem] font-medium gap-1.5'>
-          {/* <User size={25}/>  */}
-          Utilisateurs{' '}
+    <div className='flex flex-col gap-5'>
+      <div className='flex max-md:flex-col gap-2 px-5 py-4 rounded-[10px] bg-white justify-between max-md:items-start items-center'>
+        <h1 className='flex items-center leading-[1.3] text-gray-700 md:text-[1.25rem] font-medium gap-1.5'>
+          <User size={22}/> 
+          Administrateurs{' '}
         </h1>
         <Breadcrumb />
       </div>
-      {/* <ClientStats data={data}></ClientStats> */}
+
       <div className='flex flex-col gap-4 rounded-[6px] py-0.5'>
+        <div className='pb-2 border-b'></div>
         <div className='flex justify-between items-center gap-4'>
           <div className='flex w-[30%] items-center gap-3'>
             <input
@@ -194,16 +188,14 @@ function Utilisateurs () {
             <UserModal toast={toast} dispatch={dispatch} open={open} setOpen={()=>setOpen(false)} />
           </div>
         </div>
-        <div className='rounded-[7px] overflow-hidden bg-white border'>
+        <div className='rounded-[5px] overflow-hidden bg-white border'>
           <Table>
             <TableHeader className='text-black border-b'>
               <TableRow>
                 <TableHead>UUID</TableHead>
                 <TableHead>Noms</TableHead>
-                <TableHead>Nom d'utilisateur</TableHead>
-                <TableHead>sexe</TableHead>
+                <TableHead>email</TableHead>
                 <TableHead>Statut</TableHead>
-                <TableHead>Née le</TableHead>
                 <TableHead>Créer le</TableHead>
                 <TableHead className='text-right'>Actions</TableHead>
               </TableRow>
@@ -211,7 +203,7 @@ function Utilisateurs () {
             <TableBody>
               {filterClient.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className='text-center py-8'>
+                  <TableCell colSpan={8} className='text-center py-7'>
                    Pas de resultat
                   </TableCell>
                 </TableRow>
@@ -221,12 +213,12 @@ function Utilisateurs () {
                     className='hover:bg-primary/5 cursor-pointer'
                     key={index}
                   >
-                    <TableCell className='font-medium'>{index + 1}</TableCell>
+                    <TableCell className=''>{index + 1}</TableCell>
                     <TableCell className='flex items-center space-x-3'>
                       <Avatar>
                         {species?.profile && (
                           <AvatarImage
-                            className='object-contain border w-[150px] overflow-hidden'
+                            className='object-contain border w-[80px] overflow-hidden'
                             src={BaseUrl + '' + species?.profile}
                           />
                         )}
@@ -234,63 +226,30 @@ function Utilisateurs () {
                           {species?.username?.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <p className='font-medium capitalize'>
+                        <p className='text-sm capitalize'>
                           {species?.prenom + ' ' + species?.nom}
                         </p>
-                        <p className='text-xs text-gray-500'>
-                          {species?.email}
-                        </p>
-                      </div>
                     </TableCell>
-                    <TableCell className='hidden sm:table-cell'>
-                      {species?.username ? species?.username : 'N/A'}
+                    <TableCell className=''>
+                      {species?.email}
                     </TableCell>
-                    <TableCell className='hidden md:table-cell'>
-                      {species?.gender}
+                    <TableCell className=''>
+                         <Switch
+                          checked={parseInt(species?.status)===1}
+                          onCheckedChange={(checked) => handleUpdateStatus(species?.id,checked ? 1 : 0)}
+                          className={`
+                            transition duration-300
+                            ${parseInt(species?.status) === 1 
+                              ? "data-[state=checked]:bg-green-500" 
+                              : "data-[state=unchecked]:bg-red-500"}
+                          `}
+                        />
                     </TableCell>
-                    <TableCell className='hidden md:table-cell'>
-                        <div className={`badge flex items-center justify-center rounded-[50px] text-[.75rem] border font-semibold ${species?.status===1?'bg-green-100 border-green-600 text-green-900': 'bg-error/5 border-error/50 text-error'}`}>
-                          {species?.status === 1 ? 'Activer':'Desactiver'}
-                        </div>
-                    </TableCell>
-                    <TableCell className='hidden md:table-cell'>
-                      {species?.birthday}
-                    </TableCell>
-                    <TableCell className='hidden md:table-cell'>
-                      {dayjs(species?.created_at).format('DD/MM/YYYY')}
+                    <TableCell className=''>
+                      {dayjs(species?.created_at).format('YYYY-MM-DD')}
                     </TableCell>
                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant='ghost'
-                            className='capitalize'
-                            size='icon'
-                          >
-                            <ChevronDown className='h-4 w-4' />
-                            <span className='sr-only'>Actions</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align='end'>
-                          <DropdownMenuLabel>action</DropdownMenuLabel>
-                          <DropdownMenuSeparator className='bg-black/10' />
-                          <DropdownMenuItem
-                            className='text-blue-700'
-                            // onClick={() => handleDelete(species.id)}
-                          >
-                            <Edit className='mr-2 h-4 w-4' />
-                            Modifier
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className='text-destructive'
-                            // onClick={() => handleDelete(species.id)}
-                          >
-                            <Trash2 className='mr-2 h-4 w-4' />
-                            delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <button type='button' onClick={()=>handleDelete(species?.id)} className='px-3 rounded-md bg-red-100 py-2'><Trash2 className='h-4 w-4 text-red-500' /></button>
                     </TableCell>
                   </TableRow>
                 ))
@@ -303,4 +262,4 @@ function Utilisateurs () {
   )
 }
 
-export default Utilisateurs
+export default UsersAdministration

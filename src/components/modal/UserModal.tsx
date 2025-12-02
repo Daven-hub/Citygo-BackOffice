@@ -17,19 +17,6 @@ import { Loader } from "lucide-react"
 import { registerApp } from "@/store/slices/auth.slice"
 import { getAllUsers } from "@/store/slices/user.slice"
 
-// type FormValues = {
-//   nom: string
-//   prenom?: string
-//   password?: string
-//   email: string
-//   username?: string
-//   profile?: string
-//   gender?: string
-//   birthday?: string
-//   role?: "admin" | "user"
-//   status?: boolean
-// }
-
 export default function UserModal({ toast, dispatch, open, setOpen }) {
     const [loading, setLoading] = useState(false)
     const {
@@ -38,7 +25,7 @@ export default function UserModal({ toast, dispatch, open, setOpen }) {
         control,
         formState: { errors },
         reset,
-    } = useForm<FormValues>({
+    } = useForm({
         defaultValues: {
             status: true,
             role: "admin",
@@ -46,7 +33,6 @@ export default function UserModal({ toast, dispatch, open, setOpen }) {
     })
 
     const onSubmit = async (datas) => {
-        // console.log("Form Data:", data)
         setLoading(true);
         try {
             const datamodel = new FormData()
@@ -65,6 +51,7 @@ export default function UserModal({ toast, dispatch, open, setOpen }) {
                 title: "Enregistrement",
                 description: "Utilisateur créé avec success!",
             });
+            setOpen(false)
             reset()
         } catch (error) {
             toast({
@@ -83,7 +70,7 @@ export default function UserModal({ toast, dispatch, open, setOpen }) {
             <DialogContent>
                 <DialogTitle>Créer un Utilisteur</DialogTitle>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+                <form id='register' onSubmit={handleSubmit(onSubmit)} className="mt-1">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Nom*</label>
@@ -145,13 +132,14 @@ export default function UserModal({ toast, dispatch, open, setOpen }) {
                             />
                         </div>
 
-                        <div>
+                        {/* <div>
                             <label className="block text-sm font-medium text-gray-700">Gender</label>
                             <Controller
                                 name="gender"
                                 control={control}
                                 defaultValue=""
                                 render={({ field }) => (
+                                    <div className="mt-1">
                                     <Select onValueChange={field.onChange} value={field.value}>
                                         <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select" />
@@ -162,18 +150,19 @@ export default function UserModal({ toast, dispatch, open, setOpen }) {
                                             <SelectItem value="O">Autre</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                    </div>
                                 )}
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Birthday</label>
+                            <label className="block text-sm font-medium text-gray-700">Date de naissance</label>
                             <Input
                                 type="date"
                                 className="mt-1 block w-full rounded-md border p-2"
                                 {...register("birthday")}
                             />
-                        </div>
+                        </div> */}
 
                         {/* Status */}
                         <div className="flex items-center col-span-2 space-x-2">
@@ -189,9 +178,9 @@ export default function UserModal({ toast, dispatch, open, setOpen }) {
                     {/* Actions */}
                     <div className="mt-3 border-t pt-3 flex justify-end space-x-2">
                         <DialogClose asChild>
-                            <Button variant="outline">Annuler</Button>
+                            <Button type="button" variant="outline">Annuler</Button>
                         </DialogClose>
-                        <Button disabled={loading} type="submit" className="!bg-green-700 text-white">
+                        <Button disabled={loading} formTarget="#register" type="submit" className="!bg-green-700 text-white">
                             {loading ? <Loader /> : 'Sauvegarder'}
                         </Button>
                     </div>

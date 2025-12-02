@@ -56,9 +56,9 @@ function Layout() {
       <div className='fixed w-full transition-all duration-300 bg-black bg-opacity-80 z-20 h-full top-0 left-0 big-overlay'></div>
       <Sidebar setIsSidebarOpen={setIsSidebarOpen}/>
 
-      <div className="w-full transition-all duration-500 bg-gray-50 corps-admin flex flex-col">
+      <div className="w-full transition-all bg-[#e6e6e691] duration-500 corps-admin flex flex-col">
         <Navbar />
-        <main className="flex-1 px-6 max-md:px-[4%] py-7">
+        <main className="transition-all duration-500 relative px-4 max-md:px-[4%] py-5">
           <Outlet />
         </main>
         {/* <FooterAdmin /> */}

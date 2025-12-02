@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   const userConnected = useMemo(() => {
     if (!detail || !users) return null;
     const oneUser =
-      users.find((x) => x?.id === detail?.id)
+      users?.find((x) => x?.id === detail?.id)
       null;
 
     if (!oneUser) return null;
