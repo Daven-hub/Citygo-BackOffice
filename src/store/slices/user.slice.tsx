@@ -3,8 +3,8 @@ import userService from "../../services/userService";
 // import authService from '../../services/authService';
 
 interface paramsType{
-  id:Number,
-  datas:Object
+  id:number,
+  datas:object
 }
 
 const initialState = {
@@ -56,7 +56,7 @@ export const getAllUsers = createAsyncThunk(
 
 export const getUserById = createAsyncThunk(
   "user/getById",
-  async (id, thunkAPI) => {
+  async (id:number, thunkAPI) => {
     try {
       // const token = thunkAPI.getState ().auth.user.token;
       return await userService.getUserId(id);
@@ -105,7 +105,7 @@ export const userSlice = createSlice({
         state.userStatus = "success";
         const updatedUser = action.payload.result;
         const index = state.users.findIndex(
-          (us) => us?.idUsershop === updatedUser?.idUsershop
+          (us) => us?.id === updatedUser?.id
         );
         if (index !== -1) {
           const existingUser = state.users[index];
@@ -149,7 +149,7 @@ export const userSlice = createSlice({
       .addCase(deleteuser.fulfilled, (state, action) => {
         state.userStatus = "success";
         state.users = state.users.filter(
-          (post) => post.idUsershop !== action.payload.id
+          (post) => post.id !== action.payload.id
         );
       })
       .addCase(deleteuser.rejected, (state, action) => {

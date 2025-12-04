@@ -22,6 +22,11 @@ module.exports = {
 				},
         background: '#f8f9fa',
         surface: '#ffffff',
+        card:'#ffffff',
+        muted: {
+          DEFAULT: "#ffffff",
+          foreground: "hsl(var(--muted-foreground))",
+        },
         text: {
           primary: '#0b304a',
           secondary: '#6c757d'

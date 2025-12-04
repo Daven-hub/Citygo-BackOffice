@@ -7,19 +7,19 @@ import { NavLink, useNavigate, useParams } from "react-router-dom";
 function ForgotPassword() {
   const navigate = useNavigate();
   const [loading, setIsLoading] = useState(false);
-  const [isLoading, setLoading] = useState(false);
+  // const [isLoading, setLoading] = useState(false);
 
 
-  const handleLogin = async () => {
-    setIsLoading(true);
-    try {
+  // const handleLogin = async () => {
+  //   setIsLoading(true);
+  //   try {
 
-    } catch (error) {
+  //   } catch (error) {
    
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
 
   return (

@@ -11,7 +11,7 @@ export default function Breadcrumb() {
   }));
 
   return (
-    <nav className="text-sm text-gray-600 my-3">
+    <nav className="text-[.8rem] text-gray-600">
       <ol className="flex items-center space-x-2">
         <li>
           <Link to="/" className="text-blue-600 hover:underline">
@@ -21,10 +21,10 @@ export default function Breadcrumb() {
 
         {paths.map((item, idx) => (
           <li key={item.path} className="flex items-center">
-            <span className="mx-1">/</span>
+            <span className="mr-1.5 text-gray-400">/</span>
 
             {idx === paths.length - 1 ? (
-              <span className="font-medium text-gray-400">{item.label}</span>
+              <span className="font-normal text-gray-400">{item.label}</span>
             ) : (
               <Link to={item.path} className="text-blue-600 hover:underline">
                 {item.label}

@@ -1,216 +1,173 @@
-import LoaderUltra from '@/components/ui/loaderUltra'
+import LoaderUltra from "@/components/ui/loaderUltra";
 import React, { useMemo, useState, useEffect } from "react";
 import ReactECharts from "echarts-for-react";
-import { Car, User, Star, DollarSign, ArrowDownToLine } from 'lucide-react';
+import {
+  Car,
+  Users,
+  MapPin,
+  TrendingUp,
+} from "lucide-react";
+import { RevenueChart } from "@/components/RevenueChart";
+import { TopDestinations } from "@/components/TopDestinations";
+import { RecentRidesTable } from "@/components/RecentRidesTable";
+import { StatsCard } from "@/components/StatsCard";
 
 function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simuler un chargement
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
-  // ==== FAUSSES DONNEES ====
-  const sampleData = useMemo(() => ({
-    summary: {
-      ridesToday: 1248,
-      activeDrivers: 312,
-      avgRating: 4.82,
-      revenueToday: 2890,
+  const cards = [
+    {
+      title: "Utilisateurs",
+      amount: "100",
+      trend: "+10.08%",
+      color: "#7C3AED",
+      chartColor: "#8B5CF6",
     },
-    ridesByHour: Array.from({ length: 24 }).map((_, i) => ({
-      hour: `${i}:00`,
-      rides: Math.round(50 + 60 * Math.abs(Math.sin(i / 3)) + Math.random() * 25),
-    })),
-    vehicleSplit: [
-      { name: "Sedan", value: 420 },
-      { name: "SUV", value: 280 },
-      { name: "Van", value: 140 },
-      { name: "Motorbike", value: 80 },
-    ],
-    topRoutes: [
-      { route: "Downtown → Airport", count: 120 },
-      { route: "Station → University", count: 98 },
-      { route: "Mall → Business Park", count: 76 },
-      { route: "North → South", count: 60 },
-    ],
-    recentRides: Array.from({ length: 6 }).map((_, i) => ({
-      id: `RIDE-${2100 + i}`,
-      passenger: ["Alice", "Bob", "Camille", "David", "Elisa", "Farid"][i % 6],
-      driver: ["John", "Maria", "Olivier", "Sara", "Paul", "Nina"][i % 6],
-      from: ["Downtown", "Station", "Mall", "North", "South", "Airport"][i % 6],
-      to: ["Airport", "University", "Business Park", "Station", "Mall", "Downtown"][i % 6],
-      price: (8 + Math.round(Math.random() * 20)).toFixed(2),
-      status: ["Completed", "On going", "Cancelled"][Math.floor(Math.random() * 3)],
-    })),
-  }), []);
+    {
+      title: "Utilisateurs actifs",
+      amount: "90",
+      trend: "-9.08%",
+      color: "#F43F5E",
+      chartColor: "#FB7185",
+    },
+    {
+      title: "Nouveaux Utilisateurs",
+      amount: "50",
+      trend: "+12.08%",
+      color: "#10B981",
+      chartColor: "#34D399",
+    },
+    {
+      title: "Conducteurs vérifiés",
+      amount: "20",
+      trend: "+12.08%",
+      color: "#14B8A6",
+      chartColor: "#2DD4BF",
+    },
+  ];
 
-  // ==== ECHART OPTIONS ====
-  const lineOption = useMemo(() => ({
-    tooltip: { trigger: "axis" },
-    grid: { left: 10, right: 10, bottom: 30, top: 20 },
+  const statsCard=[
+    {
+      title:"Revenus totaux",
+      value:"FCFA 90,847",
+      change:"+12.5% ce mois",
+      changeTyp:"positive",
+      icon:Users,
+      delay:0
+    },
+    {
+      title:"Trajets actifs",
+      value:"12,847",
+      change:"+8.2% cette semaine",
+      changeTyp:"positive",
+      icon:Car,
+      delay:50
+    },
+    {
+      title:"Destinations",
+      value:"156",
+      change:"23 nouvelles villes",
+      changeTyp:"neutral",
+      icon:MapPin,
+      delay:100
+    },
+    {
+      title:"Revenus mensuels",
+      value:"FCFA 42,300",
+      change:"+18.7% vs mois dernier",
+      changeTyp:"positive",
+      icon:TrendingUp,
+      delay:150
+    }
+  ]
+
+
+  const chartOptions = (color) => ({
     xAxis: {
+      show: false,
       type: "category",
-      data: sampleData.ridesByHour.map(r => r.hour),
-      boundaryGap: false,
-      axisLabel: { fontSize: 11 },
+      data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     },
-    yAxis: { type: "value", axisLabel: { fontSize: 11 } },
-    series: [
-      {
-        name: "Rides",
-        type: "line",
-        smooth: true,
-        areaStyle: {
-          color: {
-            type: "linear",
-            x: 0, y: 0, x2: 0, y2: 1,
-            colorStops: [
-              { offset: 0, color: "rgba(30,58,138,0.35)" },
-              { offset: 1, color: "rgba(14,165,233,0.02)" },
-            ],
-          },
-        },
-        lineStyle: { width: 3, color: "#1e40af" },
-        data: sampleData.ridesByHour.map(r => r.rides),
-      },
-    ],
-  }), [sampleData]);
-
-  const pieOption = useMemo(() => ({
-    tooltip: { trigger: "item" },
-    legend: { bottom: 0, textStyle: { fontSize: 12 } },
-    series: [
-      {
-        name: "Vehicle types",
-        type: "pie",
-        radius: ["40%", "70%"],
-        avoidLabelOverlap: false,
-        label: { show: false },
-        emphasis: { label: { show: true, fontSize: 14, fontWeight: "bold" } },
-        labelLine: { show: false },
-        data: sampleData.vehicleSplit,
-        color: ["#1e40af", "#0ea5e9", "#f59e0b", "#10b981"],
-      },
-    ],
-  }), [sampleData]);
-
-  const barOption = useMemo(() => ({
-    tooltip: { trigger: "axis" },
-    xAxis: { type: "value", axisLabel: { fontSize: 11 } },
-    yAxis: {
-      type: "category",
-      data: sampleData.topRoutes.map(r => r.route),
-      axisLabel: { fontSize: 12 },
-    },
+    yAxis: { show: false, type: "value" },
+    grid: { left: 0, right: 0, top: 0, bottom: 0 },
     series: [
       {
         type: "bar",
-        data: sampleData.topRoutes.map(r => r.count),
-        barWidth: 14,
+        data: [10, 6, 8, 5, 9, 12, 8, 5, 10, 12],
+        barWidth: "80%",
+        barGap: "5%",
+        barCategoryGap: "5%",
         itemStyle: {
-          borderRadius: 8,
-          color: {
-            type: "linear",
-            x: 0, y: 0, x2: 1, y2: 0,
-            colorStops: [{ offset: 0, color: "#1e40af" }, { offset: 1, color: "#0ea5e9" }],
-          },
+          color: color,
+          borderRadius: [4, 4, 0, 0],
         },
       },
     ],
-    grid: { left: 10, right: 10, top: 10, bottom: 10 },
-  }), [sampleData]);
+  });
+
 
   if (isLoading) return <LoaderUltra loading={isLoading} />;
 
   return (
     <div className="text-gray-800 min-h-screen">
-      <header className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-semibold">Tableau de bord</h2>
-          <div className="text-xs text-gray-400">Vue d'ensemble en temps réel</div>
-        </div>
-        <button className="bg-blue-600 flex items-center gap-1 text-white text-sm px-4 py-2 rounded-lg shadow-sm hover:bg-blue-700 transition">
-          <ArrowDownToLine size={16}/> Générer un rapport
-        </button>
-      </header>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+        {cards.map((card, index) => (
+          <div
+            key={index}
+            className="px-5 py-4 space-y-2 rounded-[6px] relative bg-white border transition"
+          >
+            <h2 className="text-gray-500 text-sm font-medium">{card.title}</h2>
+            <p className="text-2xl text-gray-500 font-semibold mt-2">{card.amount}</p>
+            <div className="mt-2 flex items-center gap-1">
+              <span
+                className={`${
+                  card.trend.startsWith("-") ? "text-red-500" : "text-green-500"
+                } text-sm font-medium`}
+              >
+                ↗ {card.trend}
+              </span>
+            </div>
+            <div className="absolute bottom-0 right-3 h-10">
+              <ReactECharts
+                option={chartOptions(card.chartColor)}
+                style={{ height: "50%", width: "80%" }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <CardMetric title="Trajets aujourd'hui" value={sampleData.summary.ridesToday} icon={<Car size={24} />} />
-        <CardMetric title="Conducteurs actifs" value={sampleData.summary.activeDrivers} icon={<User size={24} />} />
-        <CardMetric title="Note moyenne" value={sampleData.summary.avgRating} unit="★" icon={<Star size={24} />} />
-        <CardMetric title="Revenus (aujourd'hui)" value={sampleData.summary.revenueToday} unit="€" icon={<DollarSign size={24} />} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+          {statsCard?.map((x,index)=>
+            <StatsCard
+              key={index}
+              title={x.title}
+              value={x.value}
+              change={x.change}
+              changeType={x.changeTyp}
+              icon={x.icon}
+              delay={0}
+            />
+          )}
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 bg-white rounded-lg p-4 border shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-medium">Trajets (24h)</h3>
-            <div className="text-sm text-gray-500">Dernières 24 heures</div>
-          </div>
-          <ReactECharts option={lineOption} style={{ height: 260 }} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+        <div className="lg:col-span-2">
+          <RevenueChart />
         </div>
-
-        <div className="bg-white rounded-lg p-4 border shadow-sm flex flex-col">
-          <h3 className="text-lg font-medium mb-2">Répartition des véhicules</h3>
-          <ReactECharts option={pieOption} style={{ height: 220 }} />
-          <div className="mt-2 text-xs text-gray-500">Données en pourcentage</div>
+        <div className="flex flex-col">
+          <TopDestinations />
         </div>
       </div>
-
-      {/* Lower Row */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg p-4 border shadow-sm">
-          <h3 className="text-lg font-medium mb-3">Top trajets</h3>
-          <ReactECharts option={barOption} style={{ height: 220 }} />
-        </div>
-
-        <div className="bg-white rounded-lg p-4 border shadow-sm">
-          <h3 className="text-lg font-medium mb-3">Trajets récents</h3>
-          <div className="space-y-3">
-            {sampleData.recentRides?.slice(0,4).map(r => (
-              <div key={r.id} className="flex items-center justify-between">
-                <div>
-                  <div className="font-medium">{r.passenger} → {r.driver}</div>
-                  <div className="text-sm text-gray-500">{r.from} → {r.to}</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-semibold">€{r.price}</div>
-                  <div className={`text-xs ${r.status === 'Completed' ? 'text-green-600' : r.status === 'Cancelled' ? 'text-red-500' : 'text-yellow-600'}`}>{r.status}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg p-4 border shadow-sm">
-          <h3 className="text-lg font-medium mb-3">Carte (placeholder)</h3>
-          <div className="h-48 rounded-md bg-gradient-to-br from-gray-100 to-gray-50 border flex items-center justify-center text-sm text-gray-400">
-            Intégrer une vraie carte (Mapbox, Leaflet) ici
-          </div>
-        </div>
-      </div>
+      <RecentRidesTable />
     </div>
   );
 }
 
 export default Dashboard;
-
-// ===================== CardMetric =====================
-function CardMetric({ title, value, unit, icon }) {
-  return (
-    <div className="bg-white rounded-lg p-4 border shadow-sm flex items-center gap-4 hover:shadow-md transition">
-      <div className="text-blue-600">{icon}</div>
-      <div className="flex flex-col">
-        <span className="text-sm text-gray-500">{title}</span>
-        <span className="text-2xl font-bold text-gray-800">
-          {value}{unit && <span className="text-sm text-gray-500 ml-1">{unit}</span>}
-        </span>
-      </div>
-    </div>
-  );
-}
