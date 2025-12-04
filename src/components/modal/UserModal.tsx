@@ -1,191 +1,181 @@
-"use client"
-
+import { useState } from "react";
+import { User, Mail, Phone, Car, Shield } from "lucide-react";
 import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogTitle,
-    DialogDescription,
-    DialogClose,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Controller, useForm } from "react-hook-form"
-import { Input } from "../ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
-import { useState } from "react"
-import { Loader } from "lucide-react"
-import { registerApp } from "@/store/slices/auth.slice"
-import { getAllUsers } from "@/store/slices/user.slice"
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hook/use-toast";
 
-export default function UserModal({ toast, dispatch, open, setOpen }) {
-    const [loading, setLoading] = useState(false)
-    const {
-        register,
-        handleSubmit,
-        control,
-        formState: { errors },
-        reset,
-    } = useForm({
-        defaultValues: {
-            status: true,
-            role: "admin",
-        },
-    })
+interface UserModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    role: "driver" | "passenger" | "both";
+    status: "active" | "inactive" | "suspended";
+  };
+  mode: "create" | "edit" | "view";
+}
 
-    const onSubmit = async (datas) => {
-        setLoading(true);
-        try {
-            const datamodel = new FormData()
-            for (const key in datas) {
-                if (key === 'profile') {
-                    if (datas.profile && datas.profile.length > 0) {
-                        datamodel.append('profile', datas?.profile?.[0])
-                    }
-                } else if (datas[key] !== undefined && datas[key] !== null) {
-                    datamodel.append(key, datas[key])
-                }
-            }
-            await dispatch(registerApp(datamodel)).unwrap();
-            dispatch(getAllUsers()).unwrap();
-            toast({
-                title: "Enregistrement",
-                description: "Utilisateur créé avec success!",
-            });
-            setOpen(false)
-            reset()
-        } catch (error) {
-            toast({
-                title: "Enregistrement",
-                description: error?.toString(),
-                variant: "destructive",
-            });
-        } finally {
-            setLoading(false);
-        }
-        // reset()
-    }
+export function UserModal({ open, onOpenChange, user, mode }: UserModalProps) {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    role: user?.role || "passenger",
+    status: user?.status || "active",
+  });
 
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent>
-                <DialogTitle>Créer un Utilisteur</DialogTitle>
+  const handleSubmit = () => {
+    toast({
+      title: mode === "create" ? "Utilisateur créé" : "Utilisateur modifié",
+      description: `${formData.name} a été ${mode === "create" ? "ajouté" : "modifié"} avec succès.`,
+    });
+    onOpenChange(false);
+  };
 
-                <form id='register' onSubmit={handleSubmit(onSubmit)} className="mt-1">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Nom*</label>
-                            <Input
-                                type="text"
-                                className="mt-1 block w-full rounded-md border p-2"
-                                {...register("nom", { required: "Nom is required" })}
-                            />
-                            {errors.nom && (
-                                <p className="text-xs text-red-500">{errors.nom.message}</p>
-                            )}
-                        </div>
+  const isViewMode = mode === "view";
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Prénom</label>
-                            <Input
-                                type="text"
-                                className="mt-1 block w-full rounded-md border p-2"
-                                {...register("prenom")}
-                            />
-                        </div>
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px] bg-card border-border">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-foreground">
+            <div className="w-10 h-10 rounded-lg gradient-primary flex items-center justify-center">
+              <User className="w-5 h-5 text-primary-foreground" />
+            </div>
+            {mode === "create" ? "Nouvel utilisateur" : mode === "edit" ? "Modifier l'utilisateur" : "Détails utilisateur"}
+          </DialogTitle>
+          <DialogDescription>
+            {mode === "create" 
+              ? "Remplissez les informations pour créer un nouvel utilisateur."
+              : mode === "edit"
+              ? "Modifiez les informations de l'utilisateur."
+              : "Consultez les informations de l'utilisateur."}
+          </DialogDescription>
+        </DialogHeader>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Email*</label>
-                            <Input
-                                type="email"
-                                className="mt-1 block w-full rounded-md border p-2"
-                                {...register("email", { required: "Email is required" })}
-                            />
-                            {errors.email && (
-                                <p className="text-xs text-red-500">{errors.email.message}</p>
-                            )}
-                        </div>
+        <div className="grid gap-6 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="name" className="flex items-center gap-2">
+              <User className="w-4 h-4 text-muted-foreground" />
+              Nom complet
+            </Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              disabled={isViewMode}
+              className="bg-background border-border"
+              placeholder="Jean Dupont"
+            />
+          </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Username</label>
-                            <Input
-                                type="text"
-                                className="mt-1 block w-full rounded-md border p-2"
-                                {...register("username")}
-                            />
-                        </div>
+          <div className="grid gap-2">
+            <Label htmlFor="email" className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-muted-foreground" />
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              disabled={isViewMode}
+              className="bg-background border-border"
+              placeholder="jean.dupont@email.com"
+            />
+          </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Password</label>
-                            <Input
-                                type="password"
-                                className="mt-1 block w-full rounded-md border p-2"
-                                {...register("password")}
-                            />
-                        </div>
+          <div className="grid gap-2">
+            <Label htmlFor="phone" className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-muted-foreground" />
+              Téléphone
+            </Label>
+            <Input
+              id="phone"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              disabled={isViewMode}
+              className="bg-background border-border"
+              placeholder="+33 6 12 34 56 78"
+            />
+          </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Profile URL</label>
-                            <Input
-                                type="file"
-                                className="mt-1 block w-full rounded-md border p-2"
-                                {...register("profile")}
-                            />
-                        </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label className="flex items-center gap-2">
+                <Car className="w-4 h-4 text-muted-foreground" />
+                Rôle
+              </Label>
+              <Select
+                value={formData.role}
+                onValueChange={(value) => setFormData({ ...formData, role: value as any })}
+                disabled={isViewMode}
+              >
+                <SelectTrigger className="bg-background border-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="driver">Conducteur</SelectItem>
+                  <SelectItem value="passenger">Passager</SelectItem>
+                  <SelectItem value="both">Les deux</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-                        {/* <div>
-                            <label className="block text-sm font-medium text-gray-700">Gender</label>
-                            <Controller
-                                name="gender"
-                                control={control}
-                                defaultValue=""
-                                render={({ field }) => (
-                                    <div className="mt-1">
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="M">Masculin</SelectItem>
-                                            <SelectItem value="F">Féminin</SelectItem>
-                                            <SelectItem value="O">Autre</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    </div>
-                                )}
-                            />
-                        </div>
+            <div className="grid gap-2">
+              <Label className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-muted-foreground" />
+                Statut
+              </Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData({ ...formData, status: value as any })}
+                disabled={isViewMode}
+              >
+                <SelectTrigger className="bg-background border-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-card border-border">
+                  <SelectItem value="active">Actif</SelectItem>
+                  <SelectItem value="inactive">Inactif</SelectItem>
+                  <SelectItem value="suspended">Suspendu</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Date de naissance</label>
-                            <Input
-                                type="date"
-                                className="mt-1 block w-full rounded-md border p-2"
-                                {...register("birthday")}
-                            />
-                        </div> */}
-
-                        {/* Status */}
-                        <div className="flex items-center col-span-2 space-x-2">
-                            <Input
-                                type="checkbox"
-                                {...register("status")}
-                                className="h-4 w-4 rounded border"
-                            />
-                            <span className="text-sm text-gray-700">Active le profile de l'utilisateur</span>
-                        </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="mt-3 border-t pt-3 flex justify-end space-x-2">
-                        <DialogClose asChild>
-                            <Button type="button" variant="outline">Annuler</Button>
-                        </DialogClose>
-                        <Button disabled={loading} formTarget="#register" type="submit" className="!bg-green-700 text-white">
-                            {loading ? <Loader /> : 'Sauvegarder'}
-                        </Button>
-                    </div>
-                </form>
-            </DialogContent>
-        </Dialog>
-    )
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="border-border">
+            {isViewMode ? "Fermer" : "Annuler"}
+          </Button>
+          {!isViewMode && (
+            <Button onClick={handleSubmit} className="gradient-primary text-primary-foreground">
+              {mode === "create" ? "Créer" : "Sauvegarder"}
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }

@@ -20,67 +20,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Button } from '@/components/ui/button'
 import dayjs from "dayjs";
 import Breadcrumb from '@/components/Breadcrumb'
-import UserModal from '@/components/modal/UserModal'
-// import useDeviceInfo from '@/hook/useDeviceInfo'
+import UserModal from '@/components/modal/UserModale'
 import { useNavigate } from 'react-router-dom'
 import { Switch } from '@/components/ui/switch'
-
-// export function ClientStats ({ data }) {
-//   const formatted = data.map(item => {
-//     const diff = item.nbre - item.previousNbre
-//     const percent = ((diff / item.previousNbre) * 100).toFixed(1)
-//     const nbreFormatted = String(item.nbre).padStart(2, '0')
-//     const previousFormatted = String(item.previousNbre).padStart(2, '0')
-
-//     return {
-//       ...item,
-//       nbre: nbreFormatted,
-//       previousNbre: previousFormatted,
-//       evolution: `${percent > 0 ? '+' : ''}${percent}%`,
-//       isUp: percent >= 0
-//     }
-//   })
-
-//   return (
-//     <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-//       {formatted.map((item, index) => (
-//         <div
-//           key={index}
-//           className={`${item.color} text-white rounded-[6px] p-6 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-300`}
-//         >
-//           <div className='flex justify-between items-center mb-4'>
-//             <div className='bg-white/20 p-2 rounded-lg'>
-//               <item.icon size={40} />
-//             </div>
-//             <div
-//               animate={{ y: item.isUp ? [0, -4, 0] : [0, 4, 0] }}
-//               transition={{
-//                 repeat: Infinity,
-//                 repeatType: 'mirror',
-//                 duration: 1.5
-//               }}
-//               className={`flex items-center gap-1 text-sm font-semibold ${
-//                 item.isUp ? 'text-green-100' : 'text-red-100'
-//               }`}
-//             >
-//               {item.isUp ? (
-//                 <ArrowUpRight size={18} />
-//               ) : (
-//                 <ArrowDownRight size={18} />
-//               )}
-//               <span>{item.evolution}</span>
-//             </div>
-//           </div>
-
-//           <div>
-//             <p className='text-4xl font-bold'>{item.nbre}</p>
-//             <p className='text-sm opacity-90'>{item.title}</p>
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   )
-// }
 
 function UsersAdministration () {
   const dispatch = useAppDispatch()

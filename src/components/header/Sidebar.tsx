@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import $ from 'jquery'
 // import { roleChange } from '../../pages/Admin/Dashboard';
-import { ArrowRight, Bell, Calendar, Car, CarFront, CarIcon, ChevronRight, CreditCard, Grid, MapPin, Settings, ShoppingCart, SidebarClose, User, UserIcon, UserRound } from 'lucide-react';
+import { ArrowRight, Bell, Calendar, Car, CarFront, CarIcon, ChartBar, ChevronRight, CreditCard, Grid, MapPin, Settings, ShoppingCart, SidebarClose, User, UserIcon, UserRound } from 'lucide-react';
 import { useAuth } from '@/context/authContext';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
@@ -37,17 +37,18 @@ function Sidebar({setIsSidebarOpen}) {
         group: 'Management',
         alowed:[],
         corps: [
-          { title: 'Vehicules', icon: <CarFront size={18} />, path: '/vehicules', children: [], alowed:['admin','super'] },
-          { title: 'Trajets', icon: <MapPin size={18} />, path: '/rides', children: [], alowed:['admin','super'] },
-          { title: 'Booking', icon: <Calendar size={18} />, path: '/bookings', children: [], alowed:['admin','super'], },
+          // { title: 'Vehicules', icon: <CarFront size={18} />, path: '/vehicules', children: [], alowed:['admin','super'] },
+          { title: 'Trajets', icon: <CarFront size={18} />, path: '/trajets', children: [], alowed:['admin','super'] },
+          { title: 'Reservations', icon: <Calendar size={18} />, path: '/reservations', children: [], alowed:['admin','super'], },
           { title: 'Transactions', icon: <CreditCard size={18} />, path: '/transactions', children: [], alowed:['admin','super'], },
           { title: 'Notifications', icon: <Bell size={18} />, path: '/notifications', children: [], alowed:['admin','super'], },
+          // { title: 'Destination', icon: <MapPin size={18} />, path: '/destinations', children: [], alowed:['admin','super'], },
           { title: 'Utilisateurs', icon: <User size={18} />, path: '', children: [
-            { title: 'Passagers', icon: <UserRound size={18} />, path: '/passagers', children: [], alowed:['admin','super'], },
-            { title: 'Drivers', icon: <CarFront size={18} />, path: '/drivers', children: [], alowed:['admin','super'] },
+            { title: 'Utilisateurs', icon: <CarFront size={18} />, path: '/utilisateurs', children: [], alowed:['admin','super'] },
             { title: 'Administrations', icon: <Bell size={18} />, path: '/utilisateurs-admin', children: [], alowed:['admin','super']}
           ], alowed:['super']},
           { title: 'Profile', icon: <UserIcon size={18} />, path: '/profile', children: [], alowed:['admin','super'] },
+          { title: 'Rapports', icon: <ChartBar size={18} />, path: '/rapports', children: [], alowed:['admin','super'] },
           { title: 'Paramètres', icon: <Settings size={18} />, path: '/settings', children: [], alowed:['admin','super'], },
         ]
       },
