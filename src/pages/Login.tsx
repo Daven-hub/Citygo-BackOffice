@@ -21,10 +21,13 @@ function Login() {
     formState: { errors: errorLog },
   } = useForm({
     defaultValues: {
-      username: "",
+      phoneNumber: "",
       password: "",
+      rememberMe:false,
     },
   });
+
+  // console.log('watch',watch())
 
   const handleLogin = async (data) => {
     setIsLoading(true);
@@ -58,15 +61,17 @@ function Login() {
             >
               <div className="flex flex-col gap-0">
                 <input
-                {...register('username')}
+                {...register('phoneNumber')}
+                  autoComplete="off"
                   type="text"
                   className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary/60 w-full px-3 py-3 rounded-[5px] outline-0"
-                  placeholder="Nom d'utilisateur ou Email *"
+                  placeholder="Téléphone (+237) *"
                 />
               </div>
               <div className="flex flex-col gap-0.5">
                 <input
                 {...register('password')}
+                autoComplete="off"
                   type="password"
                   className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary/60 w-full px-3 py-3 rounded-[5px] outline-0"
                   placeholder="Password *"
@@ -75,8 +80,8 @@ function Login() {
               <div className="flex items-center justify-between">
                 <label className="flex items-center space-x-2 text-[.8rem] text-gray-700">
                   <input
+                    {...register("rememberMe")}
                     type="checkbox"
-                    name="rememberMe"
                     className="w-3 h-3 accent-blue-600 rounded cursor-pointer"
                   />
                   <span>Se souvenir de moi</span>

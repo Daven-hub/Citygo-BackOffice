@@ -13,6 +13,12 @@ import Bookings from "./pages/Bookings";
 import Destinations from "./pages/Destinations";
 import Rapports from "./pages/Rapports";
 import UserDetail from "./pages/UserDetail";
+// import KYC from "./pages/KYC";
+import BookingsDetail from "./pages/BookingsDetail";
+import RidesDetail from "./pages/RidesDetail";
+import KYCRequestDetail from "./pages/KYCRequestDetail";
+import DriverApplicationDetail from "./pages/DriverApplicationDetail";
+import KYC from "./pages/KYC/index";
 
 // Lazy loading
 const Login = lazy(() => import("./pages/Login"));
@@ -50,10 +56,15 @@ const App = () => {
                 {/* <Route path="rapports" element={<Rapports />} /> */}
                 {/* <Route path="destinations" element={<Destinations />} /> */}
                 <Route path="reservations" element={<Bookings />} />
+                <Route path="reservations/:bookingId" element={<BookingsDetail />} />
+                <Route path="kyc" element={<KYC />} />
+                <Route path="kyc/demande/:requestId" element={<KYCRequestDetail />} />
+                <Route path="kyc/applications/:applicationId" element={<DriverApplicationDetail />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="utilisateurs" element={<Users />} />
                 <Route path="/utilisateurs/:userId" element={<UserDetail />} />
                 <Route path="trajets" element={<Rides />} />
+                <Route path="trajets/:rideId" element={<RidesDetail />} />
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="transactions" element={<Transactions />} />
                 <Route path="profile" element={<Profile />} />

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, MoreHorizontal, ArrowRight, Calendar, Clock, Users as UsersIcon } from "lucide-react";
+import { Search, Filter, MoreHorizontal, ArrowRight, Calendar, Clock, Users as UsersIcon, Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface Ride {
   id: string;
@@ -42,6 +43,7 @@ const statusConfig = {
 };
 
 export default function Rides() {
+  const navigate=useNavigate()
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredRides = rides.filter(
@@ -181,7 +183,10 @@ export default function Rides() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="bg-card border-border">
-                          <DropdownMenuItem>Voir les détails</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => navigate(`/trajets/${ride.id}`)}>
+                            <Eye className="w-4 h-4 mr-2" />
+                            Voir les détails
+                          </DropdownMenuItem>
                           <DropdownMenuItem>Modifier</DropdownMenuItem>
                           <DropdownMenuItem className="text-destructive">Annuler</DropdownMenuItem>
                         </DropdownMenuContent>

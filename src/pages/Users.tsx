@@ -152,7 +152,6 @@ export default function Users() {
                       />
                     </td>
 
-                    {/* Nom */}
                     <td className="py-3 px-6">
                       <div className="flex items-center gap-3">
                         <Avatar className="w-10 h-10">
@@ -164,7 +163,6 @@ export default function Users() {
                       </div>
                     </td>
 
-                    {/* Contact */}
                     <td className="py-3 px-6">
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2 text-muted-foreground">
@@ -178,17 +176,14 @@ export default function Users() {
                       </div>
                     </td>
 
-                    {/* Rôle */}
                     <td className="py-3 px-6">
                       <Badge variant="outline" className={cn("font-medium text-[.7rem]", roleConfig[user.role].className)}>
                         {roleConfig[user.role].label}
                       </Badge>
                     </td>
 
-                    {/* Trajets */}
                     <td className="py-4 px-6 text-sm text-foreground font-medium">{user.rides}</td>
 
-                    {/* Note */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-1">
                         <span className="text-warning">★</span>
@@ -196,14 +191,12 @@ export default function Users() {
                       </div>
                     </td>
 
-                    {/* Statut */}
                     <td className="py-3 px-6">
                       <Badge variant="outline" className={cn("font-medium text-[.7rem]", statusConfig[user.status].className)}>
                         {statusConfig[user.status].label}
                       </Badge>
                     </td>
 
-                    {/* Date */}
                     <td className="py-3 px-6">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Calendar className="w-3.5 h-3.5" />
@@ -211,7 +204,6 @@ export default function Users() {
                       </div>
                     </td>
 
-                    {/* Actions */}
                     <td className="py-3 px-6 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -246,10 +238,6 @@ export default function Users() {
             </table>
           </div>
         </div>
-
-        {/* Debug (optionnel pour voir le tableau d'IDs cochés) */}
-        {/* <pre className="text-xs text-muted">{JSON.stringify(selectedIds, null, 2)}</pre> */}
-
       </div>
 
       {selectedUser && (
