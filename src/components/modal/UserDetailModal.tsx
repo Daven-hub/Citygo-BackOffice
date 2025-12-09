@@ -102,7 +102,7 @@ export function UserDetailModal({ open, onOpenChange, user }: UserDetailModalPro
                 </Badge>
               </DialogDescription>
             </div>
-            <div className="text-right">
+            <div className="text-right mr-5">
               <div className="flex items-center gap-1 text-warning">
                 <Star className="w-5 h-5 fill-warning" />
                 <span className="text-xl font-bold text-foreground">{user.rating}</span>
@@ -113,7 +113,7 @@ export function UserDetailModal({ open, onOpenChange, user }: UserDetailModalPro
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid w-full grid-cols-4 bg-muted/30">
+          <TabsList className="grid w-full border grid-cols-4 bg-muted/30">
             <TabsTrigger value="overview">Aperçu</TabsTrigger>
             <TabsTrigger value="activities">Activités</TabsTrigger>
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
@@ -144,17 +144,17 @@ export function UserDetailModal({ open, onOpenChange, user }: UserDetailModalPro
               <div className="grid grid-cols-3 gap-4">
                 <div className="p-4 rounded-lg bg-muted/30 border border-border/50 text-center">
                   <Car className="w-6 h-6 mx-auto text-primary mb-2" />
-                  <p className="text-2xl font-bold text-foreground">{user.rides}</p>
+                  <p className="text-xl font-bold text-foreground">{user.rides}</p>
                   <span className="text-xs text-muted-foreground">Trajets</span>
                 </div>
                 <div className="p-4 rounded-lg bg-muted/30 border border-border/50 text-center">
                   <CreditCard className="w-6 h-6 mx-auto text-success mb-2" />
-                  <p className="text-2xl font-bold text-foreground">€{(user.rides * 18.5).toFixed(0)}</p>
+                  <p className="text-xl font-bold text-foreground">{(user.rides * 18.5).toFixed(0)} FCFA</p>
                   <span className="text-xs text-muted-foreground">Total dépensé</span>
                 </div>
                 <div className="p-4 rounded-lg bg-muted/30 border border-border/50 text-center">
                   <Calendar className="w-6 h-6 mx-auto text-accent mb-2" />
-                  <p className="text-sm font-bold text-foreground">{user.joinedAt}</p>
+                  <p className="text-xl font-bold text-foreground">{user.joinedAt}</p>
                   <span className="text-xs text-muted-foreground">Inscrit le</span>
                 </div>
               </div>

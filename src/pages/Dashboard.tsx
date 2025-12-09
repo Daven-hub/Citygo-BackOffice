@@ -86,7 +86,6 @@ function Dashboard() {
     }
   ]
 
-
   const chartOptions = (color) => ({
     xAxis: {
       show: false,
@@ -119,7 +118,7 @@ function Dashboard() {
         {cards.map((card, index) => (
           <div
             key={index}
-            className="px-5 py-4 space-y-2 rounded-[6px] relative bg-white border transition"
+            className="px-5 pt-4 pb-3.5 space-y-2 rounded-[6px] relative bg-white border transition"
           >
             <h2 className="text-gray-500 text-sm font-medium">{card.title}</h2>
             <p className="text-2xl text-gray-500 font-semibold mt-2">{card.amount}</p>
@@ -132,10 +131,10 @@ function Dashboard() {
                 ↗ {card.trend}
               </span>
             </div>
-            <div className="absolute bottom-0 right-3 h-10">
+            <div className="absolute bottom-[15%] right-3 w-14 h-5">
               <ReactECharts
                 option={chartOptions(card.chartColor)}
-                style={{ height: "50%", width: "80%" }}
+                style={{ height: "100%", width: "100%" }}
               />
             </div>
           </div>

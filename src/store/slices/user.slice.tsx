@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import userService from "../../services/userService";
+import { RootState } from "..";
 // import authService from '../../services/authService';
 
-interface paramsType{
-  id:number,
-  datas:object
+interface paramsType {
+  id: number;
+  datas: object;
 }
 
 const initialState = {
@@ -16,7 +17,7 @@ const initialState = {
 
 export const updateUser = createAsyncThunk(
   "user/updatye",
-  async ({ id, datas }:paramsType, thunkAPI) => {
+  async ({ id, datas }: paramsType, thunkAPI) => {
     try {
       const response = await userService.updateUser(id, datas);
       if (!response.success) {
@@ -36,12 +37,18 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-export const getAllUsers = createAsyncThunk(
-  "users/getAlll",
+export const getAllUsers = createAsyncThunk<any, void, { state: RootState }>(
+  "users/getAll",
   async (_, thunkAPI) => {
     try {
-      // const token = thunkAPI.getState ().auth.user.token;
-      return await userService.getAllUser();
+      const token = thunkAPI.getState().auth.accessToken;
+      console.log('token',token)
+      const response = await userService.getAllUser(token);
+      if (!response.success) {
+        return thunkAPI.rejectWithValue(response.error.message);
+      } else {
+        return response;
+      }
     } catch (error) {
       const message =
         (error.response &&
@@ -56,7 +63,7 @@ export const getAllUsers = createAsyncThunk(
 
 export const getUserById = createAsyncThunk(
   "user/getById",
-  async (id:number, thunkAPI) => {
+  async (id: number, thunkAPI) => {
     try {
       // const token = thunkAPI.getState ().auth.user.token;
       return await userService.getUserId(id);
@@ -104,9 +111,7 @@ export const userSlice = createSlice({
       .addCase(updateUser.fulfilled, (state, action) => {
         state.userStatus = "success";
         const updatedUser = action.payload.result;
-        const index = state.users.findIndex(
-          (us) => us?.id === updatedUser?.id
-        );
+        const index = state.users.findIndex((us) => us?.id === updatedUser?.id);
         if (index !== -1) {
           const existingUser = state.users[index];
           state.users[index] = {
@@ -125,11 +130,12 @@ export const userSlice = createSlice({
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
         state.userStatus = "success";
-        state.users = action.payload;
+        state.users = action.payload?.data.content;
       })
       .addCase(getAllUsers.rejected, (state, action) => {
         state.userStatus = "error";
-        state.userError = action.payload || "Impossible de charger les utilisateurs";
+        state.userError =
+          action.payload || "Impossible de charger les utilisateurs";
       })
       .addCase(getUserById.pending, (state) => {
         state.userStatus = "loading";

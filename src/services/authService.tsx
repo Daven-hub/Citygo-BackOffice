@@ -1,19 +1,15 @@
 import axios from './api';
+import { URL_L } from './route';
 
 const register = async userData => {
-  const response = await axios.post ('/auth?action=register', userData);
-  // console.log(response)
-  return response.data;
-};
-const registerShop = async userData => {
-  const response = await axios.post ('/auth?action=registershop', userData);
+  const response = await axios.post ('/auth/register', userData);
   // console.log(response)
   return response.data;
 };
 
 const login = async (userData) => {
-  const response = await axios.post ('/auth?action=login', userData);
-  // console.log(response.data)
+  const response = await axios.post ('/auth/login', userData);
+  // console.log(response)
   return response.data;
 };
 
@@ -24,8 +20,7 @@ const logout = () => {
 const authService = {
   register,
   logout,
-  login,
-  registerShop
+  login
 };
 
 export default authService;

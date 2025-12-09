@@ -18,6 +18,7 @@ import { ConfirmModal } from "@/components/modal/ConfirmModal";
 import { useToast } from "@/hook/use-toast";
 import { cn } from "@/lib/utils";
 import { StatsCard } from "@/components/StatsCard";
+import { useNavigate } from "react-router-dom";
 
 interface Booking {
   id: string;
@@ -116,6 +117,7 @@ const statusConfig = {
 
 export default function Bookings() {
   const { toast } = useToast();
+  const navigate=useNavigate()
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "edit" | "view">("create");
@@ -211,10 +213,6 @@ export default function Bookings() {
               <Filter className="w-4 h-4" />
             </Button>
           </div>
-          {/* <Button onClick={() => handleOpenModal("create")} className="gradient-primary text-primary-foreground hover:opacity-90">
-            <Plus className="w-4 h-4 mr-2" />
-            Nouvelle réservation
-          </Button> */}
         </div>
 
         {/* Bookings Grid */}
@@ -241,9 +239,9 @@ export default function Bookings() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-card border-border">
-                      <DropdownMenuItem onClick={() => handleOpenModal("view", booking)}>
+                      <DropdownMenuItem onClick={() => navigate(`/reservations/${booking.id}`)}>
                         <Eye className="w-4 h-4 mr-2" />
-                        Voir détails
+                        détails complet
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleOpenModal("edit", booking)}>
                         <Edit2 className="w-4 h-4 mr-2" />

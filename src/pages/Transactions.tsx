@@ -11,15 +11,14 @@ import {
   DollarSign,
   Eye,
 } from "lucide-react";
-// import { AdminLayout } from "@/layouts/AdminLayout";
-// import { AdminHeader } from "@/components/admin/AdminHeader";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-// import { TransactionModal } from "@/components/admin/modals/TransactionModal";
 import { StatsCard } from "@/components/StatsCard";
 import { cn } from "@/lib/utils";
+import { TransactionDetailModal } from "@/components/modal/TransactionDetailModal";
+import Pagination from "@/components/Pagination";
 
 interface Transaction {
   id: string;
@@ -38,7 +37,7 @@ const transactions: Transaction[] = [
     id: "TX001",
     type: "payment",
     amount: 2500,
-    user: "Ngassa Daniel",
+    user: "Maxime Tsafack",
     description: "Paiement trajet Douala → Yaoundé",
     date: "15/01/2025",
     status: "completed",
@@ -49,7 +48,7 @@ const transactions: Transaction[] = [
     id: "TX002",
     type: "payout",
     amount: 2000,
-    user: "Manga Evelyne",
+    user: "Lionel Fotso",
     description: "Versement conducteur hebdomadaire",
     date: "14/01/2025",
     status: "completed",
@@ -59,7 +58,7 @@ const transactions: Transaction[] = [
     id: "TX003",
     type: "commission",
     amount: 500,
-    user: "CovoitCM Admin",
+    user: "CityGo",
     description: "Commission sur trajet RD001",
     date: "14/01/2025",
     status: "completed",
@@ -69,7 +68,7 @@ const transactions: Transaction[] = [
     id: "TX004",
     type: "refund",
     amount: 1500,
-    user: "Bikoi Arnaud",
+    user: "Maxime Tsafack",
     description: "Remboursement trajet annulé Bafoussam → Douala",
     date: "13/01/2025",
     status: "completed",
@@ -80,7 +79,7 @@ const transactions: Transaction[] = [
     id: "TX005",
     type: "payment",
     amount: 3000,
-    user: "Mbefa Christelle",
+    user: "Maxime Tsafack",
     description: "Paiement trajet Yaoundé → Buea",
     date: "13/01/2025",
     status: "pending",
@@ -90,7 +89,7 @@ const transactions: Transaction[] = [
     id: "TX006",
     type: "payout",
     amount: 8500,
-    user: "Tambe Roland",
+    user: "Lionel Fotso",
     description: "Versement conducteur hebdomadaire",
     date: "12/01/2025",
     status: "completed",
@@ -100,7 +99,7 @@ const transactions: Transaction[] = [
     id: "TX007",
     type: "payment",
     amount: 1800,
-    user: "Akom Esther",
+    user: "Lionel Fotso",
     description: "Paiement trajet Garoua → Ngaoundéré",
     date: "12/01/2025",
     status: "failed",
@@ -110,7 +109,7 @@ const transactions: Transaction[] = [
     id: "TX008",
     type: "commission",
     amount: 950,
-    user: "CovoitCM Admin",
+    user: "CityGo",
     description: "Commissions sur plusieurs trajets",
     date: "11/01/2025",
     status: "completed",
@@ -139,8 +138,8 @@ const typeConfig = {
   commission: {
     label: "Commission",
     icon: TrendingUp,
-    className: "bg-accent/10 text-accent",
-    iconBg: "bg-accent/20",
+    className: "bg-gray-100 text-accent",
+    iconBg: "bg-gray-200",
   },
 };
 
@@ -162,6 +161,8 @@ const statusConfig = {
 export default function Transactions() {
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 6;
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
 
@@ -172,6 +173,12 @@ export default function Transactions() {
         .toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
       transaction.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalAppPages = Math.ceil(filteredTransactions.length / pageSize);
+  const paginatedTransaction = filteredTransactions.slice(
+    (page - 1) * pageSize,
+    page * pageSize
   );
 
   const handleViewTransaction = (transaction: Transaction) => {
@@ -192,43 +199,59 @@ export default function Transactions() {
     .filter((t) => t.status === "pending")
     .reduce((acc, t) => acc + t.amount, 0);
 
+  const statData = [
+    {
+      title: "Revenus totaux",
+      value: `${totalRevenue.toFixed(2)} FCFA`,
+      icon: DollarSign,
+      trend: {
+        value: 18,
+        isPositive: true,
+      },
+    },
+    {
+      title: "Versements",
+      value: `${totalPayouts.toFixed(2)} FCFA`,
+      icon: Wallet,
+      trend: {
+        value: 12,
+        isPositive: true,
+      },
+    },
+    {
+      title: "Commissions",
+      value: totalCommissions.toFixed(2) + " FCFA",
+      icon: TrendingUp,
+      trend: {
+        value: 8,
+        isPositive: true,
+      },
+    },
+    {
+      title: "En attente",
+      value: `${pendingAmount.toFixed(2)} FCFA`,
+      icon: CreditCard,
+      trend: {
+        value: 2,
+        isPositive: false,
+      },
+    },
+  ];
   return (
     <>
-      {/* <AdminHeader
-        title="Transactions"
-        subtitle="Suivez les paiements et les versements"
-      /> */}
-
-      <div className="space-y-6">
-        {/* Stats */}
+      <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard
-            title="Revenus totaux"
-            value={`${totalRevenue.toFixed(2)} FCFA`}
-            icon={DollarSign}
-            trend={{ value: 18, isPositive: true }}
-          />
-          <StatsCard
-            title="Versements"
-            value={`${totalPayouts.toFixed(2)} FCFA`}
-            icon={Wallet}
-            trend={{ value: 12, isPositive: true }}
-          />
-          <StatsCard
-            title="Commissions"
-            value={`${totalCommissions.toFixed(2)} FCFA`}
-            icon={TrendingUp}
-            trend={{ value: 8, isPositive: true }}
-          />
-          <StatsCard
-            title="En attente"
-            value={`${pendingAmount.toFixed(2)} FCFA`}
-            icon={CreditCard}
-            trend={{ value: 2, isPositive: false }}
-          />
+          {statData?.map((x,index)=>
+            <StatsCard
+              key={index}
+              title={x.title}
+              value={x.value}
+              icon={DollarSign}
+              trend={x.trend}
+            />
+          )}
         </div>
 
-        {/* Toolbar */}
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
           <div className="flex gap-3 flex-1">
             <div className="relative flex-1 max-w-md">
@@ -250,7 +273,7 @@ export default function Transactions() {
           </Button>
         </div>
 
-        {/* Transactions Table */}
+        {/*Table */}
         <div className="rounded-xl border border-border bg-white overflow-hidden animate-fade-in">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -283,7 +306,7 @@ export default function Transactions() {
                 </tr>
               </thead>
               <tbody>
-                {filteredTransactions.map((transaction) => {
+                {paginatedTransaction.map((transaction) => {
                   const TypeIcon = typeConfig[transaction.type].icon;
                   return (
                     <tr
@@ -346,7 +369,7 @@ export default function Transactions() {
                       <td className="py-3 px-6 text-right">
                         <span
                           className={cn(
-                            "font-bold whitespace-nowrap",
+                            "font-semibold whitespace-nowrap",
                             transaction.type === "refund" ||
                               transaction.type === "payout"
                               ? "text-destructive"
@@ -379,16 +402,33 @@ export default function Transactions() {
               </tbody>
             </table>
           </div>
+          <Pagination
+            onPageChange={setPage}
+            page={page}
+            pageSize={pageSize}
+            total={totalAppPages}
+            className=""
+          />
         </div>
       </div>
 
-      {/* {selectedTransaction && (
-        <TransactionModal
+      {selectedTransaction && (
+        <TransactionDetailModal
           open={modalOpen}
           onOpenChange={setModalOpen}
-          transaction={selectedTransaction}
+          transaction={{
+            ...selectedTransaction,
+            userEmail: "lionelfotso@gmail.com",
+            rideDetails: selectedTransaction.rideId
+              ? {
+                  from: "Douala",
+                  to: "Yaounde",
+                  date: selectedTransaction.date,
+                }
+              : undefined,
+          }}
         />
-      )} */}
+      )}
     </>
   );
 }
