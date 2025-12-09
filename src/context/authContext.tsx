@@ -15,6 +15,8 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);
 
+  console.log('user',user)
+  console.log('users',users)
   // detail = utilisateur connecté via auth.slice
   const detail = useMemo(() => user, [user]);
 
@@ -40,7 +42,6 @@ export const AuthProvider = ({ children }) => {
     if (!detail || !users) return null;
     const oneUser =
       users?.find((x) => x?.id === detail?.id)
-      null;
 
     if (!oneUser) return null;
 

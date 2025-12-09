@@ -21,7 +21,7 @@
     --secondary: 35 45% 25%;
     --secondary-foreground: 35 25% 85%;
 
-    --muted: 25 20% 15%;
+    --muted: 25 20% 8%;
     --muted-foreground: 35 15% 65%;
 
     --accent: 35 65% 55%;
@@ -36,7 +36,12 @@
 
     --radius: 0.75rem;
   }
+}
 
+@layer base {
+  /* * {
+    @apply border-border;
+  } */
   body {
     @apply font-playfair;
     background-attachment: fixed;
@@ -99,9 +104,3 @@
   }
 }
 
-/* Animations de survol fluides */
-* {
-  transition-property: transform, opacity, color, background-color, border-color, box-shadow;
-  transition-duration: 0.3s;
-  transition-timing-function: ease-in-out;
-}

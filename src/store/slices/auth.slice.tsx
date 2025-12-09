@@ -2,16 +2,18 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authService from '@/services/authService';
 
 const userFromStorage= localStorage.getItem("user")
+// user: userFromStorage ? JSON.parse(userFromStorage) : null,
 
 
 const initialState = {
-  user: userFromStorage ? JSON.parse(userFromStorage) : null,
-  token: localStorage.getItem("token") || null,
-  csrf: localStorage.getItem("csrf") || null,
+  user:  userFromStorage ? JSON.parse(userFromStorage) : null,
+  accessToken: localStorage.getItem("accessToken") || null,
+  refreshToken: localStorage.getItem("accessToken") || null,
+  expiresIn: 0,
   users:[],
   authStatus: "ndle",
-  statusR:false,
-  error: null,
+  // statusR:false,
+  // error: null,
 }
 
 export const registerApp = createAsyncThunk (
@@ -43,12 +45,12 @@ export const login = createAsyncThunk(
     try {
       const response= await authService.login(payload);
       if (!response.success) {
-        return thunkAPI.rejectWithValue(response.error || "Connexion échouée");
+        return thunkAPI.rejectWithValue(response.error.message);
       }else{
         return response;
       }
     } catch (err) {
-      console.log("err",err)
+      console.log('err',err)
       const message =
         err.response?.data?.message ||
         err.message ||
@@ -66,9 +68,10 @@ export const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
-      state.token = null;
-      state.csrf = null;
-      localStorage.removeItem('token');
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.expiresIn = 0;
+      localStorage.removeItem('accessToken');
       localStorage.removeItem('csrf');
       localStorage.removeItem('user');
     },
@@ -87,23 +90,23 @@ export const authSlice = createSlice({
       })
       .addCase (registerApp.rejected, (state, action) => {
         state.authStatus = "success";
-        state.error = action.payload || action.error.message || "Erreur de connexion";
+        // state.error = action.payload || action.error.message || "Erreur de connexion";
       })
       .addCase(login.pending, (state) => {
         state.authStatus = "loading";
       })
       .addCase(login.fulfilled, (state, action) => {
         state.authStatus = "success";
-        state.user= action.payload.user;
-        state.token = action.payload.token;
-        state.csrf = action.payload.csrf;
-        localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('csrf', action.payload.csrf);
-        localStorage.setItem('user', JSON.stringify(action.payload.user));
+        state.user= action.payload.data.user;
+        state.accessToken = action.payload.data.accessToken;
+        state.refreshToken = action.payload.data.refreshToken;
+        localStorage.setItem('accessToken', action.payload.data.accessToken);
+        localStorage.setItem('refreshToken', action.payload.data.refreshToken);
+        localStorage.setItem('user', JSON.stringify({userId:action.payload.data.user.userId}));
       })
       .addCase(login.rejected, (state, action) => {
         state.authStatus = "error";
-        state.error = action.payload || action.error.message || "Erreur de connexion";
+        // state.error = action.payload || action.error.message || "Erreur de connexion";
       });
   },
 });

@@ -5,10 +5,14 @@ import './App.css'
 import { store } from "@/store";
 import { Provider } from 'react-redux';
 import { AuthProvider } from './context/authContext.tsx';
+import { TooltipProvider } from './components/ui/tooltip.tsx';
 
 createRoot(document.getElementById("root")!).render(
 <Provider store={store}>
     <AuthProvider>
-        <App />
+        {/* <QueryClientProvider client={queryClient}> */}
+        <TooltipProvider>
+            <App />
+        </TooltipProvider>
     </AuthProvider>
 </Provider>);
