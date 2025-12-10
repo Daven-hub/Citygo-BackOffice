@@ -42,13 +42,13 @@ export const getAllUsers = createAsyncThunk<any, void, { state: RootState }>(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.accessToken;
-      console.log('token',token)
       const response = await userService.getAllUser(token);
       if (!response.success) {
         return thunkAPI.rejectWithValue(response.error.message);
       } else {
         return response;
       }
+      // return await userService.getAllUser()
     } catch (error) {
       const message =
         (error.response &&
@@ -61,12 +61,13 @@ export const getAllUsers = createAsyncThunk<any, void, { state: RootState }>(
   }
 );
 
-export const getUserById = createAsyncThunk(
+export const getUserById = createAsyncThunk<any, void, { state: RootState }>(
   "user/getById",
-  async (id: number, thunkAPI) => {
+  async (id, thunkAPI) => {
     try {
-      // const token = thunkAPI.getState ().auth.user.token;
-      return await userService.getUserId(id);
+      const token = thunkAPI.getState().auth.accessToken.trim();
+      console.log('token',token)
+      return await userService.getUserId(id,token);
     } catch (error) {
       const message =
         (error.response &&
@@ -130,6 +131,7 @@ export const userSlice = createSlice({
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
         state.userStatus = "success";
+        // state.users = action.payload;
         state.users = action.payload?.data.content;
       })
       .addCase(getAllUsers.rejected, (state, action) => {
@@ -142,7 +144,7 @@ export const userSlice = createSlice({
       })
       .addCase(getUserById.fulfilled, (state, action) => {
         state.userStatus = "success";
-        state.usersId = action.payload;
+        state.usersId = action.payload.data;
       })
       .addCase(getUserById.rejected, (state, action) => {
         state.userStatus = "error";

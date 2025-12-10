@@ -163,13 +163,7 @@ export default function Bookings() {
 
   return (
     <>
-      {/* <AdminHeader
-        title="Réservations"
-        subtitle="Gérez les réservations de covoiturage"
-      /> */}
-
-      <div className="space-y-6">
-        {/* Stats */}
+      <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatsCard
             title="Total réservations"
@@ -199,7 +193,7 @@ export default function Bookings() {
 
         {/* Toolbar */}
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
-          <div className="flex gap-3 flex-1">
+          <div className="flex gap-2 flex-1">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -224,7 +218,7 @@ export default function Bookings() {
                 key={booking.id}
                 className="rounded-xl border border-border bg-card p-5 hover:shadow-lg hover:border-primary/30 transition-all duration-200 animate-fade-in"
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-mono text-muted-foreground">#{booking.id}</span>
                     <Badge variant="outline" className={cn("font-medium", statusConfig[booking.status].className)}>
@@ -268,12 +262,12 @@ export default function Bookings() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex flex-col items-center gap-1">
                     <div className="w-2.5 h-2.5 rounded-full bg-primary" />
-                    <div className="w-0.5 h-6 bg-border" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-accent" />
+                    <div className="w-0.5 h-4 bg-primary/20" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-gray-500" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">{booking.from}</p>
-                    <p className="text-sm text-muted-foreground mt-2">{booking.to}</p>
+                    <p className="font-medium text-[1rem] text-foreground">{booking.from}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{booking.to}</p>
                   </div>
                 </div>
 

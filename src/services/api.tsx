@@ -4,8 +4,9 @@ import axios from 'axios';
 
 // 👉 Crée une instance
 const axiosInstance = axios.create({
-  baseURL: 'https://api.dev.citygo-drive.com'
-  // baseURL: '/api'
+  // baseURL: 'http://api.dev.citygo-drive.com'
+  // baseURL: 'https://cng-ngc.org/api'
+  baseURL:'http://api.dev.citygo-drive.com'
   // headers: {
   //   'Content-Type': 'application/json',
   // },

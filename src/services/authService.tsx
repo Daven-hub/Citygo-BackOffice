@@ -1,5 +1,4 @@
 import axios from './api';
-import { URL_L } from './route';
 
 const register = async userData => {
   const response = await axios.post ('/auth/register', userData);
@@ -9,7 +8,7 @@ const register = async userData => {
 
 const login = async (userData) => {
   const response = await axios.post ('/auth/login', userData);
-  // console.log(response)
+  console.log('response',response)
   return response.data;
 };
 

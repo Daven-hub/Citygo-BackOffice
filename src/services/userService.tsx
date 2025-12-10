@@ -1,18 +1,18 @@
 import axios from "./api";
 // import { BaseUrl } from '../config';
 
-const API_URL = "/admin/";
+const API_URL = "/admin";
 
 const getAllUser = async (token) => {
   try {
     const config = {
       headers: {
-        // Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`
       },
     };
-    // ?page=0&size=20
-    const response = await axios.get(`/admin/users`, config);
+    const response = await axios.get(API_URL+'/users',config);
     console.log("response1", "test");
+    // ?page=0&size=20
     console.log("response", response);
 
     return response.data;
@@ -34,13 +34,13 @@ const updateUser = async (id, userData) => {
 };
 
 // Login user
-const getUserId = async (id) => {
-  // const config = {
-  //   headers: {
-  //     Authorization: `Bearer ${token}`,
-  //   },
-  // };
-  const response = await axios.get(API_URL + "?id=" + id);
+const getUserId = async (id,token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await axios.get(API_URL + "/users/" + id,config);
   return response.data;
 };
 
@@ -50,7 +50,7 @@ const deleteUserId = async (id) => {
   //     Authorization: `Bearer ${token}`,
   //   },
   // };
-  const response = await axios.delete(API_URL + "?id=" + id);
+  const response = await axios.delete(API_URL + "/users/" + id);
   return response.data;
 };
 
