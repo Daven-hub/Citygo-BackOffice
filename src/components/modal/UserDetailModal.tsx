@@ -14,21 +14,13 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { UserType } from "@/store/slices/user.slice";
+import dayjs from "dayjs";
 
 interface UserDetailModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    role: "driver" | "passenger" | "both";
-    status: "active" | "inactive" | "suspended";
-    rides: number;
-    rating: number;
-    joinedAt: string;
-  };
+  user: UserType;
 }
 
 const roleConfig = {
@@ -43,7 +35,6 @@ const statusConfig = {
   suspended: { label: "Suspendu", className: "bg-destructive/10 text-destructive border-destructive/20" },
 };
 
-// Mock data for user activities
 const userActivities = [
   { id: "1", type: "ride", description: "Trajet Paris → Lyon complété", date: "02/12/2024", amount: "+25.00 €" },
   { id: "2", type: "booking", description: "Réservation confirmée Marseille → Nice", date: "01/12/2024", amount: "-18.50 €" },
@@ -88,14 +79,14 @@ export function UserDetailModal({ open, onOpenChange, user }: UserDetailModalPro
           <div className="flex items-center gap-4">
             <Avatar className="w-16 h-16">
               <AvatarFallback className="bg-primary/10 text-primary text-xl font-medium">
-                {user.name.split(" ").map((n) => n[0]).join("")}
+                {user.displayName.split(" ").map((n) => n[0]).join("")}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <DialogTitle className="text-xl text-foreground">{user.name}</DialogTitle>
+              <DialogTitle className="text-xl text-foreground">{user.displayName}</DialogTitle>
               <DialogDescription className="flex items-center gap-3 mt-1">
-                <Badge variant="outline" className={cn("font-medium", roleConfig[user.role].className)}>
-                  {roleConfig[user.role].label}
+                <Badge variant="outline" className={cn("font-medium", roleConfig[user.roles?.join('')].className)}>
+                  {roleConfig[user.roles?.join('')].label}
                 </Badge>
                 <Badge variant="outline" className={cn("font-medium", statusConfig[user.status].className)}>
                   {statusConfig[user.status].label}
@@ -105,9 +96,9 @@ export function UserDetailModal({ open, onOpenChange, user }: UserDetailModalPro
             <div className="text-right mr-5">
               <div className="flex items-center gap-1 text-warning">
                 <Star className="w-5 h-5 fill-warning" />
-                <span className="text-xl font-bold text-foreground">{user.rating}</span>
+                <span className="text-xl font-bold text-foreground">4.5</span>
               </div>
-              <span className="text-xs text-muted-foreground">{user.rides} trajets</span>
+              <span className="text-xs text-muted-foreground">10 trajets</span>
             </div>
           </div>
         </DialogHeader>
@@ -144,17 +135,17 @@ export function UserDetailModal({ open, onOpenChange, user }: UserDetailModalPro
               <div className="grid grid-cols-3 gap-4">
                 <div className="p-4 rounded-lg bg-muted/30 border border-border/50 text-center">
                   <Car className="w-6 h-6 mx-auto text-primary mb-2" />
-                  <p className="text-xl font-bold text-foreground">{user.rides}</p>
+                  <p className="text-xl font-bold text-foreground">10</p>
                   <span className="text-xs text-muted-foreground">Trajets</span>
                 </div>
                 <div className="p-4 rounded-lg bg-muted/30 border border-border/50 text-center">
                   <CreditCard className="w-6 h-6 mx-auto text-success mb-2" />
-                  <p className="text-xl font-bold text-foreground">{(user.rides * 18.5).toFixed(0)} FCFA</p>
+                  <p className="text-xl font-bold text-foreground">{(10 * 18.5).toFixed(0)} FCFA</p>
                   <span className="text-xs text-muted-foreground">Total dépensé</span>
                 </div>
                 <div className="p-4 rounded-lg bg-muted/30 border border-border/50 text-center">
                   <Calendar className="w-6 h-6 mx-auto text-accent mb-2" />
-                  <p className="text-xl font-bold text-foreground">{user.joinedAt}</p>
+                  <p className="text-xl font-bold text-foreground">{dayjs(user.createdAt).format('YYYY-MM-DD')}</p>
                   <span className="text-xs text-muted-foreground">Inscrit le</span>
                 </div>
               </div>

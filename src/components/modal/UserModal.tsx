@@ -19,28 +19,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hook/use-toast";
+import { UserType } from "@/store/slices/user.slice";
 
 interface UserModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    role: "driver" | "passenger" | "both";
-    status: "active" | "inactive" | "suspended";
-  };
+  user?:UserType
   mode: "create" | "edit" | "view";
 }
 
 export function UserModal({ open, onOpenChange, user, mode }: UserModalProps) {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    name: user?.name || "",
+    name: user?.displayName || "",
     email: user?.email || "",
     phone: user?.phone || "",
-    role: user?.role || "passenger",
+    roles: user?.roles || [],
     status: user?.status || "active",
   });
 
@@ -127,7 +121,7 @@ export function UserModal({ open, onOpenChange, user, mode }: UserModalProps) {
                 Rôle
               </Label>
               <Select
-                value={formData.role}
+                value={formData.roles.join('')}
                 onValueChange={(value) => setFormData({ ...formData, role: value as any })}
                 disabled={isViewMode}
               >

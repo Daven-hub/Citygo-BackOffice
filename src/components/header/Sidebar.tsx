@@ -1,9 +1,7 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import $ from "jquery";
-// import { roleChange } from '../../pages/Admin/Dashboard';
 import {
-  ArrowRight,
   Bell,
   Calendar,
   Car,
@@ -14,17 +12,14 @@ import {
   CreditCard,
   Grid,
   Mail,
-  MapPin,
   Settings,
   ShieldCheck,
-  ShoppingCart,
   SidebarClose,
   User,
   UserIcon,
-  UserRound,
 } from "lucide-react";
 import { useAuth } from "@/context/authContext";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+// import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 function Sidebar({ setIsSidebarOpen }) {
   $(function () {
@@ -54,7 +49,7 @@ function Sidebar({ setIsSidebarOpen }) {
           icon: <Grid size={18} />,
           path: "/",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         // { title: 'Vehicules', icon: <CarFront size={18} />, path: '/vehicules', children: [], alowed:['admin','super'] },
         {
@@ -62,28 +57,28 @@ function Sidebar({ setIsSidebarOpen }) {
           icon: <CarFront size={18} />,
           path: "/trajets",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Reservations",
           icon: <Calendar size={18} />,
           path: "/reservations",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "KYC",
           icon: <ShieldCheck size={18} />,
           path: "/kyc",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Transactions",
           icon: <CreditCard size={18} />,
           path: "/transactions",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         // { title: 'Destination', icon: <MapPin size={18} />, path: '/destinations', children: [], alowed:['admin','super'], },
         {
@@ -96,61 +91,58 @@ function Sidebar({ setIsSidebarOpen }) {
               icon: <CarFront size={18} />,
               path: "/utilisateurs",
               children: [],
-              alowed: ["admin", "super"],
+              alowed: ["ROLE_ADMIN"],
             },
             {
               title: "Administrations",
               icon: <Bell size={18} />,
               path: "/utilisateurs-admin",
               children: [],
-              alowed: ["admin", "super"],
+              alowed: ["ROLE_ADMIN"],
             },
           ],
-          alowed: ["super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Notifications",
           icon: <Bell size={18} />,
           path: "/notifications",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Messages",
           icon: <Mail size={18} />,
           path: "/messages",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Profile",
           icon: <UserIcon size={18} />,
           path: "/profile",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Rapports",
           icon: <ChartBar size={18} />,
           path: "/rapports",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Paramètres",
           icon: <Settings size={18} />,
           path: "/settings",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
       ],
     },
   ];
 
   const location = useLocation();
-
-  const isChildActive = (children) =>
-    children.some((child) => location.pathname.startsWith(child.path));
 
   return (
     <div
@@ -188,7 +180,7 @@ function Sidebar({ setIsSidebarOpen }) {
                       : false;
 
                   return item.children.length === 0 ? (
-                    item.alowed?.includes(userConnected?.role) && (
+                    item.alowed?.some(role => userConnected?.roles?.includes(role)) && (
                       <NavLink
                         key={index}
                         to={item.path}

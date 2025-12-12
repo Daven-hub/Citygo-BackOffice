@@ -1,18 +1,19 @@
+import { useAuth } from "@/context/authContext";
 import { useToast } from "@/hook/use-toast";
-import { useAppDispatch } from "@/store/hook";
+import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { login } from "@/store/slices/auth.slice";
 import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 
 
 function Login() {
   const navigate = useNavigate();
   const dispatch=useAppDispatch()
-  const [loading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const {toast}=useToast()
+  const {userConnected}=useAuth()
 
   const {
     register,
@@ -27,17 +28,16 @@ function Login() {
     },
   });
 
-  // console.log('watch',watch())
 
   const handleLogin = async (data) => {
-    setIsLoading(true);
+    setLoading(true);
     try {
       await dispatch(login(data)).unwrap();
+      window.location.replace('/')
       toast({
         title: "Connexion reussie",
-        description: "Bienvenue",
+        // description: "Bienvenue "+userConnected?.displayName,
       });
-      navigate("/");
     } catch (error) {
       toast({
         title: "Connexion echouée",
@@ -45,7 +45,7 @@ function Login() {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 

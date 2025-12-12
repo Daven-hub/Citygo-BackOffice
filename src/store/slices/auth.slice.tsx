@@ -1,15 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authService from '@/services/authService';
+import { RootState } from '..';
 
 const userFromStorage= localStorage.getItem("user")
-// user: userFromStorage ? JSON.parse(userFromStorage) : null,
-
 
 const initialState = {
   user:  userFromStorage ? JSON.parse(userFromStorage) : null,
   accessToken: localStorage.getItem("accessToken") || null,
   refreshToken: localStorage.getItem("accessToken") || null,
-  expiresIn: 0,
+  expiresIn: parseInt(localStorage.getItem("accessToken")) || 0,
   users:[],
   authStatus: "ndle",
   // statusR:false,
@@ -61,20 +60,38 @@ export const login = createAsyncThunk(
   }
 );
 
+export const refreshTokenAsync = createAsyncThunk<any, void, { state: RootState }>(
+  'auth/refreshToken',
+  async (_, thunkAPI) => {
+    const state= thunkAPI.getState().auth;
+    try {
+      const response = await authService.refreshToken(state.refreshToken);
+      if (!response.success) return thunkAPI.rejectWithValue(response.error?.message);
+      return response;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+
+export const logoutAsync = createAsyncThunk<any, void, { state: RootState }>(
+  'auth/Logout',
+  async (_, thunkAPI) => {
+    const state= thunkAPI.getState().auth;
+    try {
+      const response = await authService.logout(state.refreshToken);
+      return response;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    logout: (state) => {
-      state.user = null;
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.expiresIn = 0;
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('csrf');
-      localStorage.removeItem('user');
-    },
     reset: (state) => {
       state.users=[]
     }
@@ -97,16 +114,11 @@ export const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.authStatus = "success";
-        // state.user= action.payload.user;
-        // state.accessToken = action.payload.token;
-        // state.refreshToken = action.payload.csfr;
-        // localStorage.setItem('accessToken', action.payload.token);
-        // localStorage.setItem('refreshToken', action.payload.csfr);
-        // localStorage.setItem('user', JSON.stringify(action.payload.user));
-
-         state.user= action.payload.data.user;
+        state.user= action.payload.data.user;
         state.accessToken = action.payload.data.accessToken;
         state.refreshToken = action.payload.data.refreshToken;
+        state.expiresIn = action.payload.data.expiresIn;
+        localStorage.setItem('expiresIn', action.payload.data.expiresIn);
         localStorage.setItem('accessToken', action.payload.data.accessToken);
         localStorage.setItem('refreshToken', action.payload.data.refreshToken);
         localStorage.setItem('user', JSON.stringify({userId:action.payload.data.user.userId}));
@@ -114,9 +126,51 @@ export const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.authStatus = "error";
         // state.error = action.payload || action.error.message || "Erreur de connexion";
+      }).addCase(refreshTokenAsync.pending, (state) => {
+        state.authStatus = "loading";
+      }).addCase(refreshTokenAsync.fulfilled, (state, action) => {
+        state.authStatus = "success";
+        state.accessToken = action.payload.data.accessToken;
+        state.expiresIn = action.payload.data.expiresIn;
+        localStorage.setItem('expiresIn', action.payload.data.expiresIn);
+        localStorage.setItem('accessToken', action.payload.data.accessToken);
+      })
+      .addCase(refreshTokenAsync.rejected, (state) => {
+        state.user = null;
+        state.accessToken = null;
+        state.refreshToken = null;
+        state.expiresIn = 0;
+        localStorage.removeItem('user');
+         localStorage.removeItem('expiresIn');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      }).addCase(logoutAsync.pending, (state) => {
+        state.authStatus = "loading";
+      }).addCase(logoutAsync.fulfilled, (state, action) => {
+        state.authStatus = "success";
+        state.user = null;
+        state.accessToken = null;
+        state.refreshToken = null;
+        state.expiresIn = 0;
+        localStorage.removeItem('user');
+        localStorage.removeItem('expiresIn');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      })
+      .addCase(logoutAsync.rejected, (state) => {
+        state.authStatus = "error";
+        state.user = null;
+        state.accessToken = null;
+        state.refreshToken = null;
+        state.expiresIn = 0;
+        localStorage.removeItem('user');
+        localStorage.removeItem('expiresIn');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
       });
+      ;
   },
 });
 
-export const { logout, reset } = authSlice.actions;
+export const { reset } = authSlice.actions;
 export default authSlice.reducer;

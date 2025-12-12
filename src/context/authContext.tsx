@@ -1,64 +1,67 @@
 // AuthContext.js
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { getAllUsers, getUserById } from "@/store/slices/user.slice";
-import { logout } from "@/store/slices/auth.slice";
+import { getAllUsers } from "@/store/slices/user.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
+import { logoutAsync } from "@/store/slices/auth.slice";
+import { useToast } from "@/hook/use-toast";
+import { injectLogoutHandler } from "@/services/api";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const dispatch = useAppDispatch();
+  const {toast}=useToast()
 
-  const { usersId } = useAppSelector((state) => state.users);
+  const {users } = useAppSelector((state) => state.users);
   const { user } = useAppSelector((state) => state.auth);
 
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);
 
-  console.log('user',user)
-  console.log('usersId',usersId)
-  // detail = utilisateur connecté via auth.slice
-  // const detail = useMemo(() => user, [user]);
+  const detail = useMemo(() => user, [user]);
 
   useEffect(() => {
     const fetchData = async () => {
       const start = performance.now();
-
       await Promise.all([
-        // dispatch(getAllUsers()),
-        dispatch(getUserById(user?.userId))
+        dispatch(getAllUsers())
       ]);
-
       const end = performance.now();
       const elapsed = end - start;
       setDuration(elapsed);
-
       setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
     };
 
     fetchData();
-  }, [dispatch,user?.userId]);
+  }, [dispatch]);
 
-  // const userConnected = useMemo(() => {
-  //   if (!detail || !users) return null;
-  //   const oneUser =
-  //     users?.find((x) => x?.id === detail?.id)
+  const userConnected = useMemo(() => {
+      if (!detail || !users ) return null;
+      const oneUser = users?.find((x)=>x.id===user?.userId) || null;
+      if (!oneUser) return null;
+      return oneUser;
+    }, [users, detail,user?.userId]);
 
-  //   if (!oneUser) return null;
+  // console.log('userConnected',userConnected)
 
-  //   const { password, ...rest } = oneUser;
-  //   return rest;
-  // }, [users, detail]);
-  const userConnected=usersId;
-
-  const refreshUser = async () => {
-    await Promise.all([dispatch(getAllUsers())]);
-  };
 
   const handleLogout = async () => {
-    await dispatch(logout());
-    window.location.replace("/");
+      setIsLoading(true);
+      try {
+        await dispatch(logoutAsync()).unwrap();
+        window.location.replace("/connexion");
+      } catch (error) {
+        toast({
+          title: "Déconnexion échouée",
+          description: error?.toString(),
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
   };
+
+  injectLogoutHandler(handleLogout);
 
 
   return (
@@ -67,8 +70,7 @@ export const AuthProvider = ({ children }) => {
         userConnected,
         handleLogout,
         isLoading,
-        duration,
-        refreshUser,
+        duration
       }}
     >
       {children}
