@@ -13,27 +13,28 @@ const initialState = {
   authStatus: "ndle",
 }
 
-// export const registerApp = createAsyncThunk (
-//   'auth/register',
-//   async (datas, thunkAPI) => {
-//     try {
-//       const response= await authService.register(datas);
-//       if (!response.success) {
-//         return thunkAPI.rejectWithValue(response.error);
-//       }else{
-//         return response;
-//       }
-//     } catch (err) {
-//       const message =
-//         (err.response &&
-//           err.response.data &&
-//           err.response.data.message) ||
-//         err.message ||
-//         err.toString ();
-//       return thunkAPI.rejectWithValue (message);
-//     }
-//   }
-// );
+export const registerApp = createAsyncThunk(
+  'auth/register',
+  async (datas: unknown, thunkAPI) => {
+    try {
+      const response = await authService.register(datas);
+      if (!response.success) {
+        return thunkAPI.rejectWithValue(response.error);
+      } else {
+        return response;
+      }
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        String(err);
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 
 
 export const login = createAsyncThunk(
@@ -101,16 +102,15 @@ export const authSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      // .addCase (registerApp.pending, state => {
-      //   state.authStatus = "loading";
-      // })
-      // .addCase (registerApp.fulfilled, (state, action) => {
-      //   state.authStatus = "success";
-      //   state.users.unshift (action.payload.result);
-      // })
-      // .addCase (registerApp.rejected, (state, action) => {
-      //   state.authStatus = "success";
-      // })
+      .addCase(registerApp.pending, state => {
+        state.authStatus = "loading";
+      })
+      .addCase(registerApp.fulfilled, (state) => {
+        state.authStatus = "success";
+      })
+      .addCase(registerApp.rejected, (state) => {
+        state.authStatus = "error";
+      })
       .addCase(login.pending, (state) => {
         state.authStatus = "loading";
       })
