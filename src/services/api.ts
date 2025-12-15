@@ -1,54 +1,67 @@
-// src/services/api.js
-import {refreshTokenAsync } from "@/store/slices/auth.slice";
+import { refreshTokenAsync } from "@/store/slices/auth.slice";
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://cng-ngc.org/api/proxy.php?path=http://api.dev.citygo-drive.com",
+  baseURL: "http://api.dev.citygo-drive.com",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+
 let store;
-let logoutHandler = () => {};
 
 export const injectStore = (_store) => {
   store = _store;
 };
-export const injectLogoutHandler = (handler) => {
-  logoutHandler = handler;
+
+export const hardLogout = () => {
+  localStorage.removeItem("user");
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("expiresIn");
+
+  window.location.replace("/connexion");
 };
 
 let isRefreshing = false;
 let refreshPromise = null; 
 
+
 axiosInstance.interceptors.request.use(async (config) => {
-  const state = store.getState().auth;
-  const accessToken = state.accessToken;
-  const expiresIn = state.expiresIn;
+  if (!store) return config;
+
+  const { accessToken, refreshToken, expiresIn } = store.getState().auth;
   const now = Math.floor(Date.now() / 1000);
   const timeUntilExpiry = expiresIn - now;
-  const REFRESH_THRESHOLD = 60;
+  const REFRESH_THRESHOLD = 360;
 
   let token = accessToken;
 
-  // Si le token est présent et expire bientôt (dans moins de 60s)
-  if (accessToken && timeUntilExpiry < REFRESH_THRESHOLD && timeUntilExpiry > 0) {
+  console.log('timeUntilExpiry',timeUntilExpiry)
+  if (
+    accessToken &&
+    refreshToken &&
+    timeUntilExpiry > 0 &&
+    timeUntilExpiry < REFRESH_THRESHOLD
+  ) {
     if (!isRefreshing) {
       isRefreshing = true;
-      console.log("Token expire bientôt (<60s). Lancement du refresh...");
-      refreshPromise = store.dispatch(refreshTokenAsync())
-        .then((result) => {
-          isRefreshing = false;
-          refreshPromise = null;
-          console.log('.data.accessToken',result?.data?.accessToken)
-          return result?.data?.accessToken;
+      console.log('preparation')
+      refreshPromise = store
+        .dispatch(refreshTokenAsync())
+        .unwrap()
+        .then((res) => {
+          console.log("[AUTH] Refresh OK");
+          return res.data.accessToken;
         })
         .catch((err) => {
-          isRefreshing = false;
-          refreshPromise = null;
-          logoutHandler();
+          console.error("[AUTH] Refresh failed", err);
+          hardLogout();
           throw err;
+        })
+        .finally(() => {
+          isRefreshing = false;
         });
     }
 
@@ -58,11 +71,35 @@ axiosInstance.interceptors.request.use(async (config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  
+
   return config;
-}, (error) => {
-  return Promise.reject(error);
 });
 
+// axiosInstance.interceptors.response.use(
+//   (response) => response,
+//   async (error) => {
+//     const originalRequest = error.config;
+
+//     if (
+//       error.response?.status === 401 &&
+//       !originalRequest._retry
+//     ) {
+//       originalRequest._retry = true;
+
+//       try {
+//         const res = await store.dispatch(refreshTokenAsync()).unwrap();
+//         const newToken = res.data.accessToken;
+
+//         originalRequest.headers.Authorization = `Bearer ${newToken}`;
+//         return axiosInstance(originalRequest);
+//       } catch (err) {
+//         console.error("[AUTH] Refresh 401 failed");
+//         hardLogout();
+//       }
+//     }
+
+//     return Promise.reject(error);
+//   }
+// );
 
 export default axiosInstance;

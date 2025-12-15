@@ -12,6 +12,12 @@ interface dataType {
   datas: object;
 }
 
+interface bulkType {
+  userIds: string[];
+  operation: string;
+  reason: string
+}
+
 export interface UserType {
   avatarUrl: string | null;
   bio: string | null;
@@ -35,6 +41,8 @@ export interface UserType {
 interface UsersState {
   users: UserType[];
   userLogId: any[];
+  bulks: any[],
+  analytics: any[],
   usersId: UserType | null;
   userStatus: "idle" | "loading" | "success" | "error";
   userError?: string | null;
@@ -43,6 +51,8 @@ interface UsersState {
 const initialState: UsersState = {
   users: [],
   userLogId: [],
+  bulks:[],
+  analytics: [],
   usersId: null,
   userStatus: "idle",
   userError: null,
@@ -190,6 +200,37 @@ export const getUsetActivityLogById = createAsyncThunk<any,string,{ state: RootS
   }
 });
 
+export const BulkOperationUsers = createAsyncThunk<any,bulkType,{ state: RootState }>(
+  "users/userBulk-operations", 
+  async ({userIds,operation,reason}, thunkAPI) => {
+  try {
+    const userData={userIds,operation,reason}
+    // const token = thunkAPI.getState ().auth.user.token;
+    return await userService.userBulkOperation(userData);
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+export const AnalyticsUser = createAsyncThunk<any,void,{ state: RootState }>(
+  "users/analyticsUser", 
+  async (_, thunkAPI) => {
+  try {
+    // const token = thunkAPI.getState ().auth.user.token;
+    return await userService.getAnalytics();
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
 export const userSlice = createSlice({
   name: "users",
   initialState,
@@ -216,20 +257,16 @@ export const userSlice = createSlice({
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.userStatus = "error";
-        // state.userError = action.payload || "Modification échouée";
       })
       .addCase(getAllUsers.pending, (state) => {
         state.userStatus = "loading";
       })
       .addCase(getAllUsers.fulfilled, (state, action) => {
         state.userStatus = "success";
-        // state.users = action.payload;
         state.users = action.payload?.data.content;
       })
       .addCase(getAllUsers.rejected, (state, action) => {
         state.userStatus = "error";
-        // state.userError =
-        //   action.payload || "Impossible de charger les utilisateurs";
       })
       .addCase(getUserById.pending, (state) => {
         state.userStatus = "loading";
@@ -240,8 +277,6 @@ export const userSlice = createSlice({
       })
       .addCase(getUserById.rejected, (state, action) => {
         state.userStatus = "error";
-        // state.userError =
-        //   action.payload || "Impossible de charger l'utilisateur";
       })
       .addCase(deleteuser.pending, (state) => {
         state.userStatus = "loading";
@@ -254,7 +289,6 @@ export const userSlice = createSlice({
       })
       .addCase(deleteuser.rejected, (state, action) => {
         state.userStatus = "error";
-        // state.userError = action.payload || "Suppression échouée";
       })
       .addCase(suspendUserById.pending, (state) => {
         state.userStatus = "loading";
@@ -294,7 +328,6 @@ export const userSlice = createSlice({
       })
       .addCase(unSuspendUserById.rejected, (state, action) => {
         state.userStatus = "error";
-        // state.userError = action.payload || "Modification échouée";
       })
       .addCase(UpdateLocalFlag.pending, (state) => {
         state.userStatus = "loading";
@@ -314,7 +347,6 @@ export const userSlice = createSlice({
       })
       .addCase(UpdateLocalFlag.rejected, (state, action) => {
         state.userStatus = "error";
-        // state.userError = action.payload || "Modification échouée";
       })
       .addCase(getUsetActivityLogById.pending, (state) => {
         state.userStatus = "loading";
@@ -325,8 +357,26 @@ export const userSlice = createSlice({
       })
       .addCase(getUsetActivityLogById.rejected, (state, action) => {
         state.userStatus = "error";
-        // state.userError =
-        //   action.payload || "Impossible de charger l'utilisateur";
+      })
+      .addCase(BulkOperationUsers.pending, (state) => {
+        state.userStatus = "loading";
+      })
+      .addCase(BulkOperationUsers.fulfilled, (state, action) => {
+        state.userStatus = "success";
+        state.bulks = action.payload.data;
+      })
+      .addCase(BulkOperationUsers.rejected, (state, action) => {
+        state.userStatus = "error";
+      })
+      .addCase(AnalyticsUser.pending, (state) => {
+        state.userStatus = "loading";
+      })
+      .addCase(AnalyticsUser.fulfilled, (state, action) => {
+        state.userStatus = "success";
+        state.analytics = action.payload.data;
+      })
+      .addCase(AnalyticsUser.rejected, (state, action) => {
+        state.userStatus = "error";
       });
   },
 });

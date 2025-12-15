@@ -7,35 +7,33 @@ const userFromStorage= localStorage.getItem("user")
 const initialState = {
   user:  userFromStorage ? JSON.parse(userFromStorage) : null,
   accessToken: localStorage.getItem("accessToken") || null,
-  refreshToken: localStorage.getItem("accessToken") || null,
-  expiresIn: parseInt(localStorage.getItem("accessToken")) || 0,
-  users:[],
+  refreshToken: localStorage.getItem("refreshToken") || null,
+  expiresIn: parseInt(localStorage.getItem("expiresIn")) || 0,
+  // users:[],
   authStatus: "ndle",
-  // statusR:false,
-  // error: null,
 }
 
-export const registerApp = createAsyncThunk (
-  'auth/register',
-  async (datas, thunkAPI) => {
-    try {
-      const response= await authService.register(datas);
-      if (!response.success) {
-        return thunkAPI.rejectWithValue(response.error);
-      }else{
-        return response;
-      }
-    } catch (err) {
-      const message =
-        (err.response &&
-          err.response.data &&
-          err.response.data.message) ||
-        err.message ||
-        err.toString ();
-      return thunkAPI.rejectWithValue (message);
-    }
-  }
-);
+// export const registerApp = createAsyncThunk (
+//   'auth/register',
+//   async (datas, thunkAPI) => {
+//     try {
+//       const response= await authService.register(datas);
+//       if (!response.success) {
+//         return thunkAPI.rejectWithValue(response.error);
+//       }else{
+//         return response;
+//       }
+//     } catch (err) {
+//       const message =
+//         (err.response &&
+//           err.response.data &&
+//           err.response.data.message) ||
+//         err.message ||
+//         err.toString ();
+//       return thunkAPI.rejectWithValue (message);
+//     }
+//   }
+// );
 
 
 export const login = createAsyncThunk(
@@ -64,8 +62,13 @@ export const refreshTokenAsync = createAsyncThunk<any, void, { state: RootState 
   'auth/refreshToken',
   async (_, thunkAPI) => {
     const state= thunkAPI.getState().auth;
+    const data= {
+      refreshToken: state.refreshToken
+    }
+    console.log('data',data)
     try {
-      const response = await authService.refreshToken(state.refreshToken);
+      const response = await authService.refreshToken(data);
+       console.log('response',response)
       if (!response.success) return thunkAPI.rejectWithValue(response.error?.message);
       return response;
     } catch (err) {
@@ -93,46 +96,46 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     reset: (state) => {
-      state.users=[]
+      // state.users=[]
     }
   },
   extraReducers: builder => {
     builder
-      .addCase (registerApp.pending, state => {
-        state.authStatus = "loading";
-      })
-      .addCase (registerApp.fulfilled, (state, action) => {
-        state.authStatus = "success";
-        state.users.unshift (action.payload.result);
-      })
-      .addCase (registerApp.rejected, (state, action) => {
-        state.authStatus = "success";
-        // state.error = action.payload || action.error.message || "Erreur de connexion";
-      })
+      // .addCase (registerApp.pending, state => {
+      //   state.authStatus = "loading";
+      // })
+      // .addCase (registerApp.fulfilled, (state, action) => {
+      //   state.authStatus = "success";
+      //   state.users.unshift (action.payload.result);
+      // })
+      // .addCase (registerApp.rejected, (state, action) => {
+      //   state.authStatus = "success";
+      // })
       .addCase(login.pending, (state) => {
         state.authStatus = "loading";
       })
       .addCase(login.fulfilled, (state, action) => {
         state.authStatus = "success";
+        const now = Math.floor(Date.now() / 1000);
         state.user= action.payload.data.user;
         state.accessToken = action.payload.data.accessToken;
         state.refreshToken = action.payload.data.refreshToken;
-        state.expiresIn = action.payload.data.expiresIn;
-        localStorage.setItem('expiresIn', action.payload.data.expiresIn);
+        state.expiresIn = now + action.payload.data.expiresIn;
+        localStorage.setItem('expiresIn', now + action.payload.data.expiresIn);
         localStorage.setItem('accessToken', action.payload.data.accessToken);
         localStorage.setItem('refreshToken', action.payload.data.refreshToken);
         localStorage.setItem('user', JSON.stringify({userId:action.payload.data.user.userId}));
       })
       .addCase(login.rejected, (state, action) => {
         state.authStatus = "error";
-        // state.error = action.payload || action.error.message || "Erreur de connexion";
       }).addCase(refreshTokenAsync.pending, (state) => {
         state.authStatus = "loading";
       }).addCase(refreshTokenAsync.fulfilled, (state, action) => {
         state.authStatus = "success";
+        const now = Math.floor(Date.now() / 1000);
         state.accessToken = action.payload.data.accessToken;
-        state.expiresIn = action.payload.data.expiresIn;
-        localStorage.setItem('expiresIn', action.payload.data.expiresIn);
+        state.expiresIn = now + action.payload.data.expiresIn;
+        localStorage.setItem('expiresIn', now + action.payload.data.expiresIn);
         localStorage.setItem('accessToken', action.payload.data.accessToken);
       })
       .addCase(refreshTokenAsync.rejected, (state) => {

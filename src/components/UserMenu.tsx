@@ -21,22 +21,24 @@ function UserMenu({isAdmin,isLight=true}) {
       const { userConnected, handleLogout } = useAuth();
       return (
             <div ref={popoverRef} className='flex relative items-center font-bold text-[.75rem] gap-2'>
-                  <div onClick={() => setOpen(!open)} className='cursor-pointer flex items-center gap-2'>
-                        <Avatar.Root className="AvatarRoot inline-flex w-[35px] h-[35px] object-cover object-top rounded-full items-center justify-center overflow-hidden align-middle">
-                              <Avatar.Image
-                                    className="AvatarImage bg-gray-50 object-cover"
-                                    src={userConnected?.avatarUrl}
-                                    alt={userConnected?.displayName}
-                              />
-                              <Avatar.Fallback className="AvatarFallback flex h-full w-full uppercase items-center justify-center bg-primary/10 text-sm font-semibold text-primary" delayMs={100}>
-                                    {userConnected?.displayName?.split(" ").slice(0, 2).map(n => n[0]).join("")}
-                              </Avatar.Fallback>
-                        </Avatar.Root>
-                        <div className='flex max-md:hidden flex-col leading-[1.3]'>
-                              <span className={`${isAdmin?(isLight?'text-white/85':'text-secondary/90'):'text-secondary/90'} truncate max-w-[110px] text-[.82rem] capitalize font-medium`}>{userConnected?.displayName}</span>
-                              <span className={`${isAdmin?(isLight?'text-white/75':'text-gray-500'):'text-gray-700/70'} capitalize font-normal text-[.66rem]`}>{'Admin'}</span>
+                  <div onClick={() => setOpen(!open)} className='cursor-pointer flex items-center gap-2.5'>
+                        {/* <div className='flex max-md:hidden text-end flex-col gap-0.5 leading-[1.3]'>
+                              <span className={`${isAdmin?(isLight?'text-white/85':'text-secondary/90'):'text-secondary/90'} truncate max-w-[110px] text-[.85rem] capitalize font-medium`}>{userConnected?.displayName}</span>
+                              <span className={`${isAdmin?(isLight?'text-white/75':'text-gray-500'):'text-gray-700/70'} capitalize font-normal text-[.65rem]`}>{'Administrateur'}</span>
+                        </div> */}
+                        <div className='flex items-center gap-0.5'>
+                              <Avatar.Root className="AvatarRoot inline-flex w-[37px] h-[37px] object-cover object-top rounded-full items-center justify-center overflow-hidden align-middle">
+                                    <Avatar.Image
+                                          className="AvatarImage bg-gray-50 object-cover"
+                                          src={userConnected?.avatarUrl}
+                                          alt={userConnected?.displayName}
+                                    />
+                                    <Avatar.Fallback className="AvatarFallback flex h-full w-full uppercase items-center justify-center bg-primary/10 text-sm font-semibold text-primary" delayMs={100}>
+                                          {userConnected?.displayName?.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                                    </Avatar.Fallback>
+                              </Avatar.Root>
+                              <ChevronDown size={18} strokeWidth={2} className='text-gray-500'/>
                         </div>
-                        <ChevronDown size={18} strokeWidth={2} className='text-gray-500'/>
                   </div>
                   {/* Popover */}
                   {open && (

@@ -32,7 +32,7 @@ const suspendUserById = async (userId,datas)=>{
 }
 
 const unSuspendUserById = async (userId)=>{
-   const response = await axios.post(API_URL + "/users/" + userId+'/suspend');
+   const response = await axios.post(API_URL + "/users/" + userId+'/unsuspend');
    return response.data;
 }
 
@@ -46,6 +46,20 @@ const getUserActivityLog = async (userId)=>{
    return response.data;
 }
 
+const userBulkOperation = async (datas)=>{
+   const response = await axios.post(API_URL + "/users/bulk-operations",datas);
+   return response.data;
+}
+
+const getAnalytics = async () => {
+  try {
+    const response = await axios.get(API_URL+'/users/analytics');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 const authService = {
   getAllUser,
   getUserId,
@@ -54,7 +68,9 @@ const authService = {
   suspendUserById,
   unSuspendUserById,
   updateLocalFlag,
-  getUserActivityLog
+  getUserActivityLog,
+  userBulkOperation,
+  getAnalytics
 };
 
 export default authService;

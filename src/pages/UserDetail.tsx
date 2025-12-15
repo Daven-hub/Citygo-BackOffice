@@ -2,50 +2,22 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft,
-  Mail,
-  Phone,
-  Calendar,
-  Car,
-  CreditCard,
-  Star,
-  Activity,
-  TrendingUp,
-  Clock,
-  FileText,
-  Shield,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
   User as UserIcon,
-  Globe,
-  Ban,
-  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import {
-  roleConfig,
-  statusConfig,
-  driverStatusConfig,
-  documentStatusConfig,
-} from "@/types/user";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { getUserById, getUsetActivityLogById } from "@/store/slices/user.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import LoaderUltra from "@/components/ui/loaderUltra";
-import dayjs from "dayjs";
+import UserHeader from "@/components/tabs/users/UserHeader";
+// import UserKpis from "@/components/tabs/users/UserKpsi";
+// import UserTabs from "@/components/tabs/users/UserTabs";
+import {
+  UnderlineTabs,
+  UnderlineTabsContent,
+} from "@/components/ui/underline-tabs";
+import Overview from "@/components/tabs/users/Overview";
 import ActivityTab from "@/components/tabs/users/ActivityTab";
 
 const userActivities = [
@@ -177,7 +149,7 @@ export default function UserDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);
   const [activeTab, setActiveTab] = useState("overview");
-  const { usersId,userLogId } = useAppSelector((state) => state.users);
+  const { usersId, userLogId } = useAppSelector((state) => state.users);
 
   const user = usersId;
 
@@ -186,7 +158,7 @@ export default function UserDetail() {
       const start = performance.now();
       await Promise.all([
         dispatch(getUserById(userId)),
-        dispatch(getUsetActivityLogById(userId))
+        dispatch(getUsetActivityLogById(userId)),
       ]);
       const end = performance.now();
       const elapsed = end - start;
@@ -195,8 +167,6 @@ export default function UserDetail() {
     };
     fetchData();
   }, [dispatch, userId]);
-
-  console.log('userLogId',userLogId)
 
   const isDriver = user?.roles?.includes("ROLE_DRIVER");
   const isPassengerOnly = user?.roles?.includes("ROLE_USER");
@@ -210,6 +180,7 @@ export default function UserDetail() {
       return dateString;
     }
   };
+  
 
   if (isLoading) {
     return <LoaderUltra loading={isLoading} duration={duration} />;
@@ -217,7 +188,7 @@ export default function UserDetail() {
 
   if (!user) {
     return (
-      <div className="p-6 text-center">
+      <div className="text-center">
         <p className="text-muted-foreground">Utilisateur non trouvé</p>
         <Button onClick={() => navigate("/utilisateurs")} className="mt-4">
           Retour à la liste
@@ -227,690 +198,37 @@ export default function UserDetail() {
   }
 
   return (
-    <>
-      <div className="space-y-4">
-        {/* Back button and header */}
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/utilisateurs")}
-            className="gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Retour
-          </Button>
-        </div>
+    <div className="space-y-5">
+      <button
+        onClick={() => navigate("/utilisateurs")}
+        className="flex text-sm items-center gap-2 text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Retour
+      </button>
+      <UnderlineTabs defaultValue="apercu">
+        <UserHeader user={user} />
+        <UnderlineTabsContent value="apercu">
+          <Overview user={user} userLog={userLogId}/>
+        </UnderlineTabsContent>
 
-        {/* User Header Card */}
-        <Card className="bg-card border-border">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-6">
-                <Avatar className="w-24 h-24">
-                  <AvatarFallback className="bg-primary/10 text-primary text-3xl font-medium">
-                    {user?.displayName
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">
-                    {user?.displayName}
-                  </h2>
-                  <p className="text-sm text-muted-foreground">{user?.email}</p>
-                  <div className="flex items-center gap-3 mt-2.5">
-                    {(() => {
-                      const roles =
-                        user?.roles?.filter((r) => r !== "ROLE_ADMIN") || [];
-                      const hasBoth =
-                        roles.includes("ROLE_USER") &&
-                        roles.includes("ROLE_DRIVER");
-                      const finalRoles = hasBoth ? ["both"] : roles;
-                      return finalRoles.map((item, index) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className={cn(
-                            "font-medium text-[.7rem]",
-                            roleConfig[item]?.className
-                          )}
-                        >
-                          {roleConfig[item]?.label}
-                        </Badge>
-                      ));
-                    })()}
+        <UnderlineTabsContent value="info">
+         information personnelle
+        </UnderlineTabsContent>
 
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "font-medium",
-                        statusConfig[user.status]?.className
-                      )}
-                    >
-                      {statusConfig[user.status]?.label}
-                    </Badge>
+        <UnderlineTabsContent value="activites">
+          <ActivityTab userActivities={userLogId} />
+        </UnderlineTabsContent>
+        <UnderlineTabsContent value="reservations">
+          Reservations
+        </UnderlineTabsContent>
+        <UnderlineTabsContent value="trajets">
+          Trajets
+        </UnderlineTabsContent>
+      </UnderlineTabs>
+      {/* <UserKpis user={user} /> */}
 
-                    {user.driverVerified && (
-                      <Badge
-                        variant="outline"
-                        className="bg-success/10 text-success border-success/20 font-medium"
-                      >
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Vérifié
-                      </Badge>
-                    )}
-                    {/* {user.flags?.banned && (
-                      <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 font-medium">
-                        <Ban className="w-3 h-3 mr-1" />
-                        Banni
-                      </Badge>
-                    )} */}
-                  </div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center gap-2 text-warning">
-                  <Star className="w-6 h-6 fill-warning" />
-                  <span className="text-2xl font-bold text-foreground">
-                    4.5
-                  </span>
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  10 trajets
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-white/95">
-            <TabsTrigger value="overview">Aperçu</TabsTrigger>
-            <TabsTrigger value="activities">Activités</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="bookings">Réservations</TabsTrigger>
-            {/* {isDriver && <TabsTrigger value="driver">Conducteur</TabsTrigger>} */}
-            {/* {isDriver && <TabsTrigger value="documents">Documents</TabsTrigger>} */}
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6 mt-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {/* Contact Info */}
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <UserIcon className="w-5 h-5 text-primary" />
-                    Informations de contact
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center gap-3 py-3 rounded-lg bg-muted/30">
-                    <Mail className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Email</p>
-                      <p className="font-medium text-foreground">
-                        {user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 py-3 rounded-lg bg-muted/30">
-                    <Phone className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Téléphone</p>
-                      <p className="font-medium text-foreground">
-                        {user.phone}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 py-3 rounded-lg bg-muted/30">
-                    <Calendar className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Date d'inscription
-                      </p>
-                      <p className="font-medium text-foreground">
-                        {dayjs(user.createdAt).format("YYYY-MM-DD")}
-                      </p>
-                    </div>
-                  </div>
-                  {user?.locale && (
-                    <div className="flex items-center gap-3 py-3 rounded-lg bg-muted/30">
-                      <Globe className="w-5 h-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Langue</p>
-                        <p className="font-medium text-foreground">
-                          {user.locale}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Profile Info for Passengers */}
-              {/* {user.profile && ( */}
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-primary" />
-                    Profil
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* {user?.bio && ( */}
-                    {/* <div className="p-3 rounded-lg bg-muted/30">
-                      <p className="text-sm text-muted-foreground mb-1">Bio</p>
-                      <p className="text-foreground">{user?.bio}</p>
-                    </div> */}
-                  {/* )} */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 rounded-lg bg-primary/10 text-center">
-                      <p className="text-sm text-muted-foreground mb-1.5">
-                        Conducteur vérifié
-                      </p>
-                      {user.driverVerified ? (
-                        <CheckCircle className="w-6 h-6 text-success mx-auto" />
-                      ) : (
-                        <XCircle className="w-6 h-6 text-muted-foreground mx-auto" />
-                      )}
-                    </div>
-                    <div className="p-3 rounded-lg bg-success/10 text-center">
-                        <p className="text-sm text-muted-foreground mb-1">Telephone Vérifié</p>
-                        {user.phoneVerified ? (
-                          <CheckCircle className="w-6 h-6 text-success mx-auto" />
-                        ) : (
-                          <XCircle className="w-6 h-6 text-muted-foreground mx-auto" />
-                        )}
-                      </div>
-                  </div>
-                  {user.createdAt && (
-                    <div className="p-3 rounded-lg bg-muted/30">
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Créé le
-                      </p>
-                      <p className="text-foreground">
-                        {formatDate(user.createdAt)}
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-              {/* )} */}
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-card border-border">
-                <CardContent className="p-4 text-center">
-                  <Car className="w-8 h-8 mx-auto text-primary mb-2" />
-                  <p className="text-2xl font-bold text-foreground">10</p>
-                  <span className="text-sm text-muted-foreground">Trajets</span>
-                </CardContent>
-              </Card>
-              <Card className="bg-card border-border">
-                <CardContent className="p-4 text-center">
-                  <CreditCard className="w-8 h-8 mx-auto text-success mb-2" />
-                  <p className="text-2xl font-bold text-foreground">
-                    €{(15 * 18.5).toFixed(0)}
-                  </p>
-                  <span className="text-sm text-muted-foreground">
-                    Total dépensé
-                  </span>
-                </CardContent>
-              </Card>
-              <Card className="bg-card border-border">
-                <CardContent className="p-4 text-center">
-                  <Star className="w-8 h-8 mx-auto text-warning mb-2" />
-                  <p className="text-2xl font-bold text-foreground">15</p>
-                  <span className="text-sm text-muted-foreground">
-                    Note moyenne
-                  </span>
-                </CardContent>
-              </Card>
-              <Card className="bg-card border-border">
-                <CardContent className="p-4 text-center">
-                  <TrendingUp className="w-8 h-8 mx-auto text-accent mb-2" />
-                  <p className="text-2xl font-bold text-foreground">94%</p>
-                  <span className="text-sm text-muted-foreground">
-                    Taux complétion
-                  </span>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Performance */}
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                  Performance
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        Taux de complétion
-                      </span>
-                      <span className="font-medium text-foreground">94%</span>
-                    </div>
-                    <Progress value={94} className="h-2" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Ponctualité</span>
-                      <span className="font-medium text-foreground">87%</span>
-                    </div>
-                    <Progress value={87} className="h-2" />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        Taux de réponse
-                      </span>
-                      <span className="font-medium text-foreground">98%</span>
-                    </div>
-                    <Progress value={98} className="h-2" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="activities" className="mt-4">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle>Historique des activités</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-               <ActivityTab userActivities={userLogId} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="transactions" className="mt-4">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle>Transactions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {userTransactions.map((tx) => (
-                  <div
-                    key={tx.id}
-                    className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={cn(
-                          "w-10 h-10 rounded-lg flex items-center justify-center",
-                          tx.type === "payment"
-                            ? "bg-success/10"
-                            : tx.type === "refund"
-                            ? "bg-destructive/10"
-                            : "bg-primary/10"
-                        )}
-                      >
-                        <CreditCard
-                          className={cn(
-                            "w-5 h-5",
-                            tx.type === "payment"
-                              ? "text-success"
-                              : tx.type === "refund"
-                              ? "text-destructive"
-                              : "text-primary"
-                          )}
-                        />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground capitalize">
-                          {tx.type}
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-muted-foreground">
-                            {tx.id}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            •
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {tx.date}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span
-                        className={cn(
-                          "font-bold",
-                          tx.amount > 0 ? "text-success" : "text-destructive"
-                        )}
-                      >
-                        {tx.amount > 0 ? "+" : ""}
-                        {tx.amount.toFixed(2)} €
-                      </span>
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "ml-2 text-xs",
-                          tx.status === "completed"
-                            ? "bg-success/10 text-success border-success/20"
-                            : "bg-warning/10 text-warning border-warning/20"
-                        )}
-                      >
-                        {tx.status === "completed" ? "Complété" : "En attente"}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="bookings" className="mt-4">
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle>Réservations</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {userBookings.map((booking) => (
-                  <div
-                    key={booking.id}
-                    className="p-4 rounded-lg bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm text-muted-foreground">
-                        {booking.id}
-                      </span>
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "font-medium",
-                          bookingStatusConfig[
-                            booking.status as keyof typeof bookingStatusConfig
-                          ]?.className
-                        )}
-                      >
-                        {
-                          bookingStatusConfig[
-                            booking.status as keyof typeof bookingStatusConfig
-                          ].label
-                        }
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex flex-col items-center gap-1">
-                        <div className="w-2 h-2 rounded-full bg-primary" />
-                        <div className="w-0.5 h-6 bg-border" />
-                        <div className="w-2 h-2 rounded-full bg-accent" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-foreground">
-                          {booking.from}
-                        </p>
-                        <p className="font-medium text-foreground mt-2">
-                          {booking.to}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-1 text-muted-foreground mb-1">
-                          <Calendar className="w-3 h-3" />
-                          <span className="text-sm">{booking.date}</span>
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          {booking.seats} place(s)
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* {isDriver && (
-            <TabsContent value="driver" className="mt-6 space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="bg-card border-border">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Car className="w-5 h-5 text-primary" />
-                      Informations conducteur
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                      <span className="text-muted-foreground">
-                        Statut candidature
-                      </span>
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "font-medium",
-                          driverStatusConfig[user?.driverInfo?.status].className
-                        )}
-                      >
-                        {driverStatusConfig[user?.driverInfo?.status].label}
-                      </Badge>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/30">
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Numéro de permis
-                      </p>
-                      <p className="font-medium text-foreground font-mono">
-                        {user?.driverInfo?.licenseNumber}
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/30">
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Date d'expiration du permis
-                      </p>
-                      <p className="font-medium text-foreground">
-                        {formatDate(user?.driverInfo?.licenseExpiryDate)}
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/30">
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Expérience (années)
-                      </p>
-                      <p className="font-medium text-foreground">
-                        {user?.driverInfo?.experience} ans
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-lg bg-muted/30">
-                      <p className="text-sm text-muted-foreground mb-1">
-                        ID Candidature
-                      </p>
-                      <p className="font-medium text-foreground font-mono text-xs">
-                        {user?.driverInfo?.applicationId}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-card border-border">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5 text-warning" />
-                      Contact d'urgence
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {user.driverInfo.emergencyContact?.name && (
-                      <div className="p-3 rounded-lg bg-muted/30">
-                        <p className="text-sm text-muted-foreground mb-1">
-                          Nom
-                        </p>
-                        <p className="font-medium text-foreground">
-                          {user.driverInfo.emergencyContact.name}
-                        </p>
-                      </div>
-                    )}
-                    {user.driverInfo.emergencyContact?.phone && (
-                      <div className="p-3 rounded-lg bg-muted/30">
-                        <p className="text-sm text-muted-foreground mb-1">
-                          Téléphone
-                        </p>
-                        <p className="font-medium text-foreground">
-                          {user.driverInfo.emergencyContact.phone}
-                        </p>
-                      </div>
-                    )}
-                    {user.driverInfo.emergencyContact?.relationship && (
-                      <div className="p-3 rounded-lg bg-muted/30">
-                        <p className="text-sm text-muted-foreground mb-1">
-                          Relation
-                        </p>
-                        <p className="font-medium text-foreground">
-                          {user.driverInfo.emergencyContact.relationship}
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <CardTitle>Motivation</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-foreground">
-                    {user.driverInfo.motivation}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <CardTitle>Historique de la candidature</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <FileText className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">
-                        Candidature soumise
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatDate(user.driverInfo.submittedAt)}
-                      </p>
-                    </div>
-                  </div>
-                  {user.driverInfo.reviewedAt && (
-                    <div className="flex items-center gap-4 p-3 rounded-lg bg-muted/30">
-                      <div
-                        className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center",
-                          user.driverInfo.status === "APPROVED"
-                            ? "bg-success/10"
-                            : "bg-destructive/10"
-                        )}
-                      >
-                        {user.driverInfo.status === "APPROVED" ? (
-                          <CheckCircle className="w-5 h-5 text-success" />
-                        ) : (
-                          <XCircle className="w-5 h-5 text-destructive" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">
-                          Candidature{" "}
-                          {user.driverInfo.status === "APPROVED"
-                            ? "approuvée"
-                            : "rejetée"}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(user.driverInfo.reviewedAt)}
-                        </p>
-                        {user.driverInfo.reviewedBy && (
-                          <p className="text-xs text-muted-foreground">
-                            Par: {user.driverInfo.reviewedBy}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {user.driverInfo.rejectionReason && (
-                    <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
-                      <p className="text-sm font-medium text-destructive mb-1">
-                        Raison du rejet
-                      </p>
-                      <p className="text-foreground">
-                        {user.driverInfo.rejectionReason}
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          )} */}
-
-          {/* {isDriver  && (
-            <TabsContent value="documents" className="mt-6">
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-primary" />
-                    Documents envoyés
-                  </CardTitle>
-                  <CardDescription>Liste des documents fournis par le conducteur</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {user.documents.map((doc) => (
-                      <div
-                        key={doc.id}
-                        className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className={cn(
-                            "w-12 h-12 rounded-lg flex items-center justify-center",
-                            doc.status === "approved" ? "bg-success/10" :
-                            doc.status === "rejected" ? "bg-destructive/10" : "bg-warning/10"
-                          )}>
-                            <FileText className={cn(
-                              "w-6 h-6",
-                              doc.status === "approved" ? "text-success" :
-                              doc.status === "rejected" ? "text-destructive" : "text-warning"
-                            )} />
-                          </div>
-                          <div>
-                            <p className="font-medium text-foreground">{doc.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {documentTypeLabels[doc.type]}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Envoyé le: {formatDate(doc.uploadedAt)}
-                            </p>
-                            {doc.expiresAt && (
-                              <p className="text-xs text-muted-foreground">
-                                Expire le: {formatDate(doc.expiresAt)}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Badge variant="outline" className={cn("font-medium", documentStatusConfig[doc.status].className)}>
-                            {documentStatusConfig[doc.status].label}
-                          </Badge>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          )} */}
-        </Tabs>
-      </div>
-    </>
+      {/* <UserTabs user={user} activities={userLogId} /> */}
+    </div>
   );
 }

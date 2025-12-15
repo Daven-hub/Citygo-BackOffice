@@ -4,7 +4,7 @@ import { getAllUsers } from "@/store/slices/user.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { logoutAsync } from "@/store/slices/auth.slice";
 import { useToast } from "@/hook/use-toast";
-import { injectLogoutHandler } from "@/services/api";
+// import { injectLogoutHandler } from "@/services/api";
 
 const AuthContext = createContext(null);
 
@@ -61,8 +61,7 @@ export const AuthProvider = ({ children }) => {
       }
   };
 
-  injectLogoutHandler(handleLogout);
-
+  // injectLogoutHandler();
 
   return (
     <AuthContext.Provider
