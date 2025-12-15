@@ -19,6 +19,8 @@ import RidesDetail from "./pages/RidesDetail";
 import KYCRequestDetail from "./pages/KYCRequestDetail";
 import DriverApplicationDetail from "./pages/DriverApplicationDetail";
 import KYC from "./pages/KYC/index";
+import Vehicles from "./pages/Vehicles";
+import VehicleDetail from "./pages/VehicleDetail";
 
 // Lazy loading
 const Login = lazy(() => import("./pages/Login"));
@@ -55,12 +57,14 @@ const App = () => {
                 </Route>
                 {/* <Route path="rapports" element={<Rapports />} /> */}
                 {/* <Route path="destinations" element={<Destinations />} /> */}
+                <Route path="vehicules" element={<Vehicles />} />
+                <Route path="vehicules/:vehicleId" element={<VehicleDetail />} />
                 <Route path="reservations" element={<Bookings />} />
                 <Route path="reservations/:bookingId" element={<BookingsDetail />} />
                 <Route path="kyc" element={<KYC />} />
                 <Route path="kyc/demande/:requestId" element={<KYCRequestDetail />} />
                 <Route path="kyc/applications/:applicationId" element={<DriverApplicationDetail />} />
-                <Route path="settings" element={<Settings />} />
+                {/* <Route path="settings" element={<Settings />} /> */}
                 <Route path="utilisateurs" element={<Users />} />
                 <Route path="/utilisateurs/:userId" element={<UserDetail />} />
                 <Route path="trajets" element={<Rides />} />

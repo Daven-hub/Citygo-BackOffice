@@ -60,15 +60,41 @@ export interface User {
 }
 
 export const roleConfig = {
-  driver: { label: "Conducteur", className: "bg-primary/10 text-primary border-primary/20" },
-  passenger: { label: "Passager", className: "bg-secondary text-secondary-foreground border-border" },
-  both: { label: "Les deux", className: "bg-accent/10 text-accent border-accent/20" },
+  ROLE_DRIVER: {
+    label: "Conducteur",
+    className: "bg-primary/10 text-primary border-primary/20",
+  },
+  ROLE_USER: {
+    label: "Passager",
+    className: "bg-secondary text-secondary-foreground border-border",
+  },
+  both: {
+    label: "Users + Driver",
+    className: "bg-green-100 text-green-700 border-grenn-200",
+  },
+  ROLE_ADMIN: {
+    label: "Admin",
+    className: "bg-green-100 text-primary-700 border-green-200",
+  },
 };
 
 export const statusConfig = {
-  active: { label: "Actif", className: "bg-success/10 text-success border-success/20" },
-  inactive: { label: "Inactif", className: "bg-muted text-muted-foreground border-border" },
-  suspended: { label: "Suspendu", className: "bg-destructive/10 text-destructive border-destructive/20" },
+  ACTIVE: {
+    label: "Actif",
+    className: "bg-success/10 text-success border-success/20",
+  },
+  PENDING_VERIFICATION: {
+    label: "Pending",
+    className: "bg-warning/10 text-warning border-warning/20",
+  },
+  INACTIVE: {
+    label: "Inactif",
+    className: "bg-muted text-muted-foreground border-border",
+  },
+  SUSPENDED: {
+    label: "Suspendu",
+    className: "bg-destructive/10 text-destructive border-destructive/20",
+  },
 };
 
 export const driverStatusConfig = {
