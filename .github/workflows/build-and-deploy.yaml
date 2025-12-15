@@ -1,0 +1,143 @@
+# =============================================================================
+# GitHub Actions CI/CD Workflow for CityGo Backoffice
+# =============================================================================
+# Required secrets:
+# - HARBOR_USERNAME: Harbor registry username
+# - HARBOR_PASSWORD: Harbor registry password
+# - GITOPS_TOKEN: GitHub PAT with write access to citygo-gitops repo
+# =============================================================================
+
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  REGISTRY: harbor.tchoco.com
+  IMAGE_NAME: citygo/backoffice
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.meta.outputs.version }}
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Harbor Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            # For develop branch: dev-<sha>
+            type=sha,prefix=dev-,enable=${{ github.ref == 'refs/heads/develop' }}
+            # For main branch: staging-<sha>
+            type=sha,prefix=staging-,enable=${{ github.ref == 'refs/heads/main' }}
+            # For tags: v1.0.0
+            type=semver,pattern=v{{version}}
+
+      - name: Determine API URL
+        id: api-url
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "url=https://api.dev.citygo-drive.com" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "url=https://api.staging.citygo-drive.com" >> $GITHUB_OUTPUT
+          else
+            echo "url=https://api.dev.citygo-drive.com" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_API_URL=${{ steps.api-url.outputs.url }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  update-gitops-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: CityGo-Cameroun/citygo-gitops
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
+
+      - name: Update dev image tag
+        run: |
+          cd gitops
+          # Install yq if not available
+          if ! command -v yq &> /dev/null; then
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+          fi
+          # Update the image tag
+          yq e '.image.tag = "${{ needs.build.outputs.image_tag }}"' -i backoffice/values-dev.yaml
+          # Show the change
+          echo "Updated values-dev.yaml:"
+          cat backoffice/values-dev.yaml | grep -A1 "^image:"
+
+      - name: Commit and push changes
+        run: |
+          cd gitops
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add backoffice/values-dev.yaml
+          git diff --staged --quiet || git commit -m "chore(backoffice): update dev image to ${{ needs.build.outputs.image_tag }}"
+          git push
+
+  update-gitops-staging:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout GitOps repository
+        uses: actions/checkout@v4
+        with:
+          repository: CityGo-Cameroun/citygo-gitops
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
+
+      - name: Update staging image tag
+        run: |
+          cd gitops
+          if ! command -v yq &> /dev/null; then
+            sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+          fi
+          yq e '.image.tag = "${{ needs.build.outputs.image_tag }}"' -i backoffice/values-staging.yaml
+
+      - name: Commit and push changes
+        run: |
+          cd gitops
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add backoffice/values-staging.yaml
+          git diff --staged --quiet || git commit -m "chore(backoffice): update staging image to ${{ needs.build.outputs.image_tag }}"
+          git push
