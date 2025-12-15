@@ -1,9 +1,7 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import $ from "jquery";
-// import { roleChange } from '../../pages/Admin/Dashboard';
 import {
-  ArrowRight,
   Bell,
   Calendar,
   Car,
@@ -14,17 +12,14 @@ import {
   CreditCard,
   Grid,
   Mail,
-  MapPin,
   Settings,
   ShieldCheck,
-  ShoppingCart,
   SidebarClose,
   User,
   UserIcon,
-  UserRound,
 } from "lucide-react";
 import { useAuth } from "@/context/authContext";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+// import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 function Sidebar({ setIsSidebarOpen }) {
   $(function () {
@@ -51,97 +46,97 @@ function Sidebar({ setIsSidebarOpen }) {
       corps: [
         {
           title: "Tableau de Bord",
-          icon: <Grid size={18} />,
+          icon: <Grid size={20} />,
           path: "/",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
-        // { title: 'Vehicules', icon: <CarFront size={18} />, path: '/vehicules', children: [], alowed:['admin','super'] },
+        { title: 'Vehicules', icon: <CarFront size={20} />, path: '/vehicules', children: [], alowed:["ROLE_ADMIN"] },
         {
           title: "Trajets",
-          icon: <CarFront size={18} />,
+          icon: <CarFront size={20} />,
           path: "/trajets",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Reservations",
-          icon: <Calendar size={18} />,
+          icon: <Calendar size={20} />,
           path: "/reservations",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "KYC",
-          icon: <ShieldCheck size={18} />,
+          icon: <ShieldCheck size={20} />,
           path: "/kyc",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Transactions",
-          icon: <CreditCard size={18} />,
+          icon: <CreditCard size={20} />,
           path: "/transactions",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         // { title: 'Destination', icon: <MapPin size={18} />, path: '/destinations', children: [], alowed:['admin','super'], },
         {
           title: "Utilisateurs",
-          icon: <User size={18} />,
+          icon: <User size={20} />,
           path: "",
           children: [
             {
               title: "Utilisateurs",
-              icon: <CarFront size={18} />,
+              icon: <CarFront size={20} />,
               path: "/utilisateurs",
               children: [],
-              alowed: ["admin", "super"],
+              alowed: ["ROLE_ADMIN"],
             },
             {
               title: "Administrations",
-              icon: <Bell size={18} />,
+              icon: <Bell size={20} />,
               path: "/utilisateurs-admin",
               children: [],
-              alowed: ["admin", "super"],
+              alowed: ["ROLE_ADMIN"],
             },
           ],
-          alowed: ["super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Notifications",
-          icon: <Bell size={18} />,
+          icon: <Bell size={20} />,
           path: "/notifications",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Messages",
-          icon: <Mail size={18} />,
+          icon: <Mail size={20} />,
           path: "/messages",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Profile",
-          icon: <UserIcon size={18} />,
+          icon: <UserIcon size={20} />,
           path: "/profile",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Rapports",
-          icon: <ChartBar size={18} />,
+          icon: <ChartBar size={20} />,
           path: "/rapports",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Paramètres",
-          icon: <Settings size={18} />,
+          icon: <Settings size={20} />,
           path: "/settings",
           children: [],
-          alowed: ["admin", "super"],
+          alowed: ["ROLE_ADMIN"],
         },
       ],
     },
@@ -149,19 +144,16 @@ function Sidebar({ setIsSidebarOpen }) {
 
   const location = useLocation();
 
-  const isChildActive = (children) =>
-    children.some((child) => location.pathname.startsWith(child.path));
-
   return (
     <div
-      className={`fixed border-r h-[100vh] left-0 side-ccca w-[17.5%] max-md:w-[60%] max-sm:w-[80%] bg-white transform transition-transform duration-500`}
+      className={`fixed border-r h-[100vh] left-0 side-ccca w-[17.5%] max-md:w-[55%] max-sm:w-[75%] bg-white transform transition-transform duration-500`}
     >
-      <div className="flex items-center justify-between border-b py-2.5 max-md:py-[.85rem] px-[7%]">
+      <div className="flex items-center justify-between border-b py-3.5 md:py-3 px-[7%]">
         <div className="flex items-center justify-start gap-1.5 w-full">
           <img
             src={"/images/FullLogo.png"}
             alt="Logo"
-            className="w-full object-contain max-md:w-7 max-md:h-7 h-[2.7rem]"
+            className="w-auto object-contain max-md:h-11 h-[2.54rem]"
           />
         </div>
         <div className="menu-close hidden cursor-pointer max-md:block">
@@ -169,16 +161,16 @@ function Sidebar({ setIsSidebarOpen }) {
         </div>
       </div>
 
-      <div className="px-3 relative pb-3 pt-4 flex flex-col gap-8 overflow-y-auto sidebb h-[calc(100vh-69px)]">
-        <div className="sidebare-admin font-normal text-gray-600 flex flex-col gap-2.5">
+      <div className="px-3 relative pb-3 pt-5 flex flex-col gap-8 overflow-y-auto sidebb h-[calc(100vh-69px)]">
+        <div className="sidebare-admin text-[1.05rem] md:text-[.95rem] font-medium text-gray-600 flex flex-col gap-2.5">
           {sideLink?.map((x, indexi) => (
             <div key={indexi}>
               <p
-                className={`text-[.82rem] font-normal text-gray-400 text-opacity-30 mb-1`}
+                className={`text-[.85rem] font-normal text-gray-400 text-opacity-30 mb-0`}
               >
                 {x.group}
               </p>
-              <div className="flex flex-col gap-0.5">
+              <div className="flex flex-col gap-1">
                 {x?.corps.map((item, index) => {
                   const childIsActive =
                     item.children?.length > 0
@@ -188,20 +180,20 @@ function Sidebar({ setIsSidebarOpen }) {
                       : false;
 
                   return item.children.length === 0 ? (
-                    item.alowed?.includes(userConnected?.role) && (
+                    item.alowed?.some(role => userConnected?.roles?.includes(role)) && (
                       <NavLink
                         key={index}
                         to={item.path}
                         className={({ isActive }) =>
-                          `flex items-center gap-2.5 w-full px-3.5 border border-transparent py-2.5 rounded-lg text-[0.9rem] transition-colors duration-200 
+                          `flex items-center gap-2.5 w-full px-3.5 border border-transparent py-2.5 rounded-lg transition-colors duration-200 
                           ${isActive
                             ? "bg-blue-50 !text-blue-600 border-primary/10"
-                            : "text-gray-600 hover:bg-gray-100"
+                            : "text-gray-600 hover:bg-gray-50"
                           }`
                         }
                         onClick={() => setIsSidebarOpen(false)}
                       >
-                        <span className="text-xl">{item.icon}</span>
+                        <span className="text-2xl">{item.icon}</span>
                         {item.title}
                       </NavLink>
                     )
@@ -211,12 +203,12 @@ function Sidebar({ setIsSidebarOpen }) {
                         className={`settings-btn border border-transparent text-blue-600 flex items-center justify-between cursor-pointer px-3.5 py-2.5 w-full rounded-md transition-all
                           ${childIsActive
                             ? "bg-blue-100 border-primary/20"
-                            : "text-gray-600 hover:bg-gray-100"
+                            : "text-gray-500 hover:bg-gray-50"
                           }`}
                       >
                         <div className="flex items-center gap-3">
                           {item.icon}
-                          <span className="text-[.9rem]">{item.title}</span>
+                          <span className="">{item.title}</span>
                         </div>
                         <ChevronRight
                           size={17}
@@ -233,8 +225,9 @@ function Sidebar({ setIsSidebarOpen }) {
                           <li key={i} className="">
                             <NavLink
                               to={child.path}
+                               onClick={() => setIsSidebarOpen(false)}
                               className={({ isActive }) =>
-                                `flex items-center py-1.5 text-[.9rem] transition-colors
+                                `flex items-center py-1.5 transition-colors
                     ${isActive
                                   ? "!text-blue-500 font-normal"
                                   : "text-gray-700 hover:text-blue-500"

@@ -34,7 +34,7 @@ export default function LoaderUltra({
 
   return (
     <div
-      className="absolute inset-0 z-50 flex items-center justify-center"
+      className="fixed w-full h-full inset-0 z-50 flex items-center justify-center"
       style={{
         backgroundColor: `rgba(255,255,255,${opacity})`,
       }}

@@ -1,7 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Search, Filter, MoreHorizontal, UserPlus, Mail, Phone, Calendar,
-  Edit2, Ban, ExternalLink, Eye
+  Search,
+  Filter,
+  MoreHorizontal,
+  Mail,
+  Phone,
+  Calendar,
+  Edit2,
+  Ban,
+  ExternalLink,
+  Car,
+  CheckCircle,
+  FileText,
+  User,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,99 +24,232 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Checkbox } from "@/components/ui/checkbox"; // 👉 IMPORTANT
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { UserDetailModal } from "@/components/modal/UserDetailModal";
-import { UserModal } from "@/components/modal/UserModal";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  role: "driver" | "passenger" | "both";
-  status: "active" | "inactive" | "suspended";
-  rides: number;
-  rating: number;
-  joinedAt: string;
-}
-
-const users: User[] = [
-  { id: "1", name: "Lionel Fotso", email: "lionel.fotso@email.com", phone: "+237 658852214", role: "both", status: "active", rides: 45, rating: 4.8, joinedAt: "15/03/2024" },
-  { id: "2", name: "Maxime Tsafack", email: "maxime@email.com", phone: "+237 658852214", role: "driver", status: "active", rides: 128, rating: 4.9, joinedAt: "08/01/2024" },
-  { id: "3", name: "Sarah Mbarga", email: "sarah@email.com", phone: "+237 658852214", role: "passenger", status: "active", rides: 23, rating: 4.6, joinedAt: "22/05/2024" },
-  { id: "4", name: "Tony Ngo", email: "tony@mail.com", phone: "+237 658852214", role: "both", status: "inactive", rides: 67, rating: 4.7, joinedAt: "12/02/2024" },
-  { id: "5", name: "Tony Ngo", email: "tony@mail.com", phone: "+237 658852214", role: "both", status: "inactive", rides: 67, rating: 4.7, joinedAt: "12/02/2024" },
-  { id: "6", name: "Tony Ngo", email: "tony@mail.com", phone: "+237 658852214", role: "both", status: "inactive", rides: 67, rating: 4.7, joinedAt: "12/02/2024" },
-  { id: "7", name: "Tony Ngo", email: "tony@mail.com", phone: "+237 658852214", role: "both", status: "inactive", rides: 67, rating: 4.7, joinedAt: "12/02/2024" },
-];
+import { useAppDispatch, useAppSelector } from "@/store/hook";
+import {
+  getAllUsers,
+  unSuspendUserById,
+  UserType,
+} from "@/store/slices/user.slice";
+import LoaderUltra from "@/components/ui/loaderUltra";
+import dayjs from "dayjs";
+import { useToast } from "@/hook/use-toast";
+import { UserSuspendModal } from "@/components/modal/UserSuspendModal";
+import { useAuth } from "@/context/authContext";
+import { BulkActionModal } from "@/components/modal/BulkActionModal";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 
 const roleConfig = {
-  driver: { label: "Conducteur", className: "bg-primary/10 text-primary border-primary/20" },
-  passenger: { label: "Passager", className: "bg-secondary text-secondary-foreground border-border" },
-  both: { label: "Les deux", className: "bg-accent/10 text-accent border-accent/20" },
+  ROLE_DRIVER: {
+    label: "Conducteur",
+    className: "bg-primary/10 text-primary border-primary/20",
+  },
+  ROLE_USER: {
+    label: "Passager",
+    className: "bg-secondary text-secondary-foreground border-border",
+  },
+  both: {
+    label: "Users + Driver",
+    className: "bg-green-100 text-green-700 border-grenn-200",
+  },
+  ROLE_ADMIN: {
+    label: "Admin",
+    className: "bg-green-100 text-primary-700 border-green-200",
+  },
 };
 
 const statusConfig = {
-  active: { label: "Actif", className: "bg-success/10 text-success border-success/20" },
-  inactive: { label: "Inactif", className: "bg-muted text-muted-foreground border-border" },
-  suspended: { label: "Suspendu", className: "bg-destructive/10 text-destructive border-destructive/20" },
+  ACTIVE: {
+    label: "Actif",
+    className: "bg-success/10 text-success border-success/20",
+  },
+  PENDING_VERIFICATION: {
+    label: "En attente",
+    className: "bg-warning/10 text-warning border-warning/20",
+  },
+  INACTIVE: {
+    label: "Inactif",
+    className: "bg-muted text-muted-foreground border-border",
+  },
+  SUSPENDED: {
+    label: "Suspendu",
+    className: "bg-destructive/10 text-destructive border-destructive/20",
+  },
 };
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIds, setSelectedIds] = useState<string[]>([]); // 👉 tableau des IDs cochés
-
+  const dispatch = useAppDispatch();
+  const { users } = useAppSelector((state) => state.users);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [duration, setDuration] = useState(0);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [suspendModalOpen, setSuspendModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
+  const [bulkActionModalOpen, setBulkActionModalOpen] = useState(false);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { userConnected } = useAuth();
 
   const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    (user) =>{
+      const matchesSearch=
+      user?.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user?.phone?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "all" || user.status === statusFilter;
+      const matchesRole = roleFilter === "all" || user.roles.includes(roleFilter);
+      return matchesSearch && matchesStatus && matchesRole;
+    }
   );
 
-  // 👉 GESTION DES CHECKBOXES
-  const toggleUserSelection = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((uid) => uid !== id) : [...prev, id]
-    );
+  const handleViewFullDetail = (userId: string) =>
+    navigate(`/utilisateurs/${userId}`);
+  // const handleEditUser = (user: UserType) => setSelectedUser(user);
+  const handleSuspendUser = (user: UserType) => {
+    setSelectedUser(user);
+    setSuspendModalOpen(true);
   };
 
-  const toggleSelectAll = () => {
-    if (selectedIds.length === filteredUsers.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(filteredUsers.map((u) => u.id));
+  const handleReactive = async (userId: string) => {
+    setLoading(true);
+    try {
+      const datas = users?.find((x) => x.id === userId);
+      await dispatch(unSuspendUserById(userId)).unwrap();
+      toast({
+        title: "Utilisateur réactivé",
+        description: `${datas?.displayName} a été réactivé.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: error?.toString(),
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const isAllSelected = filteredUsers.length > 0 && selectedIds.length === filteredUsers.length;
-
-  const handleViewUser = (user: User) => {
-    setSelectedUser(user);
-    setDetailModalOpen(true);
+  const handleSelectUser = (userId: string, checked: boolean) => {
+    if (checked) setSelectedUserIds((prev) => [...prev, userId]);
+    else setSelectedUserIds((prev) => prev.filter((id) => id !== userId));
   };
 
-  const handleViewFullDetail = (userId: string) => {
-    navigate(`/utilisateurs/${userId}`);
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) setSelectedUserIds(filteredUsers.map((user) => user.id));
+    else setSelectedUserIds([]);
   };
 
-  const handleEditUser = (user: User) => {
-    setSelectedUser(user);
-    setEditModalOpen(true);
+  const handleBulkAction = () => setBulkActionModalOpen(true);
+
+  const handleBulkActionSubmit = (data: {
+    userIds: string[];
+    operation: string;
+    reason: string;
+  }) => {
+      setSelectedUserIds([])
   };
+
+  const allSelected =
+    filteredUsers.length > 0 && selectedUserIds.length === filteredUsers.length;
+  const someSelected =
+    selectedUserIds.length > 0 && selectedUserIds.length < filteredUsers.length;
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const start = performance.now();
+      await dispatch(getAllUsers());
+      const end = performance.now();
+      const elapsed = end - start;
+      setDuration(elapsed);
+      setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
+    };
+    fetchData();
+  }, [dispatch]);
+
+  const actifUser=users.filter((x)=>x.status==='ACTIVE')?.length
+  const pendingUser=users.filter((x)=>x.status==='PENDING_VERIFICATION')?.length
+  const suspendUser=users.filter((x)=>x.status==='SUSPENDED')?.length
+
+  const statCard=[
+  {
+    key: "total",
+    label: "Total",
+    value: users?.length,
+    icon: User,
+    colorClass: "text-primary",
+    bgColorClass: "bg-primary/10",
+  },
+  {
+    key: "approved",
+    label: "Approuvés",
+    value: actifUser,
+    icon: CheckCircle,
+    colorClass: "text-success",
+    bgColorClass: "bg-success/10",
+  },
+  {
+    key: "pending",
+    label: "En attente",
+    value: pendingUser,
+    icon: FileText,
+    colorClass: "text-warning",
+    bgColorClass: "bg-warning/10",
+  },
+  {
+    key: "suspended",
+    label: "Suspendus",
+    value: suspendUser,
+    icon: Ban,
+    colorClass: "text-destructive",
+    bgColorClass: "bg-destructive/10",
+  },
+];
+
+  if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
 
   return (
     <>
-      <div className="space-y-6">
-        {/* Toolbar */}
+      <div className="space-y-4">
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {statCard?.map((x,index)=>
+          <Card key={index} className="bg-card border-border shadow-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">{x.label}</p>
+                  <p className={cn("text-2xl font-bold", x.colorClass)}>
+                    {x.value}
+                  </p>
+                </div>
+                <div
+                  className={cn(
+                    "h-10 w-10 rounded-xl flex items-center justify-center",
+                    x.bgColorClass
+                  )}
+                >
+                  <x.icon className={cn("h-5 w-5", x.colorClass)} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          )}
+        </div>
+
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
           <div className="flex gap-3 flex-1">
-            <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1 max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Rechercher un utilisateur..."
@@ -114,126 +258,224 @@ export default function Users() {
                 className="pl-10 bg-card border-border"
               />
             </div>
-            <Button variant="outline" size="icon" className="border-border">
-              <Filter className="w-4 h-4" />
-            </Button>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-full md:w-44 border-border text-foreground">
+                    <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <SelectValue placeholder="Statut" />
+                  </SelectTrigger>
+                  <SelectContent className="border-border">
+                    <SelectItem value="all" className="text-foreground">Tous les statuts</SelectItem>
+                    <SelectItem value="ACTIVE" className="text-success">Active</SelectItem>
+                    <SelectItem value="PENDING_VERIFICATION" className="text-warning">En attente</SelectItem>
+                    <SelectItem value="SUSPENDED" className="text-destructive">Suspendu</SelectItem>
+                    <SelectItem value="INACTIVE" className="text-primary">Inactif</SelectItem>
+                  </SelectContent>
+                </Select>
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger className="w-full md:w-44 border-border text-foreground">
+                    <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <SelectValue placeholder="Statut" />
+                  </SelectTrigger>
+                  <SelectContent className="border-border">
+                    <SelectItem value="all" className="text-foreground">Tous les roles</SelectItem>
+                    <SelectItem value="ROLE_DRIVER" className="text-foreground">Chauffeur</SelectItem>
+                  </SelectContent>
+                </Select>
           </div>
+
+          {selectedUserIds.length > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleBulkAction}
+              className="border-primary text-primary bg-white hover:bg-primary/10"
+            >
+              Actions groupées ({selectedUserIds.length})
+            </Button>
+          )}
         </div>
 
-        {/* Users Table */}
         <div className="rounded-xl border border-border bg-card overflow-hidden animate-fade-in">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border bg-muted/30">
                   <th className="py-4 px-6">
-                    <Checkbox checked={isAllSelected} onCheckedChange={toggleSelectAll} />
+                    <Checkbox
+                      type="button"
+                      checked={allSelected}
+                      onCheckedChange={handleSelectAll}
+                      onClick={(e) => e.stopPropagation()}
+                      className="border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                      {...(someSelected
+                        ? { "data-state": "indeterminate" }
+                        : {})}
+                    />
                   </th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Utilisateur</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Contact</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Rôle</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Trajets</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Note</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Statut</th>
-                  <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Inscrit le</th>
-                  <th className="text-right py-4 px-6 text-sm font-medium text-muted-foreground">Actions</th>
+                  <th className="text-left py-3.5 px-5 text-sm font-medium text-muted-foreground">
+                    Utilisateur
+                  </th>
+                  <th className="text-left py-3.5 px-5 text-sm font-medium text-muted-foreground">
+                    Contact
+                  </th>
+                  <th className="text-left py-3.5 px-5 text-sm font-medium text-muted-foreground">
+                    Rôle
+                  </th>
+                  <th className="text-left py-3.5 px-5 text-sm font-medium text-muted-foreground">
+                    Trajets
+                  </th>
+                  <th className="text-left py-3.5 px-5 text-sm font-medium text-muted-foreground">
+                    Note
+                  </th>
+                  <th className="text-left py-3.5 px-5 text-sm font-medium text-muted-foreground">
+                    Statut
+                  </th>
+                  <th className="text-left py-3.5 px-5 text-sm font-medium text-muted-foreground">
+                    Inscrit le
+                  </th>
+                  <th className="text-right py-3.5 px-5 text-sm font-medium text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
 
               <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id} className="border-b text-sm border-border/50 hover:bg-muted/20 transition-colors">
-
-                    {/* Checkbox ligne */}
-                    <td className="py-3 px-6">
-                      <Checkbox
-                        checked={selectedIds.includes(user.id)}
-                        onCheckedChange={() => toggleUserSelection(user.id)}
-                      />
-                    </td>
-
-                    <td className="py-3 px-6">
-                      <div className="flex items-center gap-3">
+                {filteredUsers.map((user) => {
+                  const isSelected = selectedUserIds.includes(user.id);
+                  return (
+                    <tr
+                      key={user.id}
+                      className="border-b text-[.85rem] border-border/50 hover:bg-muted/20 transition-colors"
+                    >
+                      <td className="py-3 px-5">
+                        <Checkbox
+                          type="button"
+                          checked={isSelected}
+                          onCheckedChange={(checked) =>
+                            handleSelectUser(user.id, checked as boolean)
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          className="border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                        />
+                      </td>
+                      <td className="py-3 px-5 flex items-center gap-3">
                         <Avatar className="w-10 h-10">
                           <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                            {user.name.split(" ").map((n) => n[0]).join("")}
+                            {user?.displayName
+                              ?.split(" ")
+                              .map((n) => n[0])
+                              .join("")}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="font-medium text-foreground">{user.name}</span>
-                      </div>
-                    </td>
-
-                    <td className="py-3 px-6">
-                      <div className="space-y-0.5">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Mail className="w-3.5 h-3.5" />
-                          {user.email}
+                        <span className="font-medium text-foreground">
+                          {user?.displayName}
+                        </span>
+                      </td>
+                      <td className="py-3 px-5">
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Mail className="w-3.5 h-3.5" /> {user.email?user.email:'N/A'}
+                          </div>
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Phone className="w-3.5 h-3.5" /> {user.phone?user.phone:'N/A'}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Phone className="w-3.5 h-3.5" />
-                          {user.phone}
+                      </td>
+                      <td className="py-3 flex px-5">
+                        {(() => {
+                          const roles =
+                            user?.roles?.filter((r) => r !== "ROLE_ADMIN") ||
+                            [];
+                          const hasBoth =
+                            roles.includes("ROLE_USER") &&
+                            roles.includes("ROLE_DRIVER");
+                          const finalRoles = hasBoth ? ["both"] : roles;
+                          return finalRoles.map((item, index) => (
+                            <Badge
+                              key={index}
+                              variant="outline"
+                              className={cn(
+                                "font-medium text-[.7rem]",
+                                roleConfig[item]?.className
+                              )}
+                            >
+                              {roleConfig[item]?.label}
+                            </Badge>
+                          ));
+                        })()}
+                      </td>
+                      <td className="py-4 px-5 text-sm text-foreground font-medium">
+                        10
+                      </td>
+                      <td className="py-4 px-5">
+                        <div className="flex items-center gap-1">
+                          <span className="text-warning">★</span>
+                          <span className="text-foreground font-medium">
+                            4.8
+                          </span>
                         </div>
-                      </div>
-                    </td>
-
-                    <td className="py-3 px-6">
-                      <Badge variant="outline" className={cn("font-medium text-[.7rem]", roleConfig[user.role].className)}>
-                        {roleConfig[user.role].label}
-                      </Badge>
-                    </td>
-
-                    <td className="py-4 px-6 text-sm text-foreground font-medium">{user.rides}</td>
-
-                    <td className="py-4 px-6">
-                      <div className="flex items-center gap-1">
-                        <span className="text-warning">★</span>
-                        <span className="text-foreground font-medium">{user.rating}</span>
-                      </div>
-                    </td>
-
-                    <td className="py-3 px-6">
-                      <Badge variant="outline" className={cn("font-medium text-[.7rem]", statusConfig[user.status].className)}>
-                        {statusConfig[user.status].label}
-                      </Badge>
-                    </td>
-
-                    <td className="py-3 px-6">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {user.joinedAt}
-                      </div>
-                    </td>
-
-                    <td className="py-3 px-6 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-card border-border">
-                          <DropdownMenuItem onClick={() => handleViewUser(user)}>
-                            <Eye className="w-4 h-4 mr-2" />
-                            Aperçu rapide
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleViewFullDetail(user.id)}>
-                            <ExternalLink className="w-4 h-4 mr-2" />
-                            Détails complets
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleEditUser(user)}>
-                            <Edit2 className="w-4 h-4 mr-2" />
-                            Modifier
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            <Ban className="w-4 h-4 mr-2" />
-                            Suspendre
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-
-                  </tr>
-                ))}
+                      </td>
+                      <td className="py-3 px-5">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "font-medium text-[.7rem]",
+                            statusConfig[user.status]?.className
+                          )}
+                        >
+                          {statusConfig[user.status]?.label}
+                        </Badge>
+                      </td>
+                      <td className="py-3 px-5 flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar className="w-3.5 h-3.5" />{" "}
+                        {dayjs(user?.createdAt).format("YYYY-MM-DD")}
+                      </td>
+                      <td className="py-3 px-6 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="transparent"
+                              size="icon"
+                              className="h-8 w-8"
+                            >
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="border-border"
+                          >
+                            <DropdownMenuItem
+                              onClick={() => handleViewFullDetail(user.id)}
+                            >
+                              <ExternalLink className="w-4 h-4 mr-2" /> Détails
+                              complets
+                            </DropdownMenuItem>
+                            {user.status === "SUSPENDED" && (
+                              <DropdownMenuItem
+                                disabled={loading}
+                                onClick={() => handleReactive(user.id)}
+                                className="text-success"
+                              >
+                                <Ban className="w-4 h-4 mr-2" /> Reactiver
+                              </DropdownMenuItem>
+                            )}
+                            {user.status === "ACTIVE" && (
+                              <DropdownMenuItem
+                                disabled={user.id === userConnected?.id}
+                                onClick={() => handleSuspendUser(user)}
+                                className="text-destructive"
+                              >
+                                <Ban className="w-4 h-4 mr-2" /> Suspendre
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -247,15 +489,18 @@ export default function Users() {
           user={selectedUser}
         />
       )}
-
-      {selectedUser && (
-        <UserModal
-          open={editModalOpen}
-          onOpenChange={setEditModalOpen}
-          user={selectedUser}
-          mode="edit"
-        />
-      )}
+      <UserSuspendModal
+        user={selectedUser}
+        open={suspendModalOpen}
+        onOpenChange={setSuspendModalOpen}
+      />
+      <BulkActionModal
+        users={users}
+        userIds={selectedUserIds}
+        open={bulkActionModalOpen}
+        onOpenChange={setBulkActionModalOpen}
+        onSubmit={handleBulkActionSubmit}
+      />
     </>
   );
 }

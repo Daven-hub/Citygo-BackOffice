@@ -1,13 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
 import {
-  ChevronDown,
-  Edit,
   Trash2,
   DownloadCloud,
   Plus,
   User,
-  Eye
 } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { useToast } from '@/hook/use-toast'
@@ -15,13 +12,9 @@ import { deleteuser, getAllUsers, updateUser } from '@/store/slices/user.slice'
 import LoaderUltra from '@/components/ui/loaderUltra'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { BaseUrl } from '@/config'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
 import dayjs from "dayjs";
 import Breadcrumb from '@/components/Breadcrumb'
 import UserModal from '@/components/modal/UserModale'
-import { useNavigate } from 'react-router-dom'
 import { Switch } from '@/components/ui/switch'
 
 function UsersAdministration () {
@@ -32,7 +25,6 @@ function UsersAdministration () {
   const [search, setSearch] = useState('')
   const [open, setOpen]=useState(false)
   const { toast } = useToast()
-  const navigate= useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,12 +45,10 @@ function UsersAdministration () {
 
   const filterClient = useMemo(() => {
       const lowerSearch = search?.toLowerCase()
-      return users.filter(cat =>
-        cat?.nom?.toLowerCase()?.includes(lowerSearch) ||
-        cat?.prenom?.toLowerCase()?.includes(lowerSearch) ||
+      return users?.filter((x)=>x.roles?.includes('ROLE_ADMIN')).filter(cat =>
+        cat?.displayName?.toLowerCase()?.includes(lowerSearch) ||
         cat?.email?.toLowerCase()?.includes(lowerSearch) ||
-        cat?.adresse?.toLowerCase()?.includes(lowerSearch) ||
-        cat?.username?.toLowerCase()?.includes(lowerSearch)
+        cat?.phone?.toLowerCase()?.includes(lowerSearch)
       )
     }, [users, search])
 
@@ -158,18 +148,16 @@ function UsersAdministration () {
                     <TableCell className=''>{index + 1}</TableCell>
                     <TableCell className='flex items-center space-x-3'>
                       <Avatar>
-                        {species?.profile && (
                           <AvatarImage
                             className='object-contain border w-[80px] overflow-hidden'
-                            src={BaseUrl + '' + species?.profile}
+                            src={species?.displayName}
                           />
-                        )}
-                        <AvatarFallback>
-                          {species?.username?.charAt(0)}
+                        <AvatarFallback className="AvatarFallback flex h-full w-full uppercase items-center justify-center bg-primary/10 text-sm font-semibold text-primary">
+                          {species?.displayName?.split(" ").slice(0, 2).map(n => n[0]).join("")?.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
                         <p className='text-sm capitalize'>
-                          {species?.prenom + ' ' + species?.nom}
+                          {species?.displayName}
                         </p>
                     </TableCell>
                     <TableCell className=''>
@@ -188,7 +176,7 @@ function UsersAdministration () {
                         />
                     </TableCell>
                     <TableCell className=''>
-                      {dayjs(species?.created_at).format('YYYY-MM-DD')}
+                      {dayjs(species?.createdAt).format('YYYY-MM-DD')}
                     </TableCell>
                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                       <button type='button' onClick={()=>handleDelete(species?.id)} className='px-3 rounded-md bg-red-100 py-2'><Trash2 className='h-4 w-4 text-red-500' /></button>

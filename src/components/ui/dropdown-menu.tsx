@@ -19,7 +19,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "flex cursor-pointer select-none items-center rounded-md px-2 py-1.5 text-sm text-gray-700 bg-white outline-none",
+      "flex cursor-pointer select-none items-center rounded-md px-2 py-1.5 text-sm text-gray-700 !bg-white outline-none",
       "hover:bg-gray-100 focus:bg-gray-100",
       inset && "pl-8",
       className
@@ -173,7 +173,7 @@ DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 // Shortcut
 const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
   return (
-    <span className={cn("ml-auto text-xs text-gray-400", className)} {...props} />
+    <span className={cn("ml-auto text-xs text-gray-200", className)} {...props} />
   )
 }
 DropdownMenuShortcut.displayName = "DropdownMenuShortcut"
