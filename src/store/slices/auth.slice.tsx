@@ -58,7 +58,7 @@ export const login = createAsyncThunk(
   }
 );
 
-export const refreshTokenAsync = createAsyncThunk<any, void, { state: RootState }>(
+export const refreshTokenAsync = createAsyncThunk<unknown, void, { state: RootState }>(
   'auth/refreshToken',
   async (_, thunkAPI) => {
     const state= thunkAPI.getState().auth;
@@ -77,7 +77,7 @@ export const refreshTokenAsync = createAsyncThunk<any, void, { state: RootState 
   }
 );
 
-export const logoutAsync = createAsyncThunk<any, void, { state: RootState }>(
+export const logoutAsync = createAsyncThunk<unknown, void, { state: RootState }>(
   'auth/Logout',
   async (_, thunkAPI) => {
     const state= thunkAPI.getState().auth;

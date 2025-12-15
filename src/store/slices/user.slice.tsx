@@ -40,9 +40,9 @@ export interface UserType {
 
 interface UsersState {
   users: UserType[];
-  userLogId: any[];
-  bulks: any[],
-  analytics: any[],
+  userLogId: unknown[];
+  bulks: unknown[],
+  analytics: unknown[],
   usersId: UserType | null;
   userStatus: "idle" | "loading" | "success" | "error";
   userError?: string | null;
@@ -80,7 +80,7 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-export const getAllUsers = createAsyncThunk<any, void, { state: RootState }>(
+export const getAllUsers = createAsyncThunk<unknown, void, { state: RootState }>(
   "users/getAll",
   async (_, thunkAPI) => {
     try {
@@ -103,13 +103,9 @@ export const getAllUsers = createAsyncThunk<any, void, { state: RootState }>(
   }
 );
 
-export const getUserById = createAsyncThunk<any, string, { state: RootState }>(
+export const getUserById = createAsyncThunk<unknown, string, { state: RootState }>(
   "user/getById",
-<<<<<<< HEAD
-  async (id:number, thunkAPI) => {
-=======
   async (id, thunkAPI) => {
->>>>>>> dev
     try {
       const token = thunkAPI.getState().auth.accessToken.trim();
       return await userService.getUserId(id, token);
@@ -143,7 +139,7 @@ export const deleteuser = createAsyncThunk(
   }
 );
 
-export const suspendUserById = createAsyncThunk<any,dataType,{ state: RootState }>(
+export const suspendUserById = createAsyncThunk<unknown, dataType, { state: RootState }>(
   "users/suspended", 
   async ({ userId, datas }, 
   thunkAPI) => {
@@ -159,7 +155,7 @@ export const suspendUserById = createAsyncThunk<any,dataType,{ state: RootState 
     }
 });
 
-export const unSuspendUserById = createAsyncThunk<any,string,{ state: RootState }>(
+export const unSuspendUserById = createAsyncThunk<unknown, string, { state: RootState }>(
   "users/unSuspended", 
   async (id, thunkAPI) => {
     try {
@@ -174,7 +170,7 @@ export const unSuspendUserById = createAsyncThunk<any,string,{ state: RootState 
     }
 });
 
-export const UpdateLocalFlag = createAsyncThunk<any,dataType,{ state: RootState }>(
+export const UpdateLocalFlag = createAsyncThunk<unknown, dataType, { state: RootState }>(
   "users/localFlag", 
   async ({ userId, datas }, thunkAPI) => {
   try {
@@ -189,7 +185,7 @@ export const UpdateLocalFlag = createAsyncThunk<any,dataType,{ state: RootState 
   }
 });
 
-export const getUsetActivityLogById = createAsyncThunk<any,string,{ state: RootState }>(
+export const getUsetActivityLogById = createAsyncThunk<unknown, string, { state: RootState }>(
   "users/activityLogById", 
   async (userId, thunkAPI) => {
   try {
@@ -204,7 +200,7 @@ export const getUsetActivityLogById = createAsyncThunk<any,string,{ state: RootS
   }
 });
 
-export const BulkOperationUsers = createAsyncThunk<any,bulkType,{ state: RootState }>(
+export const BulkOperationUsers = createAsyncThunk<unknown, bulkType, { state: RootState }>(
   "users/userBulk-operations", 
   async ({userIds,operation,reason}, thunkAPI) => {
   try {
@@ -220,7 +216,7 @@ export const BulkOperationUsers = createAsyncThunk<any,bulkType,{ state: RootSta
   }
 });
 
-export const AnalyticsUser = createAsyncThunk<any,void,{ state: RootState }>(
+export const AnalyticsUser = createAsyncThunk<unknown, void, { state: RootState }>(
   "users/analyticsUser", 
   async (_, thunkAPI) => {
   try {
