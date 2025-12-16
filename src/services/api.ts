@@ -2,7 +2,7 @@ import { refreshTokenAsync } from "@/store/slices/auth.slice";
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://cng-ngc.org/api/proxy.php?path=http://api.dev.citygo-drive.com",
+  baseURL: "http://api.dev.citygo-drive.com",
   headers: {
     "Content-Type": "application/json",
   },
