@@ -302,7 +302,7 @@ export default function Bookings() {
                       </AvatarFallback>
                     </Avatar>
                   </div>
-                  <span className="text-lg font-bold text-primary">{booking.price} €</span>
+                  <span className="text-lg font-bold text-primary">{booking.price} Fcfa</span>
                 </div>
               </div>
             );

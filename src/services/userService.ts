@@ -51,9 +51,18 @@ const userBulkOperation = async (datas)=>{
    return response.data;
 }
 
-const getAnalytics = async () => {
+const getAnalytics = async (periode) => {
   try {
-    const response = await axios.get(API_URL+'/users/analytics');
+    const response = await axios.get(API_URL+'/users/analytics?period='+periode);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
+const getAnalyticMetric = async (periode,metric) => {
+  try {
+    const response = await axios.get(API_URL+'/users/analytics?period='+periode+'&metric='+metric);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -70,7 +79,8 @@ const authService = {
   updateLocalFlag,
   getUserActivityLog,
   userBulkOperation,
-  getAnalytics
+  getAnalytics,
+  getAnalyticMetric
 };
 
 export default authService;

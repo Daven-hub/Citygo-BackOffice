@@ -71,7 +71,7 @@ const App = () => {
                 <Route path="trajets/:rideId" element={<RidesDetail />} />
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="transactions" element={<Transactions />} />
-                <Route path="profile" element={<Profile />} />
+                {/* <Route path="profile" element={<Profile />} /> */}
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Route>
