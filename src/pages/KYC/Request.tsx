@@ -21,11 +21,12 @@ function Request({kycStats, statusFilter,setStatusFilter ,searchQuery,setSearchQ
   };
   return (
     <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <StatsCard title="Total demandes" value={kycStats.total.toString()} icon={FileText} />
               <StatsCard title="En attente" value={kycStats.pending.toString()} icon={Clock} trend={{ value: kycStats.pending, isPositive: false }} />
               <StatsCard title="Validées" value={kycStats.approved.toString()} icon={CheckCircle} trend={{ value: 12, isPositive: true }} />
               <StatsCard title="Rejetées" value={kycStats.rejected.toString()} icon={XCircle} />
+              <StatsCard title="Expired" value={kycStats.rejected.toString()} icon={XCircle} />
             </div>
 
             <div className="flex gap-3">

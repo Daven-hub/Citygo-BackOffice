@@ -43,9 +43,8 @@ export const login = createAsyncThunk(
       const response= await authService.login(payload);
       if (!response.success) {
         return thunkAPI.rejectWithValue(response.error?.message);
-      }else{
-        return response;
       }
+      return response;
     } catch (err) {
       console.log('err',err)
       const message =
@@ -137,6 +136,8 @@ export const authSlice = createSlice({
         state.accessToken = action.payload.data.accessToken;
         const expireAt=now + parseInt(action.payload.data.expiresIn);
         state.expiresIn = expireAt;
+        state.refreshToken = action.payload.data.refreshToken;
+        localStorage.setItem('refreshToken', action.payload.data.refreshToken);
         localStorage.setItem('expiresIn',expireAt.toString());
         localStorage.setItem('accessToken', action.payload.data.accessToken);
       })

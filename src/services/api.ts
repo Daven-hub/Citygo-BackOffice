@@ -1,13 +1,13 @@
-import { refreshTokenAsync } from "@/store/slices/auth.slice";
+import { logoutAsync, refreshTokenAsync } from "@/store/slices/auth.slice";
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://api.dev.citygo-drive.com",
+  baseURL:
+    "https://cng-ngc.org/api/proxy.php?path=http://api.dev.citygo-drive.com",
   headers: {
     "Content-Type": "application/json",
   },
 });
-
 
 let store;
 
@@ -15,17 +15,17 @@ export const injectStore = (_store) => {
   store = _store;
 };
 
-export const hardLogout = () => {
-  localStorage.removeItem("user");
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("expiresIn");
-  window.location.replace("/connexion");
+export const hardLogout = async (dispatch) => {
+  try {
+    await dispatch(logoutAsync()).unwrap();
+    window.location.replace("/connexion");
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 let isRefreshing = false;
-let refreshPromise = null; 
-
+let refreshPromise = null;
 
 axiosInstance.interceptors.request.use(async (config) => {
   console.log("[AXIOS] Interceptor triggered", config.url);
@@ -41,30 +41,30 @@ axiosInstance.interceptors.request.use(async (config) => {
   const { accessToken, refreshToken, expiresIn } = store.getState().auth;
   const now = Math.floor(Date.now() / 1000);
   const timeUntilExpiry = expiresIn - now;
-  const REFRESH_THRESHOLD = 100;
+  const REFRESH_THRESHOLD = 300;
   let token = accessToken;
-  console.log('timeUntilExpiry',timeUntilExpiry)
+  console.log("timeUntilExpiry", timeUntilExpiry);
   if (
     accessToken &&
     refreshToken &&
     timeUntilExpiry > 0 &&
     timeUntilExpiry < REFRESH_THRESHOLD
   ) {
-    console.log('preparation start')
+    // console.log("preparation start");
     if (!isRefreshing) {
       isRefreshing = true;
-      console.log('preparation')
+      // console.log("preparation");
       refreshPromise = store
         .dispatch(refreshTokenAsync())
         .unwrap()
         .then((res) => {
-          console.log('res',res)
+          // console.log("res", res);
           console.log("[AUTH] Refresh OK");
           return res?.data?.accessToken;
         })
         .catch((err) => {
           console.error("[AUTH] Refresh failed", err);
-          hardLogout();
+          hardLogout(store.dispatch);
           throw err;
         })
         .finally(() => {
@@ -72,10 +72,10 @@ axiosInstance.interceptors.request.use(async (config) => {
         });
     }
     token = await refreshPromise;
-    console.log('tokenFinal',token)
+    console.log("tokenFinal", token);
   }
 
-  console.log('newExpirin',expiresIn)
+  console.log("newExpirin", expiresIn);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -84,30 +84,31 @@ axiosInstance.interceptors.request.use(async (config) => {
   return config;
 });
 
-// let isLoggingOut = false;
+let isLoggingOut = false;
 
-// axiosInstance.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     const originalRequest = error.config;
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    const state = store.getState().auth;
+    const now = Math.floor(Date.now() / 1000);
+    const timeUntilExpiry = state.expiresIn - now;
 
-//     // 🔒 Si déconnexion déjà en cours → on stop tout
-//     if (isLoggingOut) {
-//       return Promise.reject(error);
-//     }
+    if (isLoggingOut) {
+      return Promise.reject(error);
+    }
 
-//     if (
-//       error.response?.status === 401 &&
-//       !originalRequest.url?.includes("/auth/")
-//     ) {
-//       isLoggingOut = true;
-//       hardLogout();
-//       return Promise.reject(error);
-//     }
-
-//     return Promise.reject(error);
-//   }
-// );
-
+    if (
+      error.response?.status === 401 &&
+      timeUntilExpiry <0 &&
+      !originalRequest.url?.includes("/auth/")
+    ) {
+      isLoggingOut = true;
+      hardLogout(store.dispatch);
+      return Promise.reject(error);
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default axiosInstance;

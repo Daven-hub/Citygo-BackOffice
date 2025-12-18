@@ -11,7 +11,7 @@ import { useToast } from "@/hook/use-toast";
 import DriverApplications from "./DriverApplications";
 import Request from "./Request";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
-import { DriverApplication, getAllDriverApp, getAllKycRequest, KycRequest } from "@/store/slices/kyc.slice";
+import { DriverApplication, getAllDriverApp, getAllKycRequest, KycRequest, updateDriverApp, updateKycRequest } from "@/store/slices/kyc.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
 
 export default function KYC() {
@@ -20,6 +20,7 @@ export default function KYC() {
   const [activeTab, setActiveTab] = useState("applications");
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [appLoading, setAppLoading] = useState(false);
   const dispatch = useAppDispatch();
   const { driverApplications,requests } = useAppSelector((state) => state.kyc);
 
@@ -89,6 +90,7 @@ export default function KYC() {
     pending: driverApplications.filter(a => a.status === "PENDING").length,
     approved: driverApplications.filter(a => a.status === "APPROVED").length,
     rejected: driverApplications.filter(a => a.status === "REJECTED").length,
+    under_review: driverApplications.filter(a => a.status === "UNDER_REVIEW").length,
   };
 
   const kycStats = {
@@ -96,20 +98,54 @@ export default function KYC() {
     pending: requests.filter(r => r.status === "PENDING").length,
     approved: requests.filter(r => r.status === "APPROVED").length,
     rejected: requests.filter(r => r.status === "REJECTED").length,
+    // expired: requests.filter(r => r.status === "EXPIRED").length,
+  };
+
+  const statusTitleMap: Record<string, string> = {
+    APPROVED: "Candidature approuvée",
+    REJECTED: "Candidature rejetée",
+    UNDER_REVIEW: "Candidature en cours de validation",
   };
 
 
-  const handleAppStatusSubmit = (data: { status: "APPROVED" | "REJECTED"; reason: string }) => {
-    toast({
-      title: data.status === "APPROVED" ? "Candidature approuvée" : "Candidature rejetée",
-      description: `La candidature de ${selectedApplication?.licenseNumber} a été mise à jour.`,
-    });
-}
-  const handleKYCStatusSubmit = (data: { status: "APPROVED" | "REJECTED"; reason: string }) => {
-    toast({
-      title: data.status === "APPROVED" ? "Demande validée" : "Demande rejetée",
-      description: `La demande KYC de ${selectedKYCRequest?.user.displayName} a été mise à jour.`,
-    });
+  const handleAppStatusSubmit = async(datas: { status: "APPROVED" | "REJECTED" | "UNDER_REVIEW"; reason: string }) => {
+        setAppLoading(true);
+        try {
+          const id=selectedApplication.applicationId
+          const data={id,datas}
+          await dispatch(updateDriverApp(data)).unwrap();
+          setAppStatusModalOpen(false)
+          toast({
+            title: statusTitleMap[datas.status] ?? "Statut inconnu",
+            description: `La candidature de ${selectedApplication?.licenseNumber} a été mise à jour.`,
+          });
+        } catch (error) {
+          toast({
+            description: error?.toString(),
+            variant: "destructive",
+          });
+        } finally {
+          setAppLoading(false);
+        }
+  }
+  const handleKYCStatusSubmit = async(data: { status: "APPROVED" | "REJECTED"; reason: string[] }) => {
+    console.log('data',data)
+      // setAppLoading(true);
+      //   try {
+      //     // await dispatch(updateKycRequest(data)).unwrap();
+      //     setAppStatusModalOpen(false)
+      //     toast({
+      //       title: data.status === "APPROVED" ? "Demande validée" : "Demande rejetée",
+      //       description: `La demande KYC de ${selectedKYCRequest?.user.displayName} a été mise à jour.`,
+      //     });
+      //   } catch (error) {
+      //     toast({
+      //       description: error?.toString(),
+      //       variant: "destructive",
+      //     });
+      //   } finally {
+      //     setAppLoading(false);
+      //   }
   };
 
    if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
@@ -167,6 +203,7 @@ export default function KYC() {
       {selectedApplication && (
         <DriverApplicationStatusModal
           open={appStatusModalOpen}
+          appLoading={appLoading}
           onOpenChange={setAppStatusModalOpen}
           applicationId={selectedApplication.applicationId}
           currentStatus={selectedApplication.status}

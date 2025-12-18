@@ -7,7 +7,7 @@ export interface EmergencyContact {
   phone: string;
   relationship: string;
 }
-export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type ApplicationStatus = "PENDING" | "APPROVED" | "REJECTED" | "UNDER_REVIEW";
 export interface DriverApplication {
   applicationId: string;
   status: ApplicationStatus;
@@ -201,7 +201,7 @@ export const kycSlice = createSlice({
       })
       .addCase(updateKycRequest.fulfilled, (state, action) => {
         state.status = "success";
-        const updatedUser = action.payload.result;
+        const updatedUser = action.payload.data;
         const index = state.requests.findIndex((us) => us?.kycRequestId === updatedUser?.kycRequestId);
         if (index !== -1) {
           const existingUser = state.requests[index];
@@ -240,7 +240,7 @@ export const kycSlice = createSlice({
       })
       .addCase(updateDriverApp.fulfilled, (state, action) => {
         state.status = "success";
-        const updatedUser = action.payload.result;
+        const updatedUser = action.payload.data;
         const index = state.driverApplications.findIndex((us) => us?.applicationId === updatedUser?.applicationId);
         if (index !== -1) {
           const existingUser = state.driverApplications[index];

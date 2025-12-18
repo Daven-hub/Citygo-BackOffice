@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DriverApplication, kycStatusConfig } from "@/data/mockKYC";
-import { useToast } from "@/hook/use-toast";
+// import { useToast } from "@/hook/use-toast";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/utilis/formatDate";
 import {
@@ -42,7 +42,7 @@ function DriverApplications({
   paginatedApplications,
 }) {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  // const { toast } = useToast();
   const handleUpdateAppStatus = (app: DriverApplication) => {
     setSelectedApplication(app);
     setAppStatusModalOpen(true);
@@ -187,7 +187,7 @@ function DriverApplications({
                         <Eye className="w-4 h-4 mr-1" />
                         Détails
                       </Button>
-                      {app.status === "PENDING" && (
+                      {/* {app.status === "PENDING" && ( */}
                         <Button
                           variant="outline"
                           size="sm"
@@ -196,7 +196,7 @@ function DriverApplications({
                         >
                           Traiter
                         </Button>
-                      )}
+                      {/* )} */}
                     </div>
                   </td>
                 </tr>

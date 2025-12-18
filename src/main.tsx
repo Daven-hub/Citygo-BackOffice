@@ -6,6 +6,7 @@ import { store } from "@/store";
 import { Provider } from 'react-redux';
 import { AuthProvider } from './context/authContext.tsx';
 import { TooltipProvider } from './components/ui/tooltip.tsx';
+import { injectStore } from './services/api.ts';
 
 createRoot(document.getElementById("root")!).render(
 <Provider store={store}>
@@ -16,3 +17,4 @@ createRoot(document.getElementById("root")!).render(
         </TooltipProvider>
     </AuthProvider>
 </Provider>);
+injectStore(store);

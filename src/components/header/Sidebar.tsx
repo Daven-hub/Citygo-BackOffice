@@ -51,6 +51,42 @@ function Sidebar({ setIsSidebarOpen }) {
           children: [],
           alowed: ["ROLE_ADMIN"],
         },
+        {
+          title: "Catalogue",
+          icon: <User size={20} />,
+          path: "",
+          children: [
+            {
+              title: "Type de vehicules",
+              icon: <CarFront size={20} />,
+              path: "/utilisateurs",
+              children: [],
+              alowed: ["ROLE_ADMIN"],
+            },
+            {
+              title: "Type de bagages",
+              icon: <Bell size={20} />,
+              path: "/utilisateurs-admin",
+              children: [],
+              alowed: ["ROLE_ADMIN"],
+            },
+            {
+              title: "Langues",
+              icon: <Bell size={20} />,
+              path: "/utilisateurs-admin",
+              children: [],
+              alowed: ["ROLE_ADMIN"],
+            },
+            {
+              title: "Monnaies",
+              icon: <Bell size={20} />,
+              path: "/utilisateurs-admin",
+              children: [],
+              alowed: ["ROLE_ADMIN"],
+            },
+          ],
+          alowed: ["ROLE_ADMIN"],
+        },
         { title: 'Vehicules', icon: <CarFront size={20} />, path: '/vehicules', children: [], alowed:["ROLE_ADMIN"] },
         {
           title: "Trajets",
