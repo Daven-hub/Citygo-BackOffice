@@ -78,7 +78,7 @@ export default function Rides() {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {statCard?.map((x,index)=>

@@ -1,1 +1,0 @@
-export const URL_L="http://api.dev.citygo-drive.com"
