@@ -82,7 +82,7 @@ function Overview({ user, userLog }) {
   };
 
   const getDeviceIcon = (userAgent: string) => {
-    if (userAgent.includes("Expo") || userAgent.includes("Darwin")) {
+    if (userAgent?.includes("Expo") || userAgent?.includes("Darwin")) {
       return <Smartphone className="w-4 h-4" />;
     }
     return <Monitor className="w-4 h-4" />;

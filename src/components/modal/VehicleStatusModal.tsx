@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,67 +17,60 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/hook/use-toast";
 import { Vehicle } from "@/data/mockVehicles";
-import { CheckCircle, XCircle, Ban, PlayCircle } from "lucide-react";
+import { CheckCircle, XCircle, Ban, PlayCircle, CircleCheck } from "lucide-react";
 
 interface VehicleStatusModalProps {
   vehicle: Vehicle | null;
   open: boolean;
+  isSubmitting: boolean;
+  defaultStatus: string;
   onOpenChange: (open: boolean) => void;
-  onStatusUpdate?: (vehicleId: string, status: string, note: string) => void;
+  onStatusUpdate?: (vehicleId: string,confortLevel:string, note: string) => void;
 }
 
 const statusOptions = [
   { value: "APPROVED", label: "Approuver", icon: CheckCircle, color: "text-success" },
   { value: "REJECTED", label: "Rejeter", icon: XCircle, color: "text-destructive" },
   { value: "SUSPENDED", label: "Suspendre", icon: Ban, color: "text-warning" },
-  { value: "PENDING", label: "Réactiver", icon: PlayCircle, color: "text-primary" },
+  { value: "UNSUSPENDED", label: "Reactiver", icon: CircleCheck, color: "text-secondary" },
+  { value: "PENDING", label: "En attente", icon: PlayCircle, color: "text-primary" },
 ];
 
 export function VehicleStatusModal({
   vehicle,
   open,
+  defaultStatus,
+  isSubmitting,
   onOpenChange,
   onStatusUpdate,
 }: VehicleStatusModalProps) {
   const [status, setStatus] = useState("");
   const [note, setNote] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+      setStatus(defaultStatus)
+  }, [defaultStatus])
 
   const handleSubmit = async () => {
     if (!vehicle || !status) return;
-
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    onStatusUpdate?.(vehicle.vehicleId, status, note);
-
-    toast({
-      title: "Statut mis à jour",
-      description: `Le véhicule ${vehicle.plate} a été mis à jour avec succès.`,
-    });
-
-    setIsSubmitting(false);
+    onStatusUpdate?.(vehicle.vehicleId,vehicle.comfortLevel, note);
     setStatus("");
     setNote("");
-    onOpenChange(false);
   };
 
   const availableStatuses = statusOptions.filter((opt) => {
     if (vehicle?.status === "SUSPENDED") {
-      return opt.value === "PENDING" || opt.value === "APPROVED";
+      return opt.value === "REJECTED" || opt.value === "APPROVED" || opt.value === "UNSUSPENDED";
     }
     if (vehicle?.status === "APPROVED") {
       return opt.value === "SUSPENDED" || opt.value === "REJECTED";
     }
     if (vehicle?.status === "PENDING") {
-      return opt.value === "APPROVED" || opt.value === "REJECTED";
+      return opt.value === "APPROVED" || opt.value === "SUSPENDED" || opt.value === "REJECTED";
     }
     if (vehicle?.status === "REJECTED") {
-      return opt.value === "PENDING" || opt.value === "APPROVED";
+      return opt.value === "SUSPENDED" || opt.value === "APPROVED";
     }
     return true;
   });
@@ -92,10 +85,10 @@ export function VehicleStatusModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
+        <div className="space-y-3.5 py-2">
+          <div className="space-y-1">
             <Label htmlFor="status" className="text-foreground">Nouveau statut</Label>
-            <Select value={status} onValueChange={setStatus}>
+            <Select disabled value={status} onValueChange={setStatus}>
               <SelectTrigger className="border-border text-foreground">
                 <SelectValue placeholder="Sélectionner un statut" />
               </SelectTrigger>
@@ -112,7 +105,7 @@ export function VehicleStatusModal({
             </Select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="note" className="text-foreground">Note (optionnel)</Label>
             <Textarea
               id="note"
@@ -136,7 +129,7 @@ export function VehicleStatusModal({
           <Button
             onClick={handleSubmit}
             disabled={!status || isSubmitting}
-            className="gradient-primary text-primary-foreground"
+            className="bg-success text-white"
           >
             {isSubmitting ? "Mise à jour..." : "Confirmer"}
           </Button>

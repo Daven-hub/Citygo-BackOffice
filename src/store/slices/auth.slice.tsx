@@ -43,9 +43,11 @@ export const login = createAsyncThunk(
       const response= await authService.login(payload);
       if (!response.success) {
         return thunkAPI.rejectWithValue(response.error?.message);
-      }else{
-        return response;
       }
+      if(!response?.data?.user?.roles?.includes('ROLE_ADMIN')){
+        return thunkAPI.rejectWithValue("Cet Utilisateur n'est pas autorisé");
+      }
+      return response;
     } catch (err) {
       console.log('err',err)
       const message =
@@ -65,11 +67,11 @@ export const refreshTokenAsync = createAsyncThunk<any, void, { state: RootState 
     const data= {
       refreshToken: state.refreshToken
     }
-    console.log('data',data)
+    // console.log('data',data)
     try {
       const response = await authService.refreshToken(data);
-       console.log('response',response)
-      if (!response.success) return thunkAPI.rejectWithValue(response.error?.message);
+      //  console.log('response',response)
+      // if (!response.success) return thunkAPI.rejectWithValue(response.error?.message);
       return response;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.message);
@@ -120,8 +122,9 @@ export const authSlice = createSlice({
         state.user= action.payload.data.user;
         state.accessToken = action.payload.data.accessToken;
         state.refreshToken = action.payload.data.refreshToken;
-        state.expiresIn = now + action.payload.data.expiresIn;
-        localStorage.setItem('expiresIn', now + action.payload.data.expiresIn);
+        const expireAt=now + parseInt(action.payload.data.expiresIn);
+        state.expiresIn = expireAt;
+        localStorage.setItem('expiresIn',expireAt.toString());
         localStorage.setItem('accessToken', action.payload.data.accessToken);
         localStorage.setItem('refreshToken', action.payload.data.refreshToken);
         localStorage.setItem('user', JSON.stringify({userId:action.payload.data.user.userId}));
@@ -134,8 +137,11 @@ export const authSlice = createSlice({
         state.authStatus = "success";
         const now = Math.floor(Date.now() / 1000);
         state.accessToken = action.payload.data.accessToken;
-        state.expiresIn = now + action.payload.data.expiresIn;
-        localStorage.setItem('expiresIn', now + action.payload.data.expiresIn);
+        const expireAt=now + parseInt(action.payload.data.expiresIn);
+        state.expiresIn = expireAt;
+        state.refreshToken = action.payload.data.refreshToken;
+        localStorage.setItem('refreshToken', action.payload.data.refreshToken);
+        localStorage.setItem('expiresIn',expireAt.toString());
         localStorage.setItem('accessToken', action.payload.data.accessToken);
       })
       .addCase(refreshTokenAsync.rejected, (state) => {
@@ -144,7 +150,7 @@ export const authSlice = createSlice({
         state.refreshToken = null;
         state.expiresIn = 0;
         localStorage.removeItem('user');
-         localStorage.removeItem('expiresIn');
+        localStorage.removeItem('expiresIn');
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
       }).addCase(logoutAsync.pending, (state) => {

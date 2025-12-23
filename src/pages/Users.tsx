@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,10 +50,10 @@ const roleConfig = {
   },
   ROLE_USER: {
     label: "Passager",
-    className: "bg-secondary text-secondary-foreground border-border",
+    className: "bg-secondary/10 text-secondary border-border",
   },
   both: {
-    label: "Users + Driver",
+    label: "Les deux",
     className: "bg-green-100 text-green-700 border-grenn-200",
   },
   ROLE_ADMIN: {
@@ -360,6 +360,7 @@ export default function Users() {
                       </td>
                       <td className="py-3 px-5 flex items-center gap-3">
                         <Avatar className="w-10 h-10">
+                          <AvatarImage src={user?.avatarUrl} className="w-full h-full object-cover" />
                           <AvatarFallback className="bg-primary/10 text-primary font-medium">
                             {user?.displayName
                               ?.split(" ")

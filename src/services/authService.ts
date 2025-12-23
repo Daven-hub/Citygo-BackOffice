@@ -13,7 +13,7 @@ const login = async (userData) => {
 };
 
 const refreshToken = async (userData) => {
-  const response = await axios.post ('/auth/refresh', userData);
+  const response = await axios.post ('/auth/refresh', JSON.stringify(userData));
   console.log('responseRefresh',response)
   return response.data;
 };
