@@ -5,7 +5,7 @@ import {
   Phone, 
   Mail, 
   CreditCard, 
-  Calendar, 
+  Calendar,
   Clock, 
   Briefcase,
   AlertCircle,
@@ -23,16 +23,59 @@ import { Separator } from "@/components/ui/separator";
 import { DriverApplicationStatusModal } from "@/components/modal/DriverApplicationStatusModal";
 import { useToast } from "@/hook/use-toast";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { mockDriverApplications, kycStatusConfig } from "@/data/mockKYC";
+import { useAppDispatch, useAppSelector } from "@/store/hook";
+import { getDriverAppById } from "@/store/slices/kyc.slice";
+import LoaderUltra from "@/components/ui/loaderUltra";
 
 export default function DriverApplicationDetail() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
+  const dispatch=useAppDispatch();
+  const [isLoading, setIsLoading] = useState(true);
+  const [loading, seloading] = useState(true);
+  const [duration, setDuration] = useState(0);
+  const { driverAppId } = useAppSelector((state) => state.kyc);
   const { toast } = useToast();
   const [statusModalOpen, setStatusModalOpen] = useState(false);
 
-  const application = mockDriverApplications.find(a => a.id === applicationId);
+  useEffect(() => {
+      const fetchData = async () => {
+        const start = performance.now();
+        await dispatch(getDriverAppById(applicationId));
+        const end = performance.now();
+        const elapsed = end - start;
+        setDuration(elapsed);
+        setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
+      };
+      fetchData();
+    }, [dispatch,applicationId]);
+
+    // console.log('driverAppId',driverAppId)
+  const application = driverAppId;
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
+
+  const handleStatusSubmit = (data: { status: "APPROVED" | "REJECTED"; reason: string }) => {
+    toast({
+      title: data.status === "APPROVED" ? "Candidature approuvée" : "Candidature rejetée",
+      description: `La candidature avec pour licence: ${application.licenseNumber} a été mise à jour.`,
+    });
+  };
+
+  const StatusIcon = application?.status === "APPROVED" ? CheckCircle : 
+                     application?.status === "REJECTED" ? XCircle : Clock;
+
+  if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
 
   if (!application) {
     return (
@@ -51,26 +94,6 @@ export default function DriverApplicationDetail() {
     );
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-  };
-
-  const handleStatusSubmit = (data: { status: "APPROVED" | "REJECTED"; reason: string }) => {
-    toast({
-      title: data.status === "APPROVED" ? "Candidature approuvée" : "Candidature rejetée",
-      description: `La candidature de ${application.userName} a été mise à jour.`,
-    });
-  };
-
-  const StatusIcon = application.status === "APPROVED" ? CheckCircle : 
-                     application.status === "REJECTED" ? XCircle : Clock;
-
   return (
     <>
       <div className="space-y-4">
@@ -86,12 +109,12 @@ export default function DriverApplicationDetail() {
               <div className="flex items-center gap-4">
                 <Avatar className="w-16 h-16">
                   <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
-                    {application.userName.split(" ").map(n => n[0]).join("")}
+                    {application.licenseNumber.split(" ").map(n => n[0]).join("")}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="text-xl font-semibold text-black/65 text-foreground">{application.userName}</h2>
-                  <p className="text-sm text-muted-foreground">{application.userEmail}</p>
+                  <h2 className="text-xl font-semibold text-black/65 text-foreground">{application.licenseNumber}</h2>
+                  <p className="text-sm text-muted-foreground">{application.licenseNumber}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <Badge variant="outline" className={cn("font-medium text-xs", kycStatusConfig[application.status].className)}>
                       <StatusIcon className="w-3 h-3 mr-1" />
@@ -282,7 +305,7 @@ export default function DriverApplicationDetail() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">ID Utilisateur</p>
-                  <p className="font-mono text-sm text-foreground">{application.userId}</p>
+                  <p className="font-mono text-sm text-foreground">{application.applicationId}</p>
                 </div>
               </CardContent>
             </Card>
@@ -293,9 +316,10 @@ export default function DriverApplicationDetail() {
       <DriverApplicationStatusModal
         open={statusModalOpen}
         onOpenChange={setStatusModalOpen}
-        applicationId={application.id}
+        applicationId={application.applicationId}
         currentStatus={application.status}
         onSubmit={handleStatusSubmit}
+        appLoading={loading}
       />
     </>
   );

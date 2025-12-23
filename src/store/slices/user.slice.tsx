@@ -7,6 +7,11 @@ interface paramsType{
   datas:object
 }
 
+interface metricType {
+  period: string;
+  metric: string;
+}
+
 interface dataType {
   userId: string;
   datas: object;
@@ -40,9 +45,13 @@ export interface UserType {
 
 interface UsersState {
   users: UserType[];
-  userLogId: unknown[];
-  bulks: unknown[],
-  analytics: unknown[],
+
+
+  userLogId: any[];
+  bulks: any[],
+  analytics: UsersState[],
+  analyticMetric: any[],
+
   usersId: UserType | null;
   userStatus: "idle" | "loading" | "success" | "error";
   userError?: string | null;
@@ -53,6 +62,7 @@ const initialState: UsersState = {
   userLogId: [],
   bulks:[],
   analytics: [],
+  analyticMetric: [],
   usersId: null,
   userStatus: "idle",
   userError: null,
@@ -216,12 +226,29 @@ export const BulkOperationUsers = createAsyncThunk<unknown, bulkType, { state: R
   }
 });
 
-export const AnalyticsUser = createAsyncThunk<unknown, void, { state: RootState }>(
+
+export const AnalyticsUser = createAsyncThunk<any,string,{ state: RootState }>(
+
   "users/analyticsUser", 
-  async (_, thunkAPI) => {
+  async (periode, thunkAPI) => {
   try {
     // const token = thunkAPI.getState ().auth.user.token;
-    return await userService.getAnalytics();
+    return await userService.getAnalytics(periode);
+  } catch (error) {
+    const message =
+      (error.response && error.response.data && error.response.data.message) ||
+      error.message ||
+      error.toString();
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+export const AnalyticsWithMetric = createAsyncThunk<any,metricType,{ state: RootState }>(
+  "users/analyticsWithMetric", 
+  async ({period,metric}, thunkAPI) => {
+  try {
+    // const token = thunkAPI.getState ().auth.user.token;
+    return await userService.getAnalyticMetric(period,metric);
   } catch (error) {
     const message =
       (error.response && error.response.data && error.response.data.message) ||
@@ -379,6 +406,16 @@ export const userSlice = createSlice({
         state.analytics = action.payload.data;
       })
       .addCase(AnalyticsUser.rejected, (state, action) => {
+        state.userStatus = "error";
+      })
+      .addCase(AnalyticsWithMetric.pending, (state) => {
+        state.userStatus = "loading";
+      })
+      .addCase(AnalyticsWithMetric.fulfilled, (state, action) => {
+        state.userStatus = "success";
+        state.analyticMetric = action.payload.trends;
+      })
+      .addCase(AnalyticsWithMetric.rejected, (state, action) => {
         state.userStatus = "error";
       });
   },

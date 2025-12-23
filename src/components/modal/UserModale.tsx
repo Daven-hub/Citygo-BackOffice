@@ -14,7 +14,6 @@ import { Input } from "../ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { useState } from "react"
 import { Loader } from "lucide-react"
-import { registerApp } from "@/store/slices/auth.slice"
 import { getAllUsers } from "@/store/slices/user.slice"
 
 export default function UserModale({ toast, dispatch, open, setOpen }) {
@@ -45,7 +44,7 @@ export default function UserModale({ toast, dispatch, open, setOpen }) {
                     datamodel.append(key, datas[key])
                 }
             }
-            await dispatch(registerApp(datamodel)).unwrap();
+            // await dispatch(registerApp(datamodel)).unwrap();
             dispatch(getAllUsers()).unwrap();
             toast({
                 title: "Enregistrement",

@@ -51,6 +51,42 @@ function Sidebar({ setIsSidebarOpen }) {
           children: [],
           alowed: ["ROLE_ADMIN"],
         },
+        {
+          title: "Catalogue",
+          icon: <User size={20} />,
+          path: "",
+          children: [
+            {
+              title: "Type de vehicules",
+              icon: <CarFront size={20} />,
+              path: "/type-de-vehicule",
+              children: [],
+              alowed: ["ROLE_ADMIN"],
+            },
+            {
+              title: "Type de bagages",
+              icon: <Bell size={20} />,
+              path: "/type-de-bagage",
+              children: [],
+              alowed: ["ROLE_ADMIN"],
+            },
+            {
+              title: "Langues",
+              icon: <Bell size={20} />,
+              path: "/langues",
+              children: [],
+              alowed: ["ROLE_ADMIN"],
+            },
+            {
+              title: "Monnaies",
+              icon: <Bell size={20} />,
+              path: "/monnaies",
+              children: [],
+              alowed: ["ROLE_ADMIN"],
+            },
+          ],
+          alowed: ["ROLE_ADMIN"],
+        },
         { title: 'Vehicules', icon: <CarFront size={20} />, path: '/vehicules', children: [], alowed:["ROLE_ADMIN"] },
         {
           title: "Trajets",
@@ -162,7 +198,7 @@ function Sidebar({ setIsSidebarOpen }) {
       </div>
 
       <div className="px-3 relative pb-3 pt-5 flex flex-col gap-8 overflow-y-auto sidebb h-[calc(100vh-69px)]">
-        <div className="sidebare-admin text-[1.05rem] md:text-[.95rem] font-medium text-gray-600 flex flex-col gap-2.5">
+        <div className="sidebare-admin text-[1.05rem] md:text-[.95rem] font-medium text-gray-400 flex flex-col gap-2.5">
           {sideLink?.map((x, indexi) => (
             <div key={indexi}>
               <p
