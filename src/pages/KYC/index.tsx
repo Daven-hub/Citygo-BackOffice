@@ -13,6 +13,7 @@ import Request from "./Request";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { DriverApplication, getAllDriverApp, getAllKycRequest, KycRequest, updateDriverApp, updateKycRequest } from "@/store/slices/kyc.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
+import { getAllUsers } from "@/store/slices/user.slice";
 
 export default function KYC() {
   const { toast } = useToast();
@@ -23,13 +24,15 @@ export default function KYC() {
   const [appLoading, setAppLoading] = useState(false);
   const dispatch = useAppDispatch();
   const { driverApplications,requests } = useAppSelector((state) => state.kyc);
+  const { users } = useAppSelector((state) => state.users);
 
   useEffect(() => {
       const fetchData = async () => {
         const start = performance.now();
         await Promise.all([
           dispatch(getAllDriverApp()),
-          dispatch(getAllKycRequest())
+          dispatch(getAllKycRequest()),
+          dispatch(getAllUsers())
         ]);
         const end = performance.now();
         const elapsed = end - start;
@@ -184,6 +187,7 @@ export default function KYC() {
           <TabsContent value="requests" className="space-y-4">
             <Request
                 kycStats={kycStats}
+                users={users}
                 page={kycPage}
                 pageSize={pageSize}
                 statusFilter={requestFilter}

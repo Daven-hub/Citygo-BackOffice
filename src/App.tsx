@@ -21,6 +21,11 @@ import DriverApplicationDetail from "./pages/DriverApplicationDetail";
 import KYC from "./pages/KYC/index";
 import Vehicles from "./pages/Vehicles";
 import VehicleDetail from "./pages/VehicleDetail";
+import VehicleType from "./pages/catalogue/VehicleType";
+import Languages from "./pages/catalogue/Languages";
+import Currencies from "./pages/catalogue/Currencies";
+import LuggageType from "./pages/catalogue/LuggageType";
+// import { authChannel } from "./broadcast/authChannel";
 
 // Lazy loading
 const Login = lazy(() => import("./pages/Login"));
@@ -51,15 +56,19 @@ const App = () => {
               <Route path="/" element={<Layout />}> 
                 <Route index element={<Dashboard />} />
 
-                <Route path="utilisateurs-admin/">
+                {/* <Route path="utilisateurs-admin/">
                   <Route index element={<UsersAdministration />} />
                   <Route path=":userId" element={<DetailUserAdmin />} />
-                </Route>
+                </Route> */}
                 {/* <Route path="rapports" element={<Rapports />} /> */}
                 {/* <Route path="destinations" element={<Destinations />} /> */}
                 <Route path="vehicules" element={<Vehicles />} />
+                <Route path="type-de-vehicule" element={<VehicleType />} />
+                <Route path="langues" element={<Languages />} />
+                <Route path="monnaies" element={<Currencies />} />
+                <Route path="type-de-bagage" element={<LuggageType />} />
                 <Route path="vehicules/:vehicleId" element={<VehicleDetail />} />
-                <Route path="reservations" element={<Bookings />} />
+                {/* <Route path="reservations" element={<Bookings />} /> */}
                 <Route path="reservations/:bookingId" element={<BookingsDetail />} />
                 <Route path="kyc" element={<KYC />} />
                 <Route path="kyc/demande/:requestId" element={<KYCRequestDetail />} />
@@ -67,10 +76,10 @@ const App = () => {
                 {/* <Route path="settings" element={<Settings />} /> */}
                 <Route path="utilisateurs" element={<Users />} />
                 <Route path="/utilisateurs/:userId" element={<UserDetail />} />
-                <Route path="trajets" element={<Rides />} />
+                {/* <Route path="trajets" element={<Rides />} /> */}
                 <Route path="trajets/:rideId" element={<RidesDetail />} />
                 <Route path="notifications" element={<Notifications />} />
-                <Route path="transactions" element={<Transactions />} />
+                {/* <Route path="transactions" element={<Transactions />} /> */}
                 {/* <Route path="profile" element={<Profile />} /> */}
                 <Route path="*" element={<NotFound />} />
               </Route>

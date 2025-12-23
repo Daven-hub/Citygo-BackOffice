@@ -138,24 +138,6 @@ function DriverApplications({
                   key={index}
                   className="border-b text-sm border-border/50 hover:bg-muted/20 transition-colors"
                 >
-                  {/* <td className="py-3 px-6">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="w-9 h-9">
-                        <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                          {app.userName
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium text-foreground">
-                          {app.userName}
-                        </p>
-                        <p className="text-muted-foreground">{app.userEmail}</p>
-                      </div>
-                    </div>
-                  </td> */}
                   <td className="py-3 px-6 font-mono text-sm text-foreground">
                     {app.licenseNumber}
                   </td>
@@ -182,7 +164,7 @@ function DriverApplications({
                         variant="ghost"
                         size="sm"
                         className="text-xs"
-                        onClick={() => navigate(`/kyc/applications/${app.id}`)}
+                        onClick={() => navigate(`/kyc/applications/${app.applicationId}`)}
                       >
                         <Eye className="w-4 h-4 mr-1" />
                         Détails

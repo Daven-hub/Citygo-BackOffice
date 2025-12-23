@@ -13,20 +13,25 @@ import { CheckCircle, Clock, Eye, FileText, Filter, Search, UserCheck, XCircle }
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-function Request({kycStats, statusFilter,setStatusFilter ,searchQuery,setSearchQuery,paginatedKYCRequests,totalPages, setPage,page, pageSize,setSelectedKYCRequest,setKycStatusModalOpen}) {
+function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setSearchQuery,paginatedKYCRequests,totalPages, setPage,page, pageSize,setSelectedKYCRequest,setKycStatusModalOpen}) {
     const navigate=useNavigate()
     const handleUpdateKYCStatus = (req: KYCRequest) => {
     setSelectedKYCRequest(req);
     setKycStatusModalOpen(true);
   };
+
+  const getNameUser=(y)=>{
+    return users?.find((x)=>x.id===y).displayName
+  }
+  console.log('users',users)
   return (
     <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatsCard title="Total demandes" value={kycStats.total.toString()} icon={FileText} />
               <StatsCard title="En attente" value={kycStats.pending.toString()} icon={Clock} trend={{ value: kycStats.pending, isPositive: false }} />
               <StatsCard title="Validées" value={kycStats.approved.toString()} icon={CheckCircle} trend={{ value: 12, isPositive: true }} />
               <StatsCard title="Rejetées" value={kycStats.rejected.toString()} icon={XCircle} />
-              <StatsCard title="Expired" value={kycStats.rejected.toString()} icon={XCircle} />
+              {/* <StatsCard title="Expired" value={kycStats.rejected.toString()} icon={XCircle} /> */}
             </div>
 
             <div className="flex gap-3">
@@ -83,7 +88,7 @@ function Request({kycStats, statusFilter,setStatusFilter ,searchQuery,setSearchQ
                         </td>
                         <td className="py-3 px-6 font-mono text-sm text-foreground">{req.rejectionReasons?req.rejectionReasons:'N/A'}</td>
                         <td className="py-3 px-6 text-muted-foreground text-sm">{formatDate(req.submittedAt)}</td>
-                        <td className="py-3 px-6 text-muted-foreground text-sm">{req.reviewedBy?req.reviewedBy:'N/A'}</td>
+                        <td className="py-3 px-6 text-muted-foreground text-sm">{req.reviewedBy?getNameUser(req.reviewedBy):'N/A'}</td>
                         <td className="py-3 px-6">
                           <Badge variant="outline" className={cn("font-medium whitespace-nowrap", kycStatusConfig[req.status].className)}>
                             {kycStatusConfig[req.status].label}

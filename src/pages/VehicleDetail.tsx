@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   ArrowLeft, 
   Car, 
@@ -26,36 +26,39 @@ import { mockVehicles, vehicleStatusConfig, comfortLevelConfig } from "@/data/mo
 import { VehicleStatusModal } from "@/components/modal/VehicleStatusModal";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useAppDispatch, useAppSelector } from "@/store/hook";
+import { getvehicleById } from "@/store/slices/vehicles.slice";
+import LoaderUltra from "@/components/ui/loaderUltra";
 
 export default function VehicleDetail() {
   const { vehicleId } = useParams();
   const navigate = useNavigate();
+  const dispatch=useAppDispatch();
+  const [duration,setDuration]=useState(0)
+  const [isLoading,setIsLoading]=useState(true)
+  const {vehiclesId} = useAppSelector((state) => state.vehicle);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
 
-  const vehicle = mockVehicles.find((v) => v.vehicleId === vehicleId);
+  useEffect(() => {
+      const fetchData = async () => {
+            const start = performance.now();
+            await dispatch(getvehicleById(vehicleId));
+            const end = performance.now();
+            const elapsed = end - start;
+            setDuration(elapsed);
+            setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
+          };
+          fetchData();
+    }, [dispatch,vehicleId])
 
-  if (!vehicle) {
-    return (
-      <>
-        <div className="text-center">
-          <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">Véhicule non trouvé</p>
-          <Button onClick={() => navigate("/vehicles")} className="mt-4">
-            Retour à la liste
-          </Button>
-        </div>
-      </>
-    );
-  }
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "—";
-    try {
-      return format(new Date(dateString), "dd MMMM yyyy à HH:mm", { locale: fr });
-    } catch {
-      return dateString;
-    }
-  };
+     const formatDate = (dateString?: string) => {
+        if (!dateString) return "—";
+        try {
+          return format(new Date(dateString), "dd MMMM yyyy à HH:mm", { locale: fr });
+        } catch {
+          return dateString;
+        }
+      };
 
   const getStatusActions = () => {
     const actions = [];
@@ -73,12 +76,31 @@ export default function VehicleDetail() {
     }
     return actions;
   };
+  
+
+  const vehicle = vehiclesId;
+
+  if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
+
+  if (!vehicle) {
+    return (
+      <>
+        <div className="text-center">
+          <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground">Véhicule non trouvé</p>
+          <Button onClick={() => navigate("/vehicules")} className="mt-4">
+            Retour à la liste
+          </Button>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <div className="space-y-4">
         {/* Back button */}
-        <Button variant="ghost" onClick={() => navigate("/vehicles")} className="gap-2 text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" onClick={() => navigate("/vehicules")} className="gap-2 text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-4 h-4" />
           Retour
         </Button>
@@ -213,7 +235,7 @@ export default function VehicleDetail() {
               <Button 
                 variant="outline" 
                 className="w-full border-border text-foreground hover:bg-muted"
-                onClick={() => navigate(`/users/${vehicle.ownerId}`)}
+                onClick={() => navigate(`/utilisateurs/${vehicle.ownerId}`)}
               >
                 Voir le profil du propriétaire
               </Button>

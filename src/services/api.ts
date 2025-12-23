@@ -10,6 +10,11 @@ const axiosInstance = axios.create({
 });
 
 let store;
+let abortController = new AbortController();
+
+export const resetAbortController = () => {
+  abortController = new AbortController();
+};
 
 export const injectStore = (_store) => {
   store = _store;
@@ -18,20 +23,30 @@ export const injectStore = (_store) => {
 export const hardLogout = async (dispatch) => {
   try {
     await dispatch(logoutAsync()).unwrap();
+    abortController.abort();
     window.location.replace("/connexion");
   } catch (error) {
     console.log(error);
   }
 };
 
+
 let isRefreshing = false;
 let refreshPromise = null;
+let isLoggingOut = false;
+
+export const handleDeconnection = () => {
+  if (isLoggingOut) return;
+  isLoggingOut = true;
+  abortController.abort();
+  localStorage.clear();
+  window.location.replace("/connexion");
+};
 
 axiosInstance.interceptors.request.use(async (config) => {
   console.log("[AXIOS] Interceptor triggered", config.url);
   if (!store) return config;
-
-  if (config.url?.includes("/auth/")) {
+  if (config.url?.includes("/auth/") && !config.url?.includes("/auth/logout")) {
     if (config.headers?.Authorization) {
       delete config.headers.Authorization;
     }
@@ -41,7 +56,7 @@ axiosInstance.interceptors.request.use(async (config) => {
   const { accessToken, refreshToken, expiresIn } = store.getState().auth;
   const now = Math.floor(Date.now() / 1000);
   const timeUntilExpiry = expiresIn - now;
-  const REFRESH_THRESHOLD = 300;
+  const REFRESH_THRESHOLD = 2000;
   let token = accessToken;
   console.log("timeUntilExpiry", timeUntilExpiry);
   if (
@@ -81,18 +96,19 @@ axiosInstance.interceptors.request.use(async (config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
+  // if (isLoggingOut) {
+  //   return Promise.reject(new axios.Cancel("Logging out"));
+  // }
+
+  config.signal = abortController.signal;
   return config;
 });
 
-let isLoggingOut = false;
 
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    const state = store.getState().auth;
-    const now = Math.floor(Date.now() / 1000);
-    const timeUntilExpiry = state.expiresIn - now;
 
     if (isLoggingOut) {
       return Promise.reject(error);
@@ -100,11 +116,10 @@ axiosInstance.interceptors.response.use(
 
     if (
       error.response?.status === 401 &&
-      timeUntilExpiry <0 &&
       !originalRequest.url?.includes("/auth/")
     ) {
       isLoggingOut = true;
-      hardLogout(store.dispatch);
+      handleDeconnection();
       return Promise.reject(error);
     }
     return Promise.reject(error);

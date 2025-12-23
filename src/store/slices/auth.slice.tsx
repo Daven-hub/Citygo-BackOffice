@@ -44,6 +44,9 @@ export const login = createAsyncThunk(
       if (!response.success) {
         return thunkAPI.rejectWithValue(response.error?.message);
       }
+      if(!response?.data?.user?.roles?.includes('ROLE_ADMIN')){
+        return thunkAPI.rejectWithValue("Cet Utilisateur n'est pas autorisé");
+      }
       return response;
     } catch (err) {
       console.log('err',err)

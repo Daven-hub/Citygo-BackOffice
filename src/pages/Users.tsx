@@ -50,10 +50,10 @@ const roleConfig = {
   },
   ROLE_USER: {
     label: "Passager",
-    className: "bg-secondary text-secondary-foreground border-border",
+    className: "bg-secondary/10 text-secondary border-border",
   },
   both: {
-    label: "Users + Driver",
+    label: "Les deux",
     className: "bg-green-100 text-green-700 border-grenn-200",
   },
   ROLE_ADMIN: {

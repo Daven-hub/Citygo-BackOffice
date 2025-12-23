@@ -237,6 +237,7 @@ export const AnalyticsUser = createAsyncThunk<any,string,{ state: RootState }>(
     return thunkAPI.rejectWithValue(message);
   }
 });
+
 export const AnalyticsWithMetric = createAsyncThunk<any,metricType,{ state: RootState }>(
   "users/analyticsWithMetric", 
   async ({period,metric}, thunkAPI) => {
