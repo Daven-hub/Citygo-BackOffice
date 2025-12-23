@@ -112,11 +112,7 @@ export const getAllUsers = createAsyncThunk<any, void, { state: RootState }>(
 
 export const getUserById = createAsyncThunk<any, string, { state: RootState }>(
   "user/getById",
-<<<<<<< HEAD
-  async (id:number, thunkAPI) => {
-=======
   async (id, thunkAPI) => {
->>>>>>> dev
     try {
       const token = thunkAPI.getState().auth.accessToken.trim();
       return await userService.getUserId(id, token);
@@ -280,7 +276,7 @@ export const userSlice = createSlice({
           state.users[index] = {
             ...existingUser,
             ...updatedUser,
-            created_at: existingUser.created_at,
+            createdAt: existingUser.createdAt,
           };
         }
       })
