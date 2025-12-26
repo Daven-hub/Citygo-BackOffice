@@ -1,12 +1,12 @@
 // AuthContext.js
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { getAllUsers } from "@/store/slices/user.slice";
+import { useEffect, useMemo, useState } from "react";
+import { GetAllUsers } from "@/store/slices/user.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { logoutAsync } from "@/store/slices/auth.slice";
 import { useToast } from "@/hook/use-toast";
-// import { injectLogoutHandler } from "@/services/api";
+import { AuthContext } from "./auth-context";
 
-const AuthContext = createContext(null);
+
 
 export const AuthProvider = ({ children }) => {
   const dispatch = useAppDispatch();
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     const fetchData = async () => {
       const start = performance.now();
       await Promise.all([
-        dispatch(getAllUsers())
+        dispatch(GetAllUsers())
       ]);
       const end = performance.now();
       const elapsed = end - start;
@@ -61,8 +61,6 @@ export const AuthProvider = ({ children }) => {
       }
   };
 
-  // injectLogoutHandler();
-
   return (
     <AuthContext.Provider
       value={{
@@ -76,5 +74,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);

@@ -18,7 +18,7 @@ import {
   User,
   UserIcon,
 } from "lucide-react";
-import { useAuth } from "@/context/authContext";
+import { useAuth } from "@/context/use-auth";
 // import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 function Sidebar({ setIsSidebarOpen }) {

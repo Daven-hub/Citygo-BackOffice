@@ -13,7 +13,7 @@ import Request from "./Request";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { DriverApplication, getAllDriverApp, getAllKycRequest, KycRequest, updateDriverApp, updateKycRequest } from "@/store/slices/kyc.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
-import { getAllUsers } from "@/store/slices/user.slice";
+import { GetAllUsers } from "@/store/slices/user.slice";
 
 export default function KYC() {
   const { toast } = useToast();
@@ -32,7 +32,7 @@ export default function KYC() {
         await Promise.all([
           dispatch(getAllDriverApp()),
           dispatch(getAllKycRequest()),
-          dispatch(getAllUsers())
+          dispatch(GetAllUsers())
         ]);
         const end = performance.now();
         const elapsed = end - start;
@@ -132,7 +132,7 @@ export default function KYC() {
         }
   }
   const handleKYCStatusSubmit = async(data: { status: "APPROVED" | "REJECTED"; reason: string[] }) => {
-    console.log('data',data)
+    // console.log('data',data)
       // setAppLoading(true);
       //   try {
       //     // await dispatch(updateKycRequest(data)).unwrap();
@@ -221,7 +221,7 @@ export default function KYC() {
           onOpenChange={setKycStatusModalOpen}
           requestId={selectedKYCRequest.kycRequestId}
           currentStatus={selectedKYCRequest.status}
-          onSubmit={handleKYCStatusSubmit}
+          // onSubmit={handleKYCStatusSubmit}
         />
       )}
     </>

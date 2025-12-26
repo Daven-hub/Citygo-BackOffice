@@ -74,7 +74,7 @@ export const updateLanguage = createAsyncThunk(
   }
 );
 
-export const getAllLanguage = createAsyncThunk<any, void, { state: RootState }>(
+export const getAllLanguage = createAsyncThunk(
   "language/getAll",
   async (_, thunkAPI) => {
     try {
@@ -97,9 +97,9 @@ export const getAllLanguage = createAsyncThunk<any, void, { state: RootState }>(
   }
 );
 
-export const getLanguageById = createAsyncThunk<any, string, { state: RootState }>(
+export const getLanguageById = createAsyncThunk(
   "language/getById",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
     //   const token = thunkAPI.getState().auth.accessToken.trim();
       return await dataService.getById(id);

@@ -217,7 +217,7 @@ export function BookingModal({ open, onOpenChange, booking, mode }: BookingModal
               <Label>Statut</Label>
               <Select
                 value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value as any })}
+                // onValueChange={(value) => setFormData({ ...formData, status: value })}
                 disabled={isViewMode}
               >
                 <SelectTrigger className="bg-background border-border">

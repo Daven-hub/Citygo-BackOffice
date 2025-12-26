@@ -23,7 +23,6 @@ function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setS
   const getNameUser=(y)=>{
     return users?.find((x)=>x.id===y).displayName
   }
-  console.log('users',users)
   return (
     <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -1,7 +1,7 @@
 import axios from "./api";
 const API_URL = "/admin";
 
-const getAllUser = async (token) => {
+const getAllUser = async () => {
   try {
     const response = await axios.get(API_URL+'/users');
     return response.data;
@@ -16,7 +16,7 @@ const updateUser = async (id, userData) => {
   return response.data;
 };
 
-const getUserId = async (id,token) => {
+const getUserId = async (id) => {
   const response = await axios.get(API_URL + "/users/" + id);
   return response.data;
 };
