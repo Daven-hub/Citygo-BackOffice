@@ -129,7 +129,7 @@ export default function Vehicles() {
         }
   };
 
-  const openStatusModal = (vehicle: Vehicle,status:string,url:string) => {
+  const openStatusModal = (vehicle,status,url) => {
     setSelectedVehicle(vehicle);
     setVariable(url);
     setStatusModal(status);
@@ -273,6 +273,12 @@ export default function Vehicles() {
                 </tr>
               </thead>
               <tbody>
+                {filteredVehicles.length === 0 && (
+                  <td className="py-3 px-6" colSpan={8}>
+                    <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Aucun véhicule trouvé</p>
+                  </td>
+                )}
                 {filteredVehicles.map((vehicle) => (
                   <tr
                     key={vehicle.vehicleId}
