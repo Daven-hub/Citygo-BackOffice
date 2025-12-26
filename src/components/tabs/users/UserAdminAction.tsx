@@ -2,7 +2,7 @@ import { UserSuspendModal } from "@/components/modal/UserSuspendModal";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hook/use-toast";
 import { useAppDispatch } from "@/store/hook";
-import { getUserById, unSuspendUserById, UserType } from "@/store/slices/user.slice";
+import { GetUserById, UnSuspendUserById, UserType } from "@/store/slices/user.slice";
 import { Ban, Loader2, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
@@ -21,12 +21,12 @@ export default function UserAdminActions({ user }) {
       setLoading(true);
       try {
         const datas =user;
-        await dispatch(unSuspendUserById(userId)).unwrap();
+        await dispatch(UnSuspendUserById(userId)).unwrap();
         toast({
           title: "Utilisateur réactivé",
           description: `${datas?.displayName} a été réactivé.`,
         });
-        await dispatch(getUserById(userId)).unwrap();
+        await dispatch(GetUserById(userId)).unwrap();
       } catch (error) {
         toast({
           title: "Erreur",

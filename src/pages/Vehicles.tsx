@@ -9,9 +9,7 @@ import {
   CheckCircle,
   XCircle,
   Ban,
-  PlayCircle,
   User,
-  Phone,
   FileText,
   Armchair,
   CircleCheck,
@@ -19,15 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,7 +34,6 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import {
-  mockVehicles,
   vehicleStatusConfig,
   comfortLevelConfig,
   Vehicle,
@@ -70,7 +59,6 @@ export default function Vehicles() {
   const [loading,setLoading]=useState(false)
   const [variable, setVariable] = useState("");
   const [statusModal, setStatusModal] = useState("");
-  // const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,8 +71,6 @@ export default function Vehicles() {
         };
         fetchData();
   }, [dispatch])
-
-  // console.log('vehicles',vehicles)
 
   const filteredVehicles = vehicles.filter((vehicle) => {
     const matchesSearch =

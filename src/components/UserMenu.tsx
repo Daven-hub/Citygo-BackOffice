@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom';
 import * as Avatar from "@radix-ui/react-avatar";
-import { useAuth } from '@/context/authContext';
 import { ChevronDown, LayoutDashboard, LogOut, Settings, UserCircle } from 'lucide-react';
+import { useAuth } from '@/context/use-auth';
 
 function UserMenu({isAdmin,isLight=true}) {
       const [open, setOpen] = useState(false);

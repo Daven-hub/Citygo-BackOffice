@@ -1,19 +1,16 @@
-import { useAuth } from "@/context/authContext";
 import { useToast } from "@/hook/use-toast";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { login } from "@/store/slices/auth.slice";
 import { Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 
 function Login() {
-  const navigate = useNavigate();
   const dispatch=useAppDispatch()
   const [loading, setLoading] = useState(false);
   const {toast}=useToast()
-  const {userConnected}=useAuth()
 
   const {
     register,
