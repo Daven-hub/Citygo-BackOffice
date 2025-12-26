@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import userService from "../../services/userService";
-import { RootState } from "..";
+import { UserStats } from "@/components/UserStatOverview";
 
 interface paramsType{
   id:number,
@@ -21,6 +21,13 @@ interface bulkType {
   userIds: string[];
   operation: string;
   reason: string
+}
+
+export interface TrendData {
+  date: string;
+  registrations: number;
+  activeUsers: number;
+  driverApplications: number;
 }
 
 export interface UserType {
@@ -45,10 +52,10 @@ export interface UserType {
 
 interface UsersState {
   users: UserType[];
-  userLogId: any[];
-  bulks: any[],
-  analytics: UsersState[],
-  analyticMetric: any[],
+  userLogId: object[];
+  bulks: object[],
+  analytics: UserStats | null,
+  analyticMetric: TrendData[],
   usersId: UserType | null;
   userStatus: "idle" | "loading" | "success" | "error";
   userError?: string | null;
@@ -58,14 +65,14 @@ const initialState: UsersState = {
   users: [],
   userLogId: [],
   bulks:[],
-  analytics: [],
+  analytics: null,
   analyticMetric: [],
   usersId: null,
   userStatus: "idle",
   userError: null,
 };
 
-export const updateUser = createAsyncThunk(
+export const UpdateUser = createAsyncThunk(
   "user/updatye",
   async ({ id, datas }: paramsType, thunkAPI) => {
     try {
@@ -87,12 +94,12 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-export const getAllUsers = createAsyncThunk<any, void, { state: RootState }>(
+export const GetAllUsers = createAsyncThunk(
   "users/getAll",
   async (_, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.accessToken;
-      const response = await userService.getAllUser(token);
+      // const token = thunkAPI.getState().auth.accessToken;
+      const response = await userService.getAllUser();
       if (!response.success) {
         return thunkAPI.rejectWithValue(response.error.message);
       } else {
@@ -110,12 +117,12 @@ export const getAllUsers = createAsyncThunk<any, void, { state: RootState }>(
   }
 );
 
-export const getUserById = createAsyncThunk<any, string, { state: RootState }>(
+export const GetUserById = createAsyncThunk(
   "user/getById",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().auth.accessToken.trim();
-      return await userService.getUserId(id, token);
+      // const token = thunkAPI.getState().auth.accessToken.trim();
+      return await userService.getUserId(id);
     } catch (error) {
       const message =
         (error.response &&
@@ -128,7 +135,7 @@ export const getUserById = createAsyncThunk<any, string, { state: RootState }>(
   }
 );
 
-export const deleteuser = createAsyncThunk(
+export const Deleteuser = createAsyncThunk(
   "users/delete",
   async (id, thunkAPI) => {
     try {
@@ -146,9 +153,9 @@ export const deleteuser = createAsyncThunk(
   }
 );
 
-export const suspendUserById = createAsyncThunk<any,dataType,{ state: RootState }>(
+export const SuspendUserById = createAsyncThunk(
   "users/suspended", 
-  async ({ userId, datas }, 
+  async ({ userId, datas }:dataType, 
   thunkAPI) => {
     try {
       // const token = thunkAPI.getState ().auth.user.token;
@@ -162,9 +169,9 @@ export const suspendUserById = createAsyncThunk<any,dataType,{ state: RootState 
     }
 });
 
-export const unSuspendUserById = createAsyncThunk<any,string,{ state: RootState }>(
+export const UnSuspendUserById = createAsyncThunk(
   "users/unSuspended", 
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
       // const token = thunkAPI.getState ().auth.user.token;
       return await userService.unSuspendUserById(id);
@@ -177,9 +184,9 @@ export const unSuspendUserById = createAsyncThunk<any,string,{ state: RootState 
     }
 });
 
-export const UpdateLocalFlag = createAsyncThunk<any,dataType,{ state: RootState }>(
+export const UpdateLocalFlag = createAsyncThunk(
   "users/localFlag", 
-  async ({ userId, datas }, thunkAPI) => {
+  async ({ userId, datas }:dataType, thunkAPI) => {
   try {
     // const token = thunkAPI.getState ().auth.user.token;
     return await userService.updateLocalFlag(userId, datas);
@@ -192,9 +199,9 @@ export const UpdateLocalFlag = createAsyncThunk<any,dataType,{ state: RootState 
   }
 });
 
-export const getUsetActivityLogById = createAsyncThunk<any,string,{ state: RootState }>(
+export const GetUsetActivityLogById = createAsyncThunk(
   "users/activityLogById", 
-  async (userId, thunkAPI) => {
+  async (userId:string, thunkAPI) => {
   try {
     // const token = thunkAPI.getState ().auth.user.token;
     return await userService.getUserActivityLog(userId);
@@ -207,9 +214,9 @@ export const getUsetActivityLogById = createAsyncThunk<any,string,{ state: RootS
   }
 });
 
-export const BulkOperationUsers = createAsyncThunk<any,bulkType,{ state: RootState }>(
+export const BulkOperationUsers = createAsyncThunk(
   "users/userBulk-operations", 
-  async ({userIds,operation,reason}, thunkAPI) => {
+  async ({userIds,operation,reason}:bulkType, thunkAPI) => {
   try {
     const userData={userIds,operation,reason}
     // const token = thunkAPI.getState ().auth.user.token;
@@ -223,9 +230,9 @@ export const BulkOperationUsers = createAsyncThunk<any,bulkType,{ state: RootSta
   }
 });
 
-export const AnalyticsUser = createAsyncThunk<any,string,{ state: RootState }>(
+export const AnalyticsUser = createAsyncThunk(
   "users/analyticsUser", 
-  async (periode, thunkAPI) => {
+  async (periode:string, thunkAPI) => {
   try {
     // const token = thunkAPI.getState ().auth.user.token;
     return await userService.getAnalytics(periode);
@@ -238,9 +245,9 @@ export const AnalyticsUser = createAsyncThunk<any,string,{ state: RootState }>(
   }
 });
 
-export const AnalyticsWithMetric = createAsyncThunk<any,metricType,{ state: RootState }>(
+export const AnalyticsWithMetric = createAsyncThunk(
   "users/analyticsWithMetric", 
-  async ({period,metric}, thunkAPI) => {
+  async ({period,metric}:metricType, thunkAPI) => {
   try {
     // const token = thunkAPI.getState ().auth.user.token;
     return await userService.getAnalyticMetric(period,metric);
@@ -253,18 +260,18 @@ export const AnalyticsWithMetric = createAsyncThunk<any,metricType,{ state: Root
   }
 });
 
-export const userSlice = createSlice({
+export const UserSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
-    reset: (state) => initialState,
+    // reset: (state) => initialState,
   },
   extraReducers: (builder) => {
     builder
-      .addCase(updateUser.pending, (state) => {
+      .addCase(UpdateUser.pending, (state) => {
         state.userStatus = "loading";
       })
-      .addCase(updateUser.fulfilled, (state, action) => {
+      .addCase(UpdateUser.fulfilled, (state, action) => {
         state.userStatus = "success";
         const updatedUser = action.payload.result;
         const index = state.users.findIndex(
@@ -280,45 +287,45 @@ export const userSlice = createSlice({
           };
         }
       })
-      .addCase(updateUser.rejected, (state, action) => {
+      .addCase(UpdateUser.rejected, (state, action) => {
         state.userStatus = "error";
       })
-      .addCase(getAllUsers.pending, (state) => {
+      .addCase(GetAllUsers.pending, (state) => {
         state.userStatus = "loading";
       })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
+      .addCase(GetAllUsers.fulfilled, (state, action) => {
         state.userStatus = "success";
         state.users = action.payload?.data.content;
       })
-      .addCase(getAllUsers.rejected, (state, action) => {
+      .addCase(GetAllUsers.rejected, (state, action) => {
         state.userStatus = "error";
       })
-      .addCase(getUserById.pending, (state) => {
+      .addCase(GetUserById.pending, (state) => {
         state.userStatus = "loading";
       })
-      .addCase(getUserById.fulfilled, (state, action) => {
+      .addCase(GetUserById.fulfilled, (state, action) => {
         state.userStatus = "success";
         state.usersId = action.payload.data;
       })
-      .addCase(getUserById.rejected, (state, action) => {
+      .addCase(GetUserById.rejected, (state, action) => {
         state.userStatus = "error";
       })
-      .addCase(deleteuser.pending, (state) => {
+      .addCase(Deleteuser.pending, (state) => {
         state.userStatus = "loading";
       })
-      .addCase(deleteuser.fulfilled, (state, action) => {
+      .addCase(Deleteuser.fulfilled, (state, action) => {
         state.userStatus = "success";
         state.users = state.users.filter(
           (post) => post.id !== action.payload.id
         );
       })
-      .addCase(deleteuser.rejected, (state, action) => {
+      .addCase(Deleteuser.rejected, (state, action) => {
         state.userStatus = "error";
       })
-      .addCase(suspendUserById.pending, (state) => {
+      .addCase(SuspendUserById.pending, (state) => {
         state.userStatus = "loading";
       })
-      .addCase(suspendUserById.fulfilled, (state, action) => {
+      .addCase(SuspendUserById.fulfilled, (state, action) => {
         state.userStatus = "success";
         const updatedUser = action.payload.data;
         const index = state.users.findIndex((us) => us?.id === updatedUser?.id);
@@ -331,14 +338,14 @@ export const userSlice = createSlice({
           };
         }
       })
-      .addCase(suspendUserById.rejected, (state, action) => {
+      .addCase(SuspendUserById.rejected, (state, action) => {
         state.userStatus = "error";
         // state.userError = action.payload || "Modification échouée";
       })
-      .addCase(unSuspendUserById.pending, (state) => {
+      .addCase(UnSuspendUserById.pending, (state) => {
         state.userStatus = "loading";
       })
-      .addCase(unSuspendUserById.fulfilled, (state, action) => {
+      .addCase(UnSuspendUserById.fulfilled, (state, action) => {
         state.userStatus = "success";
         const updatedUser = action.payload.data;
         const index = state.users.findIndex((us) => us?.id === updatedUser?.id);
@@ -351,7 +358,7 @@ export const userSlice = createSlice({
           };
         }
       })
-      .addCase(unSuspendUserById.rejected, (state, action) => {
+      .addCase(UnSuspendUserById.rejected, (state, action) => {
         state.userStatus = "error";
       })
       .addCase(UpdateLocalFlag.pending, (state) => {
@@ -373,14 +380,14 @@ export const userSlice = createSlice({
       .addCase(UpdateLocalFlag.rejected, (state, action) => {
         state.userStatus = "error";
       })
-      .addCase(getUsetActivityLogById.pending, (state) => {
+      .addCase(GetUsetActivityLogById.pending, (state) => {
         state.userStatus = "loading";
       })
-      .addCase(getUsetActivityLogById.fulfilled, (state, action) => {
+      .addCase(GetUsetActivityLogById.fulfilled, (state, action) => {
         state.userStatus = "success";
         state.userLogId = action.payload.data?.content;
       })
-      .addCase(getUsetActivityLogById.rejected, (state, action) => {
+      .addCase(GetUsetActivityLogById.rejected, (state, action) => {
         state.userStatus = "error";
       })
       .addCase(BulkOperationUsers.pending, (state) => {
@@ -416,5 +423,5 @@ export const userSlice = createSlice({
   },
 });
 
-export const { reset } = userSlice.actions;
-export default userSlice.reducer;
+// export const { reset } = UserSlice.actions;
+export default UserSlice.reducer;

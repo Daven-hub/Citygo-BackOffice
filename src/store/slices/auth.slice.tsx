@@ -2,6 +2,36 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authService from '@/services/authService';
 import { RootState } from '..';
 
+export interface UserProfile {
+  displayName: string;
+  avatarUrl: string;
+  locale: string;
+  bio: string;
+  driverVerified: boolean;
+}
+export interface User {
+  userId: string;
+  email: string;
+  phone: string;
+  roles: string[];
+  profile: UserProfile;
+}
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: string;
+  user: User;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  timestamp: string; // ISO string
+  data: T;
+}
+
+export type refreshResponse = ApiResponse<AuthResponse>;
+export type LogoutResponse = ApiResponse<string>;
+
 const userFromStorage= localStorage.getItem("user")
 
 const initialState = {
@@ -12,28 +42,6 @@ const initialState = {
   // users:[],
   authStatus: "ndle",
 }
-
-// export const registerApp = createAsyncThunk (
-//   'auth/register',
-//   async (datas, thunkAPI) => {
-//     try {
-//       const response= await authService.register(datas);
-//       if (!response.success) {
-//         return thunkAPI.rejectWithValue(response.error);
-//       }else{
-//         return response;
-//       }
-//     } catch (err) {
-//       const message =
-//         (err.response &&
-//           err.response.data &&
-//           err.response.data.message) ||
-//         err.message ||
-//         err.toString ();
-//       return thunkAPI.rejectWithValue (message);
-//     }
-//   }
-// );
 
 
 export const login = createAsyncThunk(
@@ -60,7 +68,7 @@ export const login = createAsyncThunk(
   }
 );
 
-export const refreshTokenAsync = createAsyncThunk<any, void, { state: RootState }>(
+export const refreshTokenAsync = createAsyncThunk<refreshResponse, void, { state: RootState }>(
   'auth/refreshToken',
   async (_, thunkAPI) => {
     const state= thunkAPI.getState().auth;
@@ -79,7 +87,7 @@ export const refreshTokenAsync = createAsyncThunk<any, void, { state: RootState 
   }
 );
 
-export const logoutAsync = createAsyncThunk<any, void, { state: RootState }>(
+export const logoutAsync = createAsyncThunk<LogoutResponse, void, { state: RootState }>(
   'auth/Logout',
   async (_, thunkAPI) => {
     const state= thunkAPI.getState().auth;
@@ -103,16 +111,6 @@ export const authSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      // .addCase (registerApp.pending, state => {
-      //   state.authStatus = "loading";
-      // })
-      // .addCase (registerApp.fulfilled, (state, action) => {
-      //   state.authStatus = "success";
-      //   state.users.unshift (action.payload.result);
-      // })
-      // .addCase (registerApp.rejected, (state, action) => {
-      //   state.authStatus = "success";
-      // })
       .addCase(login.pending, (state) => {
         state.authStatus = "loading";
       })

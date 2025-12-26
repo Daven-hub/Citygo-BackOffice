@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { getUserById, getUsetActivityLogById } from "@/store/slices/user.slice";
+import { GetUserById, GetUsetActivityLogById } from "@/store/slices/user.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import LoaderUltra from "@/components/ui/loaderUltra";
 import UserHeader from "@/components/tabs/users/UserHeader";
@@ -20,127 +20,127 @@ import {
 import Overview from "@/components/tabs/users/Overview";
 import ActivityTab from "@/components/tabs/users/ActivityTab";
 
-const userActivities = [
-  {
-    id: "1",
-    type: "ride",
-    description: "Trajet Paris → Lyon complété",
-    date: "02/12/2024",
-    amount: "+25.00 €",
-  },
-  {
-    id: "2",
-    type: "booking",
-    description: "Réservation confirmée Marseille → Nice",
-    date: "01/12/2024",
-    amount: "-18.50 €",
-  },
-  {
-    id: "3",
-    type: "review",
-    description: "Note reçue: ★★★★★",
-    date: "30/11/2024",
-    amount: null,
-  },
-  {
-    id: "4",
-    type: "ride",
-    description: "Trajet Bordeaux → Toulouse annulé",
-    date: "28/11/2024",
-    amount: "Remboursé",
-  },
-  {
-    id: "5",
-    type: "payment",
-    description: "Paiement reçu",
-    date: "25/11/2024",
-    amount: "+45.00 €",
-  },
-];
+// const userActivities = [
+//   {
+//     id: "1",
+//     type: "ride",
+//     description: "Trajet Paris → Lyon complété",
+//     date: "02/12/2024",
+//     amount: "+25.00 €",
+//   },
+//   {
+//     id: "2",
+//     type: "booking",
+//     description: "Réservation confirmée Marseille → Nice",
+//     date: "01/12/2024",
+//     amount: "-18.50 €",
+//   },
+//   {
+//     id: "3",
+//     type: "review",
+//     description: "Note reçue: ★★★★★",
+//     date: "30/11/2024",
+//     amount: null,
+//   },
+//   {
+//     id: "4",
+//     type: "ride",
+//     description: "Trajet Bordeaux → Toulouse annulé",
+//     date: "28/11/2024",
+//     amount: "Remboursé",
+//   },
+//   {
+//     id: "5",
+//     type: "payment",
+//     description: "Paiement reçu",
+//     date: "25/11/2024",
+//     amount: "+45.00 €",
+//   },
+// ];
 
-const userTransactions = [
-  {
-    id: "T001",
-    type: "payment",
-    amount: 25.0,
-    date: "02/12/2024",
-    status: "completed",
-  },
-  {
-    id: "T002",
-    type: "refund",
-    amount: -18.5,
-    date: "01/12/2024",
-    status: "completed",
-  },
-  {
-    id: "T003",
-    type: "payout",
-    amount: 120.0,
-    date: "28/11/2024",
-    status: "pending",
-  },
-  {
-    id: "T004",
-    type: "commission",
-    amount: -5.0,
-    date: "25/11/2024",
-    status: "completed",
-  },
-];
+// const userTransactions = [
+//   {
+//     id: "T001",
+//     type: "payment",
+//     amount: 25.0,
+//     date: "02/12/2024",
+//     status: "completed",
+//   },
+//   {
+//     id: "T002",
+//     type: "refund",
+//     amount: -18.5,
+//     date: "01/12/2024",
+//     status: "completed",
+//   },
+//   {
+//     id: "T003",
+//     type: "payout",
+//     amount: 120.0,
+//     date: "28/11/2024",
+//     status: "pending",
+//   },
+//   {
+//     id: "T004",
+//     type: "commission",
+//     amount: -5.0,
+//     date: "25/11/2024",
+//     status: "completed",
+//   },
+// ];
 
-const userBookings = [
-  {
-    id: "B001",
-    from: "Paris",
-    to: "Lyon",
-    date: "05/12/2024",
-    status: "confirmed",
-    seats: 2,
-  },
-  {
-    id: "B002",
-    from: "Marseille",
-    to: "Nice",
-    date: "10/12/2024",
-    status: "pending",
-    seats: 1,
-  },
-  {
-    id: "B003",
-    from: "Bordeaux",
-    to: "Toulouse",
-    date: "28/11/2024",
-    status: "cancelled",
-    seats: 3,
-  },
-];
+// const userBookings = [
+//   {
+//     id: "B001",
+//     from: "Paris",
+//     to: "Lyon",
+//     date: "05/12/2024",
+//     status: "confirmed",
+//     seats: 2,
+//   },
+//   {
+//     id: "B002",
+//     from: "Marseille",
+//     to: "Nice",
+//     date: "10/12/2024",
+//     status: "pending",
+//     seats: 1,
+//   },
+//   {
+//     id: "B003",
+//     from: "Bordeaux",
+//     to: "Toulouse",
+//     date: "28/11/2024",
+//     status: "cancelled",
+//     seats: 3,
+//   },
+// ];
 
-const bookingStatusConfig = {
-  confirmed: {
-    label: "Confirmée",
-    className: "bg-primary/10 text-primary border-primary/20",
-  },
-  pending: {
-    label: "En attente",
-    className: "bg-warning/10 text-warning border-warning/20",
-  },
-  cancelled: {
-    label: "Annulée",
-    className: "bg-destructive/10 text-destructive border-destructive/20",
-  },
-  completed: {
-    label: "Terminée",
-    className: "bg-success/10 text-success border-success/20",
-  },
-};
+// const bookingStatusConfig = {
+//   confirmed: {
+//     label: "Confirmée",
+//     className: "bg-primary/10 text-primary border-primary/20",
+//   },
+//   pending: {
+//     label: "En attente",
+//     className: "bg-warning/10 text-warning border-warning/20",
+//   },
+//   cancelled: {
+//     label: "Annulée",
+//     className: "bg-destructive/10 text-destructive border-destructive/20",
+//   },
+//   completed: {
+//     label: "Terminée",
+//     className: "bg-success/10 text-success border-success/20",
+//   },
+// };
 
-const documentTypeLabels = {
-  license: "Permis de conduire",
-  insurance: "Assurance",
-  vehicle_registration: "Carte grise",
-  identity: "Pièce d'identité",
-};
+// const documentTypeLabels = {
+//   license: "Permis de conduire",
+//   insurance: "Assurance",
+//   vehicle_registration: "Carte grise",
+//   identity: "Pièce d'identité",
+// };
 
 export default function UserDetail() {
   const { userId } = useParams();
@@ -148,7 +148,7 @@ export default function UserDetail() {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);
-  const [activeTab, setActiveTab] = useState("overview");
+  // const [activeTab, setActiveTab] = useState("overview");
   const { usersId, userLogId } = useAppSelector((state) => state.users);
 
   const user = usersId;
@@ -157,8 +157,8 @@ export default function UserDetail() {
     const fetchData = async () => {
       const start = performance.now();
       await Promise.all([
-        dispatch(getUserById(userId)),
-        dispatch(getUsetActivityLogById(userId)),
+        dispatch(GetUserById(userId)),
+        dispatch(GetUsetActivityLogById(userId)),
       ]);
       const end = performance.now();
       const elapsed = end - start;

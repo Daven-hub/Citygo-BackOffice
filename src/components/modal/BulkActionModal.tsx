@@ -30,7 +30,11 @@ import {
 import { useToast } from "@/hook/use-toast";
 import { Users, AlertTriangle, Ban, UserCheck, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { BulkOperationUsers, getAllUsers, UserType } from "@/store/slices/user.slice";
+import {
+  BulkOperationUsers,
+  GetAllUsers,
+  UserType,
+} from "@/store/slices/user.slice";
 import { useAppDispatch } from "@/store/hook";
 
 const bulkActionSchema = z.object({
@@ -82,7 +86,6 @@ export function BulkActionModal({
   userIds,
   open,
   onOpenChange,
-  onSubmit,
 }: BulkActionModalProps) {
   const { toast } = useToast();
 
@@ -111,7 +114,7 @@ export function BulkActionModal({
         title: "Action effectuée",
         description: `${userIds.length} utilisateur(s) ont été traités avec succès.`,
       });
-      await dispatch(getAllUsers()).unwrap();
+      await dispatch(GetAllUsers()).unwrap();
       form.reset();
       onOpenChange(false);
     } catch (error) {

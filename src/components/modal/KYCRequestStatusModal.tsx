@@ -19,10 +19,10 @@ interface KYCRequestStatusModalProps {
   onOpenChange: (open: boolean) => void;
   requestId: string;
   currentStatus: "PENDING" | "APPROVED" | "REJECTED";
-  onSubmit: (data: {
-    status: "APPROVED" | "REJECTED";
-    reasons: string[];
-  }) => void;
+  // onSubmit: (data: {
+  //   status: "APPROVED" | "REJECTED";
+  //   reasons: string[];
+  // }) => void;
 }
 
 export function KYCRequestStatusModal({
@@ -30,7 +30,7 @@ export function KYCRequestStatusModal({
   onOpenChange,
   requestId,
   currentStatus,
-  onSubmit,
+  // onSubmit,
 }: KYCRequestStatusModalProps) {
   const [status, setStatus] = useState<"APPROVED" | "REJECTED">("APPROVED");
   const [reasons, setReasons] = useState<string[]>([]);
@@ -49,10 +49,10 @@ export function KYCRequestStatusModal({
   };
 
   const handleSubmit = () => {
-    onSubmit({
-      status,
-      reasons,
-    });
+    // onSubmit({
+    //   status,
+    //   reasons,
+    // });
 
     setReasons([]);
     setNewReason("");

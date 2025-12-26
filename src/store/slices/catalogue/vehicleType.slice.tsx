@@ -41,7 +41,7 @@ export const createVehicleType = createAsyncThunk (
       }else{
         return response;
       }
-    } catch (err:any) {
+    } catch (err) {
       const message =
         (err.response &&
           err.response.data &&
@@ -63,7 +63,7 @@ export const updateVehicleType = createAsyncThunk(
       } else {
         return response;
       }
-    } catch (error:any) {
+    } catch (error) {
       const message =
         (error.response &&
           error.response.data &&
@@ -75,7 +75,7 @@ export const updateVehicleType = createAsyncThunk(
   }
 );
 
-export const getAllVehicleType = createAsyncThunk<any, void, { state: RootState }>(
+export const getAllVehicleType = createAsyncThunk(
   "vehicleType/getAll",
   async (_, thunkAPI) => {
     try {
@@ -86,7 +86,7 @@ export const getAllVehicleType = createAsyncThunk<any, void, { state: RootState 
       } else {
         return response;
       }
-    } catch (error:any) {
+    } catch (error) {
       const message =
         (error.response &&
           error.response.data &&
@@ -98,13 +98,13 @@ export const getAllVehicleType = createAsyncThunk<any, void, { state: RootState 
   }
 );
 
-export const getVehicleTypeById = createAsyncThunk<any, string, { state: RootState }>(
+export const getVehicleTypeById = createAsyncThunk(
   "vehicleType/getById",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
     //   const token = thunkAPI.getState().auth.accessToken.trim();
       return await dataService.getById(id);
-    } catch (error:any) {
+    } catch (error) {
       const message =
         (error.response &&
           error.response.data &&
@@ -122,7 +122,7 @@ export const deleteVehiculeType = createAsyncThunk(
     try {
       // const token = thunkAPI.getState ().auth.user.token;
       return await dataService.deleteById(id);
-    } catch (error:any) {
+    } catch (error) {
       const message =
         (error.response &&
           error.response.data &&

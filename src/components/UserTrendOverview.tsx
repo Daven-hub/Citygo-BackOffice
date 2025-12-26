@@ -3,13 +3,7 @@ import { format, parseISO } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Filter } from "lucide-react";
-
-interface TrendData {
-  date: string;
-  registrations: number;
-  activeUsers: number;
-  driverApplications: number;
-}
+import { TrendData } from "@/store/slices/user.slice";
 
 interface Props {
   data: TrendData[];

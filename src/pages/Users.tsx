@@ -30,8 +30,8 @@ import { useNavigate } from "react-router-dom";
 import { UserDetailModal } from "@/components/modal/UserDetailModal";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import {
-  getAllUsers,
-  unSuspendUserById,
+  GetAllUsers,
+  UnSuspendUserById,
   UserType,
 } from "@/store/slices/user.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
@@ -113,7 +113,7 @@ export default function Users() {
 
   const handleViewFullDetail = (userId: string) =>
     navigate(`/utilisateurs/${userId}`);
-  // const handleEditUser = (user: UserType) => setSelectedUser(user);
+
   const handleSuspendUser = (user: UserType) => {
     setSelectedUser(user);
     setSuspendModalOpen(true);
@@ -123,7 +123,7 @@ export default function Users() {
     setLoading(true);
     try {
       const datas = users?.find((x) => x.id === userId);
-      await dispatch(unSuspendUserById(userId)).unwrap();
+      await dispatch(UnSuspendUserById(userId)).unwrap();
       toast({
         title: "Utilisateur réactivé",
         description: `${datas?.displayName} a été réactivé.`,
@@ -168,7 +168,7 @@ export default function Users() {
   useEffect(() => {
     const fetchData = async () => {
       const start = performance.now();
-      await dispatch(getAllUsers());
+      await dispatch(GetAllUsers());
       const end = performance.now();
       const elapsed = end - start;
       setDuration(elapsed);
@@ -500,7 +500,7 @@ export default function Users() {
         userIds={selectedUserIds}
         open={bulkActionModalOpen}
         onOpenChange={setBulkActionModalOpen}
-        onSubmit={handleBulkActionSubmit}
+        // onSubmit={handleBulkActionSubmit}
       />
     </>
   );

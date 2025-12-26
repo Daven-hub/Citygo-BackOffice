@@ -35,7 +35,7 @@ const Layout = lazy(() => import("./components/header/Layout"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const UsersAdministration = lazy(() => import("./pages/UsersAdministration"));
 const Profile = lazy(() => import("./pages/Profile"));
-const DetailUserAdmin = lazy(() => import("./pages/DetailUserAdmin"));
+// const DetailUserAdmin = lazy(() => import("./pages/DetailUserAdmin"));
 
 const Users = lazy(() => import("./pages/Users"));
 const Settings = lazy(() => import("./pages/Settings"));
