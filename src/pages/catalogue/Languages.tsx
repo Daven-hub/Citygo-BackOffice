@@ -1,67 +1,60 @@
 import { useEffect, useState } from "react";
-import {
-  Search,
-  Filter,
-  Eye,
-  Plus,
-} from "lucide-react";
+import { Search, Filter, Eye, Plus, MoreHorizontal, Edit2, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { TransactionDetailModal } from "@/components/modal/TransactionDetailModal";
 import Pagination from "@/components/Pagination";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
-import { getAllVehicleType } from "@/store/slices/catalogue/vehicleType.slice";
 import { Switch } from "@/components/ui/switch";
-import { getAllLuggage } from "@/store/slices/catalogue/luggageType.slice";
-import { getAllLanguage } from "@/store/slices/catalogue/language.slice";
+import {
+  deleteLanguage,
+  getAllLanguage,
+  LanguageType,
+} from "@/store/slices/catalogue/language.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
-
-interface Transaction {
-  id: string;
-  type: "payment" | "refund" | "payout" | "commission";
-  amount: number;
-  user: string;
-  description: string;
-  date: string;
-  status: "completed" | "pending" | "failed";
-  paymentMethod?: string;
-  rideId?: string;
-}
+import { ConfirmModal } from "@/components/modal/ConfirmModal";
+import LanguageModal from "@/components/modal/catalogue/LanguageModal";
+import { useToast } from "@/hook/use-toast";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function Languages() {
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [page, setPage] = useState(1);
-  const dispatch=useAppDispatch()
+  const dispatch = useAppDispatch();
   const { languages } = useAppSelector((state) => state.language);
   const pageSize = 6;
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<LanguageType | null>(
+    null
+  );
 
-    useEffect(() => {
-        const fetchData = async () => {
-          const start = performance.now();
-          await dispatch(getAllLanguage());
-          const end = performance.now();
-          const elapsed = end - start;
-          setDuration(elapsed);
-          setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
-        };
-        fetchData();
-      }, [dispatch]);
-
-      // console.log('languages',languages)
+  useEffect(() => {
+    const fetchData = async () => {
+      const start = performance.now();
+      await dispatch(getAllLanguage());
+      const end = performance.now();
+      const elapsed = end - start;
+      setDuration(elapsed);
+      setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
+    };
+    fetchData();
+  }, [dispatch]);
 
   const filteredTransactions = languages.filter(
-    (transaction) =>
-      transaction.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      transaction.code
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      transaction.id.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    (transaction) =>{
+      const matchSearch = transaction.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      transaction.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      transaction.nativeName.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesStatus =
+      statusFilter === "all" || transaction.active.toString() === statusFilter;
+       return matchSearch && matchesStatus;
+  });
 
   const totalAppPages = Math.ceil(filteredTransactions.length / pageSize);
   const paginatedTransaction = filteredTransactions.slice(
@@ -69,10 +62,50 @@ export default function Languages() {
     page * pageSize
   );
 
-  const handleViewTransaction = (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setModalOpen(true);
-  };
+  const handleOpen = () => {
+      setSelectedLanguage(null);
+      setModalOpen(true);
+    };
+  
+    const handleViewDetail = (data: LanguageType) => {
+      setSelectedLanguage(data);
+      setModalOpen(true);
+    };
+  
+    const handleViewVehicleType = (data: LanguageType) => {
+      setSelectedLanguage(data);
+      setModalOpen(true);
+    };
+  
+    const handleOpenDelete = (data: LanguageType) => {
+      setSelectedLanguage(data);
+      setDeleteOpen(true);
+    };
+  
+    const handleDelete = async () => {
+      setLoading(true);
+      try {
+        await dispatch(deleteLanguage(selectedLanguage?.id)).unwrap();
+        toast({
+          title: "Mise à jour du statut",
+          description:
+            "Le Statut de la langue avec le code " +
+            selectedLanguage.code +
+            " a été mis à jour avec success!",
+        });
+        setDeleteOpen(false);
+        setSelectedLanguage(null);
+        dispatch(getAllLanguage()).unwrap();
+      } catch (error) {
+        toast({
+          description: error?.toString(),
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+  
 
   if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
   return (
@@ -89,13 +122,32 @@ export default function Languages() {
                 className="pl-10 bg-card border-border"
               />
             </div>
-            <Button variant="outline" size="icon" className="border-border">
-              <Filter className="w-4 h-4" />
-            </Button>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full md:w-44 border-border text-foreground">
+                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Tous les statut" />
+              </SelectTrigger>
+              <SelectContent className="border-border">
+                <SelectItem value="all" className="text-foreground">
+                  Tous les statuts
+                </SelectItem>
+                <SelectItem value={"true"} className="text-success">
+                  ACTIVE
+                </SelectItem>
+                <SelectItem value={"false"} className="text-destructive">
+                  INACTIVE
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Button variant="outline" className="border-border bg-primary text-white">
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => handleOpen()}
+            className="border-border bg-primary text-white"
+          >
             <Plus className="w-4 h-4 mr-0.5" />
-            Nouveau Type
+            Nouvelle langue
           </Button>
         </div>
 
@@ -132,25 +184,20 @@ export default function Languages() {
                       key={transaction.id}
                       className="border-b text-sm border-border/50 hover:bg-muted/20 transition-colors cursor-pointer"
                     >
-                      <td className="py-3 px-6">
-                        {transaction?.code}
-                      </td>
-                      <td className="py-3 px-6">
-                        {transaction?.name}
-                      </td>
-                      <td className="py-3 px-6">
-                        {transaction?.nativeName}
-                      </td>
+                      <td className="py-3 px-6">{transaction?.code}</td>
+                      <td className="py-3 px-6">{transaction?.name}</td>
+                      <td className="py-3 px-6">{transaction?.nativeName}</td>
                       <td className="py-4 px-6">
                         {transaction?.active}
                         <Switch
                           checked={transaction?.active}
-                        //   onCheckedChange={(checked) => handleUpdateStatus(species?.id,checked ? 1 : 0)}
                           className={`
                             transition duration-300
-                            ${transaction?.active
-                              ? "data-[state=checked]:bg-green-500" 
-                              : "data-[state=unchecked]:bg-red-500"}
+                            ${
+                              transaction?.active
+                                ? "data-[state=checked]:bg-green-500"
+                                : "data-[state=unchecked]:bg-red-500"
+                            }
                           `}
                         />
                       </td>
@@ -158,17 +205,46 @@ export default function Languages() {
                         {transaction.sortOrder}
                       </td>
                       <td className="py-3 px-6 text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewTransaction(transaction);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="border-border w-48"
+                          >
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleViewDetail(transaction)
+                              }
+                              className="text-foreground hover:bg-muted cursor-pointer"
+                            >
+                              <Eye className="h-4 w-4 mr-2" />
+                              Voir détails
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="" />
+                            <DropdownMenuItem
+                              onClick={() => handleViewVehicleType(transaction)}
+                              className="text-secondary hover:!bg-secondary/10 cursor-pointer"
+                            >
+                              <Edit2 className="h-4 w-4 mr-2" />
+                              Modifier
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleOpenDelete(transaction)}
+                              className="text-destructive hover:!bg-destructive/10 cursor-pointer"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Supprimer
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </td>
                     </tr>
                   );
@@ -186,23 +262,29 @@ export default function Languages() {
         </div>
       </div>
 
-      {selectedTransaction && (
-        <TransactionDetailModal
-          open={modalOpen}
-          onOpenChange={setModalOpen}
-          transaction={{
-            ...selectedTransaction,
-            userEmail: "lionelfotso@gmail.com",
-            rideDetails: selectedTransaction.rideId
-              ? {
-                  from: "Douala",
-                  to: "Yaounde",
-                  date: selectedTransaction.date,
-                }
-              : undefined,
-          }}
-        />
-      )}
+      <LanguageModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        dispatch={dispatch}
+        selected={selectedLanguage}
+        setSelected={setSelectedLanguage}
+      />
+
+      <ConfirmModal
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title={"Suppression d'un type de bagage"}
+        description={
+          "Voulez vous supprimé la langue avec pour code: " +
+          selectedLanguage?.code +
+          " et pour nom: " +
+          selectedLanguage?.name +
+          " ?"
+        }
+        onConfirm={handleDelete}
+        variant="danger"
+        loading={loading}
+      />
     </>
   );
 }

@@ -116,7 +116,7 @@ export const getLuggageById = createAsyncThunk(
 
 export const deleteLuggage = createAsyncThunk(
   "Luggage/delete",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
       // const token = thunkAPI.getState ().auth.user.token;
       return await dataService.deleteById(id);

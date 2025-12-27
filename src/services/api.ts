@@ -3,7 +3,7 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL:
-    "http://api.dev.citygo-drive.com",
+    "https://cng-ngc.org/api/proxy.php?path=http://api.dev.citygo-drive.com",
   headers: {
     "Content-Type": "application/json",
   },

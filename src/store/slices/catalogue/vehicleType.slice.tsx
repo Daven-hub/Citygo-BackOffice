@@ -118,7 +118,7 @@ export const getVehicleTypeById = createAsyncThunk(
 
 export const deleteVehiculeType = createAsyncThunk(
   "vehicleType/delete",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
       // const token = thunkAPI.getState ().auth.user.token;
       return await dataService.deleteById(id);

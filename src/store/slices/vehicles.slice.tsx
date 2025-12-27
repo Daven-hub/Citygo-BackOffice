@@ -10,7 +10,7 @@ interface paramType{
 type VehicleStatus = "SUSPENDED" | "PENDING" | "APPROVED" | "REJECTED";
 type ComfortLevel = "STANDARD" | "PREMIUM" | "LUXE";
 
-type Vehicle = {
+export type Vehicle = {
   vehicleId: string;
   ownerId: string;
   ownerName: string;

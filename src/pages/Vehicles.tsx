@@ -13,6 +13,7 @@ import {
   FileText,
   Armchair,
   CircleCheck,
+  PlayCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,18 +34,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import {
-  vehicleStatusConfig,
-  comfortLevelConfig,
-  Vehicle,
-} from "@/data/mockVehicles";
+// import {
+//   vehicleStatusConfig,
+//   comfortLevelConfig,
+//   Vehicle,
+// } from "@/data/mockVehicles";
 import { VehicleStatusModal } from "@/components/modal/VehicleStatusModal";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { getAllVehicles, updateVehicleStatus } from "@/store/slices/vehicles.slice";
+import { getAllVehicles, updateVehicleStatus, Vehicle } from "@/store/slices/vehicles.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import LoaderUltra from "@/components/ui/loaderUltra";
 import { toast } from "@/hook/use-toast";
+import { ConfirmModal } from "@/components/modal/ConfirmModal";
+
+const vehicleStatusConfig = {
+  UNSUSPENDED: { label: "Reactivé", className: "bg-muted text-muted-foreground border-border" },
+  PENDING: { label: "En attente", className: "bg-warning/10 text-warning border-warning/20" },
+  APPROVED: { label: "Approuvé", className: "bg-success/10 text-success border-success/20" },
+  REJECTED: { label: "Rejeté", className: "bg-destructive/10 text-destructive border-destructive/20" },
+  SUSPENDED: { label: "Suspendu", className: "bg-destructive/10 text-destructive border-destructive/20" },
+};
+
+const comfortLevelConfig = {
+  STANDARD: { label: "Standard", className: "bg-muted text-muted-foreground border-border" },
+  COMFORT: { label: "Confort", className: "bg-primary/10 text-primary border-primary/20" },
+  PREMIUM: { label: "Premium", className: "bg-warning/10 text-warning border-warning/20" },
+};
 
 export default function Vehicles() {
   const navigate = useNavigate();
@@ -129,7 +145,7 @@ export default function Vehicles() {
         }
   };
 
-  const openStatusModal = (vehicle,status,url) => {
+  const openStatusModal = (vehicle:Vehicle,status:string,url:string) => {
     setSelectedVehicle(vehicle);
     setVariable(url);
     setStatusModal(status);
@@ -274,8 +290,8 @@ export default function Vehicles() {
               </thead>
               <tbody>
                 {filteredVehicles.length === 0 && (
-                  <td className="py-3 px-6" colSpan={8}>
-                    <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <td className="py-7 px-6 text-center" colSpan={8}>
+                    <Car className="h-12 w-12 text-muted-foreground mx-auto mb-0.5" />
                     <p className="text-muted-foreground">Aucun véhicule trouvé</p>
                   </td>
                 )}
@@ -437,10 +453,3 @@ export default function Vehicles() {
     </>
   );
 }
-
-// {filteredVehicles.length === 0 && (
-//               <div className="text-center py-12">
-//                 <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-//                 <p className="text-muted-foreground">Aucun véhicule trouvé</p>
-//               </div>
-//             )}
