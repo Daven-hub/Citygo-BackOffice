@@ -117,7 +117,7 @@ export const getLanguageById = createAsyncThunk(
 
 export const deleteLanguage = createAsyncThunk(
   "language/delete",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
       // const token = thunkAPI.getState ().auth.user.token;
       return await dataService.deleteById(id);

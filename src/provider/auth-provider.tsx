@@ -4,7 +4,7 @@ import { GetAllUsers } from "@/store/slices/user.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { logoutAsync } from "@/store/slices/auth.slice";
 import { useToast } from "@/hook/use-toast";
-import { AuthContext } from "./auth-context";
+import { AuthContext } from "@/context/auth-context";
 
 
 

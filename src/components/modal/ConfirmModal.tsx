@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle, Info, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle, Info, Loader2, XCircle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +16,7 @@ interface ConfirmModalProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   title: string;
+  loading: boolean;
   description: string;
   confirmText?: string;
   cancelText?: string;
@@ -27,25 +28,25 @@ const variantConfig = {
     icon: XCircle,
     iconClassName: "text-destructive",
     bgClassName: "bg-destructive/10",
-    actionClassName: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+    actionClassName: "bg-destructive text-destructive-foreground hover:bg-destructive/90 flex items-center gap-2",
   },
   warning: {
     icon: AlertTriangle,
     iconClassName: "text-warning",
     bgClassName: "bg-warning/10",
-    actionClassName: "bg-warning text-warning-foreground hover:bg-warning/90",
+    actionClassName: "bg-warning text-warning-foreground hover:bg-warning/90 flex items-center gap-2",
   },
   success: {
     icon: CheckCircle,
     iconClassName: "text-success",
     bgClassName: "bg-success/10",
-    actionClassName: "bg-success text-success-foreground hover:bg-success/90",
+    actionClassName: "bg-success text-success-foreground hover:bg-success/90 flex items-center gap-2",
   },
   info: {
     icon: Info,
     iconClassName: "text-primary",
     bgClassName: "bg-primary/10",
-    actionClassName: "gradient-primary text-primary-foreground",
+    actionClassName: "gradient-primary text-primary-foreground flex items-center gap-2",
   },
 };
 
@@ -54,6 +55,7 @@ export function ConfirmModal({
   onOpenChange,
   onConfirm,
   title,
+  loading,
   description,
   confirmText = "Confirmer",
   cancelText = "Annuler",
@@ -86,7 +88,7 @@ export function ConfirmModal({
             onClick={onConfirm}
             className={config.actionClassName}
           >
-            {confirmText}
+            {loading?<><Loader2 /> {confirmText}...</>:confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

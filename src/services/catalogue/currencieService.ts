@@ -1,5 +1,5 @@
 import axios from "../api";
-const API_URL = "/admin/catalog/currencies/";
+const API_URL = "/admin/catalog/currencies";
 
 const getAll = async () => {
   try {
@@ -17,7 +17,7 @@ const create = async (userData) => {
 
 const getById = async (id) => {
   try {
-    const response = await axios.get(API_URL + id);
+    const response = await axios.get(API_URL +'/'+ id);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -25,12 +25,12 @@ const getById = async (id) => {
 };
 
 const deleteById = async (id) => {
-  const response = await axios.delete(API_URL + id);
+  const response = await axios.delete(API_URL+'/' + id);
   return response.data;
 };
 
 const updateById = async (id, userData) => {
-  const response = await axios.patch(API_URL + id, userData);
+  const response = await axios.patch(API_URL +'/' + id, userData);
   return response.data;
 };
 

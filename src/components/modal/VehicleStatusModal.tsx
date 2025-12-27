@@ -17,8 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Vehicle } from "@/data/mockVehicles";
 import { CheckCircle, XCircle, Ban, PlayCircle, CircleCheck } from "lucide-react";
+import { Vehicle } from "@/store/slices/vehicles.slice";
 
 interface VehicleStatusModalProps {
   vehicle: Vehicle | null;

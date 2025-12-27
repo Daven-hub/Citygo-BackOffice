@@ -4,27 +4,22 @@ import {
   Filter,
   Eye,
   Plus,
+  MoreHorizontal,
+  Edit2,
+  Trash2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { TransactionDetailModal } from "@/components/modal/TransactionDetailModal";
 import Pagination from "@/components/Pagination";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { Switch } from "@/components/ui/switch";
-import { getAllCurrencie } from "@/store/slices/catalogue/currencie.slice";
+import { CurrencieType, deleteCurrencie, getAllCurrencie } from "@/store/slices/catalogue/currencie.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
-
-interface Transaction {
-  id: string;
-  type: "payment" | "refund" | "payout" | "commission";
-  amount: number;
-  user: string;
-  description: string;
-  date: string;
-  status: "completed" | "pending" | "failed";
-  paymentMethod?: string;
-  rideId?: string;
-}
+import { ConfirmModal } from "@/components/modal/ConfirmModal";
+import CurrenciesModal from "@/components/modal/catalogue/CurrenciesModal";
+import { useToast } from "@/hook/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function Currencies() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,11 +27,15 @@ export default function Currencies() {
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const dispatch=useAppDispatch()
   const { currencies } = useAppSelector((state) => state.currencie);
   const pageSize = 6;
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
+  const [selectedCurrencie, setSelectedCurrentie] =
+    useState<CurrencieType | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -51,13 +50,14 @@ export default function Currencies() {
       }, [dispatch]);
 
   const filteredTransactions = currencies.filter(
-    (transaction) =>
-      transaction.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      transaction.code
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      transaction.id.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    (transaction) =>{
+      const matchSearch = transaction.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      transaction.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      transaction.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesStatus =
+      statusFilter === "all" || transaction.active.toString() === statusFilter;
+       return matchSearch && matchesStatus;
+  });
 
   const totalAppPages = Math.ceil(filteredTransactions.length / pageSize);
   const paginatedTransaction = filteredTransactions.slice(
@@ -65,10 +65,49 @@ export default function Currencies() {
     page * pageSize
   );
 
-  const handleViewTransaction = (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
-    setModalOpen(true);
-  };
+ const handleOpen = () => {
+       setSelectedCurrentie(null);
+       setModalOpen(true);
+     };
+   
+     const handleViewDetail = (data: CurrencieType) => {
+       setSelectedCurrentie(data);
+       setModalOpen(true);
+     };
+   
+     const handleView = (data: CurrencieType) => {
+       setSelectedCurrentie(data);
+       setModalOpen(true);
+     };
+   
+     const handleOpenDelete = (data: CurrencieType) => {
+       setSelectedCurrentie(data);
+       setDeleteOpen(true);
+     };
+   
+     const handleDelete = async () => {
+       setLoading(true);
+       try {
+         await dispatch(deleteCurrencie(selectedCurrencie?.id)).unwrap();
+         toast({
+           title: "Mise à jour du statut",
+           description:
+             "Le Statut de la langue avec le code " +
+             selectedCurrencie.code +
+             " a été mis à jour avec success!",
+         });
+         setDeleteOpen(false);
+         setSelectedCurrentie(null);
+         dispatch(getAllCurrencie()).unwrap();
+       } catch (error) {
+         toast({
+           description: error?.toString(),
+           variant: "destructive",
+         });
+       } finally {
+         setLoading(false);
+       }
+     };
 
   if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
   return (
@@ -85,13 +124,27 @@ export default function Currencies() {
                 className="pl-10 bg-card border-border"
               />
             </div>
-            <Button variant="outline" size="icon" className="border-border">
-              <Filter className="w-4 h-4" />
-            </Button>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full md:w-44 border-border text-foreground">
+                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Tous les statut" />
+              </SelectTrigger>
+              <SelectContent className="border-border">
+                <SelectItem value="all" className="text-foreground">
+                  Tous les statuts
+                </SelectItem>
+                <SelectItem value={"true"} className="text-success">
+                  ACTIVE
+                </SelectItem>
+                <SelectItem value={"false"} className="text-destructive">
+                  INACTIVE
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Button variant="outline" className="border-border bg-primary text-white">
+          <Button type="button" onClick={() => handleOpen()} variant="outline" className="border-border bg-primary text-white">
             <Plus className="w-4 h-4 mr-0.5" />
-            Nouveau Type
+            Nouvelle monnaie
           </Button>
         </div>
 
@@ -141,7 +194,6 @@ export default function Currencies() {
                         {transaction?.active}
                         <Switch
                           checked={transaction?.active}
-                        //   onCheckedChange={(checked) => handleUpdateStatus(species?.id,checked ? 1 : 0)}
                           className={`
                             transition duration-300
                             ${transaction?.active
@@ -154,17 +206,46 @@ export default function Currencies() {
                         {transaction.sortOrder}
                       </td>
                       <td className="py-3 px-6 text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewTransaction(transaction);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="border-border w-48"
+                          >
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleViewDetail(transaction)
+                              }
+                              className="text-foreground hover:bg-muted cursor-pointer"
+                            >
+                              <Eye className="h-4 w-4 mr-2" />
+                              Voir détails
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="" />
+                            <DropdownMenuItem
+                              onClick={() => handleView(transaction)}
+                              className="text-secondary hover:!bg-secondary/10 cursor-pointer"
+                            >
+                              <Edit2 className="h-4 w-4 mr-2" />
+                              Modifier
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleOpenDelete(transaction)}
+                              className="text-destructive hover:!bg-destructive/10 cursor-pointer"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Supprimer
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </td>
                     </tr>
                   );
@@ -182,23 +263,29 @@ export default function Currencies() {
         </div>
       </div>
 
-      {selectedTransaction && (
-        <TransactionDetailModal
-          open={modalOpen}
-          onOpenChange={setModalOpen}
-          transaction={{
-            ...selectedTransaction,
-            userEmail: "lionelfotso@gmail.com",
-            rideDetails: selectedTransaction.rideId
-              ? {
-                  from: "Douala",
-                  to: "Yaounde",
-                  date: selectedTransaction.date,
-                }
-              : undefined,
-          }}
-        />
-      )}
+      <CurrenciesModal
+              open={modalOpen}
+              setOpen={setModalOpen}
+              dispatch={dispatch}
+              selected={selectedCurrencie}
+              setSelected={setSelectedCurrentie}
+            />
+      
+            <ConfirmModal
+              open={deleteOpen}
+              onOpenChange={setDeleteOpen}
+              title={"Suppression d'une Monnaie"}
+              description={
+                "Voulez vous supprimé la Monnaie avec pour code: " +
+                selectedCurrencie?.code +
+                " et pour nom: " +
+                selectedCurrencie?.name +
+                " ?"
+              }
+              onConfirm={handleDelete}
+              variant="danger"
+              loading={loading}
+            />
     </>
   );
 }
