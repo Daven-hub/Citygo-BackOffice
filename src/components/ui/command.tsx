@@ -24,7 +24,7 @@ Command.displayName = CommandPrimitive.displayName
 
 type CommandDialogProps = DialogProps
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+
 
 
 
