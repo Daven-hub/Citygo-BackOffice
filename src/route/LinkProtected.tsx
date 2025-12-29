@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
-import { useAuth } from "@/context/authContext";
 import LoaderUltra from "@/components/ui/loaderUltra";
+import { useAuth } from "@/context/use-auth";
 
 export default function LinkProtected() {
   const { userConnected, isLoading } = useAuth();

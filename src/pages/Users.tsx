@@ -30,18 +30,19 @@ import { useNavigate } from "react-router-dom";
 import { UserDetailModal } from "@/components/modal/UserDetailModal";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import {
-  getAllUsers,
-  unSuspendUserById,
+  GetAllUsers,
+  UnSuspendUserById,
   UserType,
 } from "@/store/slices/user.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
 import dayjs from "dayjs";
 import { useToast } from "@/hook/use-toast";
 import { UserSuspendModal } from "@/components/modal/UserSuspendModal";
-import { useAuth } from "@/context/authContext";
+// import { useAuth } from "@/context/authContext";
 import { BulkActionModal } from "@/components/modal/BulkActionModal";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/context/use-auth";
 
 const roleConfig = {
   ROLE_DRIVER: {
@@ -113,7 +114,7 @@ export default function Users() {
 
   const handleViewFullDetail = (userId: string) =>
     navigate(`/utilisateurs/${userId}`);
-  // const handleEditUser = (user: UserType) => setSelectedUser(user);
+
   const handleSuspendUser = (user: UserType) => {
     setSelectedUser(user);
     setSuspendModalOpen(true);
@@ -123,7 +124,7 @@ export default function Users() {
     setLoading(true);
     try {
       const datas = users?.find((x) => x.id === userId);
-      await dispatch(unSuspendUserById(userId)).unwrap();
+      await dispatch(UnSuspendUserById(userId)).unwrap();
       toast({
         title: "Utilisateur réactivé",
         description: `${datas?.displayName} a été réactivé.`,
@@ -168,7 +169,7 @@ export default function Users() {
   useEffect(() => {
     const fetchData = async () => {
       const start = performance.now();
-      await dispatch(getAllUsers());
+      await dispatch(GetAllUsers());
       const end = performance.now();
       const elapsed = end - start;
       setDuration(elapsed);
@@ -500,7 +501,7 @@ export default function Users() {
         userIds={selectedUserIds}
         open={bulkActionModalOpen}
         onOpenChange={setBulkActionModalOpen}
-        onSubmit={handleBulkActionSubmit}
+        // onSubmit={handleBulkActionSubmit}
       />
     </>
   );

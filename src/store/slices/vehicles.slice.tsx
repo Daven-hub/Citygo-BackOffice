@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { RootState } from "..";
 import dataService from '../../services/vehicleService'
 
 interface paramType{
@@ -11,7 +10,7 @@ interface paramType{
 type VehicleStatus = "SUSPENDED" | "PENDING" | "APPROVED" | "REJECTED";
 type ComfortLevel = "STANDARD" | "PREMIUM" | "LUXE";
 
-type Vehicle = {
+export type Vehicle = {
   vehicleId: string;
   ownerId: string;
   ownerName: string;
@@ -88,7 +87,7 @@ export const updateVehicleStatus = createAsyncThunk(
   }
 );
 
-export const getAllVehicles = createAsyncThunk<any, void, { state: RootState }>(
+export const getAllVehicles = createAsyncThunk(
   "vehicles/getAll",
   async (_, thunkAPI) => {
     try {
@@ -111,7 +110,7 @@ export const getAllVehicles = createAsyncThunk<any, void, { state: RootState }>(
   }
 );
 
-export const getAllPendingReview = createAsyncThunk<any, void, { state: RootState }>(
+export const getAllPendingReview = createAsyncThunk(
   "vehicles/getPendingReview",
   async (_, thunkAPI) => {
     try {
@@ -134,7 +133,7 @@ export const getAllPendingReview = createAsyncThunk<any, void, { state: RootStat
   }
 );
 
-export const getvehicleById = createAsyncThunk<any, string, { state: RootState }>(
+export const getvehicleById = createAsyncThunk(
   "vehicles/getById",
   async (id, thunkAPI) => {
     try {

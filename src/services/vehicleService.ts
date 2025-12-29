@@ -1,5 +1,5 @@
 import axios from "./api";
-const API_URL = "/admin/vehicles/";
+const API_URL = "/admin/vehicles";
 
 const getAll = async () => {
   try {
@@ -10,9 +10,9 @@ const getAll = async () => {
   }
 };
 
-const getById = async (vehicleIdid) => {
+const getById = async (vehicleId) => {
   try {
-    const response = await axios.get(API_URL + vehicleIdid);
+    const response = await axios.get(API_URL +'/'+ vehicleId);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;
@@ -25,7 +25,7 @@ const pendingReview = async () => {
 };
 
 const updateStatus = async (vehicleId,status,userData) => {
-  const response = await axios.post(API_URL+ vehicleId+'/'+status, userData);
+  const response = await axios.post(API_URL+'/'+ vehicleId+'/'+status, userData);
   return response.data;
 };
 

@@ -74,7 +74,7 @@ export const updateCurrencie = createAsyncThunk(
   }
 );
 
-export const getAllCurrencie = createAsyncThunk<any, void, { state: RootState }>(
+export const getAllCurrencie = createAsyncThunk(
   "currencies/getAll",
   async (_, thunkAPI) => {
     try {
@@ -97,9 +97,9 @@ export const getAllCurrencie = createAsyncThunk<any, void, { state: RootState }>
   }
 );
 
-export const getCurrencieById = createAsyncThunk<any, string, { state: RootState }>(
+export const getCurrencieById = createAsyncThunk(
   "currencies/getById",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
     //   const token = thunkAPI.getState().auth.accessToken.trim();
       return await dataService.getById(id);
@@ -117,7 +117,7 @@ export const getCurrencieById = createAsyncThunk<any, string, { state: RootState
 
 export const deleteCurrencie = createAsyncThunk(
   "currencies/delete",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
       // const token = thunkAPI.getState ().auth.user.token;
       return await dataService.deleteById(id);

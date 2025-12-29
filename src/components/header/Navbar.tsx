@@ -1,7 +1,7 @@
 import { Menu } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import UserMenu from '../UserMenu'
-import { useAuth } from '@/context/authContext'
+import { useAuth } from '@/context/use-auth'
 
 function Navbar () {
   const [open, setOpen] = useState(false)

@@ -1,13 +1,6 @@
 import LoaderUltra from "@/components/ui/loaderUltra";
 import React, { useState, useEffect } from "react";
-// import ReactECharts from "echarts-for-react";
-import {
-  Car,
-  Users,
-  MapPin,
-  TrendingUp,
-} from "lucide-react";
-// import { RevenueChart } from "@/components/RevenueChart";
+import { Car, Users, MapPin, TrendingUp } from "lucide-react";
 import { TopDestinations } from "@/components/TopDestinations";
 import { RecentRidesTable } from "@/components/RecentRidesTable";
 import { StatsCard } from "@/components/StatsCard";
@@ -19,147 +12,64 @@ import { UserTrendOverview } from "@/components/UserTrendOverview";
 function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);
-  const [periode, setPeriode] = useState('MONTH');
-  const [period, setPeriod] = useState('MONTH');
-  const [metric, setMetric] = useState('ALL');
-  const { analytics,analyticMetric } = useAppSelector((state) => state.users);
-  const dispatch=useAppDispatch()
+  const [periode, setPeriode] = useState("MONTH");
+  const [period, setPeriod] = useState("MONTH");
+  const [metric, setMetric] = useState("ALL");
+  const { analytics, analyticMetric } = useAppSelector((state) => state.users);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const data={period,metric}
-        const fetchData = async () => {
-          const start = performance.now();
-          await Promise.all([
-            dispatch(AnalyticsUser(periode)),
-            dispatch(AnalyticsWithMetric(data))
-          ]);
-          const end = performance.now();
-          const elapsed = end - start;
-          setDuration(elapsed);
-          setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
-        };
-        fetchData();
-      }, [dispatch,periode,period,metric]);
+    const data = { period, metric };
+    const fetchData = async () => {
+      const start = performance.now();
+      await Promise.all([
+        dispatch(AnalyticsUser(periode)),
+        dispatch(AnalyticsWithMetric(data)),
+      ]);
+      const end = performance.now();
+      const elapsed = end - start;
+      setDuration(elapsed);
+      setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
+    };
+    fetchData();
+  }, [dispatch, periode, period, metric]);
 
-      // console.log('analyticMetric',analyticMetric)
-  // const cards = [
-  //   {
-  //     title: "Utilisateurs",
-  //     amount: "100",
-  //     trend: "+10.08%",
-  //     color: "#7C3AED",
-  //     chartColor: "#8B5CF6",
-  //   },
-  //   {
-  //     title: "Utilisateurs actifs",
-  //     amount: "90",
-  //     trend: "-9.08%",
-  //     color: "#F43F5E",
-  //     chartColor: "#FB7185",
-  //   },
-  //   {
-  //     title: "Nouveaux Utilisateurs",
-  //     amount: "50",
-  //     trend: "+12.08%",
-  //     color: "#10B981",
-  //     chartColor: "#34D399",
-  //   },
-  //   {
-  //     title: "Conducteurs vérifiés",
-  //     amount: "20",
-  //     trend: "+12.08%",
-  //     color: "#14B8A6",
-  //     chartColor: "#2DD4BF",
-  //   },
-  // ];
-
-  const statsCard=[
+  const statsCard = [
     {
-      title:"Revenus totaux",
-      value:"FCFA 90,847",
-      change:"+12.5% ce mois",
-      changeTyp:"positive",
-      icon:Users,
-      delay:0
+      title: "Revenus totaux",
+      value: "FCFA 90,847",
+      change: "+12.5% ce mois",
+      changeTyp: "positive",
+      icon: Users,
+      delay: 0,
     },
     {
-      title:"Trajets actifs",
-      value:"12,847",
-      change:"+8.2% cette semaine",
-      changeTyp:"positive",
-      icon:Car,
-      delay:50
+      title: "Trajets actifs",
+      value: "12,847",
+      change: "+8.2% cette semaine",
+      changeTyp: "positive",
+      icon: Car,
+      delay: 50,
     },
     {
-      title:"Destinations",
-      value:"156",
-      change:"23 nouvelles villes",
-      changeTyp:"neutral",
-      icon:MapPin,
-      delay:100
+      title: "Destinations",
+      value: "156",
+      change: "23 nouvelles villes",
+      changeTyp: "neutral",
+      icon: MapPin,
+      delay: 100,
     },
     {
-      title:"Revenus mensuels",
-      value:"FCFA 42,300",
-      change:"+18.7% vs mois dernier",
-      changeTyp:"positive",
-      icon:TrendingUp,
-      delay:150
-    }
-  ]
+      title: "Revenus mensuels",
+      value: "FCFA 42,300",
+      change: "+18.7% vs mois dernier",
+      changeTyp: "positive",
+      icon: TrendingUp,
+      delay: 150,
+    },
+  ];
 
-  const dashboardData = {
-  period: "MONTH",
-  data: {
-    totalUsers: 6,
-    activeUsers: 6,
-    newRegistrations: 6,
-    verifiedDrivers: 0,
-    pendingDriverApplications: 0
-  },
-  trends: [
-    { date: "2025-12-01", registrations: 0, activeUsers: 0, driverApplications: 0 },
-    { date: "2025-12-02", registrations: 1, activeUsers: 1, driverApplications: 0 },
-    { date: "2025-12-03", registrations: 2, activeUsers: 2, driverApplications: 0 },
-    { date: "2025-12-04", registrations: 0, activeUsers: 0, driverApplications: 0 },
-    { date: "2025-12-05", registrations: 1, activeUsers: 2, driverApplications: 0 },
-    { date: "2025-12-06", registrations: 0, activeUsers: 1, driverApplications: 0 },
-    { date: "2025-12-07", registrations: 0, activeUsers: 0, driverApplications: 0 },
-    { date: "2025-12-08", registrations: 0, activeUsers: 0, driverApplications: 0 },
-    { date: "2025-12-09", registrations: 0, activeUsers: 1, driverApplications: 0 },
-    { date: "2025-12-10", registrations: 0, activeUsers: 0, driverApplications: 0 },
-    { date: "2025-12-11", registrations: 2, activeUsers: 4, driverApplications: 0 },
-    { date: "2025-12-12", registrations: 0, activeUsers: 0, driverApplications: 0 },
-    { date: "2025-12-13", registrations: 0, activeUsers: 1, driverApplications: 0 },
-    { date: "2025-12-14", registrations: 0, activeUsers: 1, driverApplications: 0 },
-  ]
-};
-
-  // const chartOptions = (color) => ({
-  //   xAxis: {
-  //     show: false,
-  //     type: "category",
-  //     data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-  //   },
-  //   yAxis: { show: false, type: "value" },
-  //   grid: { left: 0, right: 0, top: 0, bottom: 0 },
-  //   series: [
-  //     {
-  //       type: "bar",
-  //       data: [10, 6, 8, 5, 9, 12, 8, 5, 10, 12],
-  //       barWidth: "80%",
-  //       barGap: "5%",
-  //       barCategoryGap: "5%",
-  //       itemStyle: {
-  //         color: color,
-  //         borderRadius: [4, 4, 0, 0],
-  //       },
-  //     },
-  //   ],
-  // });
-
-
-  if (isLoading) return <LoaderUltra loading={isLoading} />;
+  if (isLoading) return <LoaderUltra duration={duration} loading={isLoading} />;
 
   return (
     <div className="text-gray-800 space-y-5 min-h-screen">
@@ -190,24 +100,34 @@ function Dashboard() {
         ))}
       </div> */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {statsCard?.map((x,index)=>
-            <StatsCard
-              key={index}
-              title={x.title}
-              value={x.value}
-              change={x.change}
-              changeType={x.changeTyp}
-              icon={x.icon}
-              delay={0}
-            />
-          )}
+        {statsCard?.map((x, index) => (
+          <StatsCard
+            key={index}
+            title={x.title}
+            value={x.value}
+            change={x.change}
+            changeType={x.changeTyp}
+            icon={x.icon}
+            delay={0}
+          />
+        ))}
       </div>
-      <UserStatOverview stats={analytics} periode={periode} setPeriode={setPeriode}/>
+      <UserStatOverview
+        stats={analytics}
+        periode={periode}
+        setPeriode={setPeriode}
+      />
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
         <div className="lg:col-span-2">
           {/* <RevenueChart /> */}
-          <UserTrendOverview data={analyticMetric} period={period} setPeriod={setPeriod} metric={metric} setMetric={setMetric} />
+          <UserTrendOverview
+            data={analyticMetric}
+            period={period}
+            setPeriod={setPeriod}
+            metric={metric}
+            setMetric={setMetric}
+          />
         </div>
         <div className="flex flex-col">
           <TopDestinations />

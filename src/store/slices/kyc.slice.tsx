@@ -83,7 +83,7 @@ export const updateKycRequest = createAsyncThunk(
   }
 );
 
-export const getAllKycRequest = createAsyncThunk<any, void, { state: RootState }>(
+export const getAllKycRequest = createAsyncThunk(
   "kycRequest/getAll",
   async (_, thunkAPI) => {
     try {
@@ -106,7 +106,7 @@ export const getAllKycRequest = createAsyncThunk<any, void, { state: RootState }
   }
 );
 
-export const getKycRequestById = createAsyncThunk<any, string, { state: RootState }>(
+export const getKycRequestById = createAsyncThunk(
   "kycRequest/getById",
   async (id, thunkAPI) => {
     try {
@@ -146,7 +146,7 @@ export const updateDriverApp = createAsyncThunk(
   }
 );
 
-export const getAllDriverApp = createAsyncThunk<any, void, { state: RootState }>(
+export const getAllDriverApp = createAsyncThunk(
   "driverApplication/getAll",
   async (_, thunkAPI) => {
     try {
@@ -169,9 +169,9 @@ export const getAllDriverApp = createAsyncThunk<any, void, { state: RootState }>
   }
 );
 
-export const getDriverAppById = createAsyncThunk<any, string, { state: RootState }>(
+export const getDriverAppById = createAsyncThunk(
   "driverApplication/getById",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
     //   const token = thunkAPI.getState().auth.accessToken.trim();
       return await dataService.getDriverApplicationById(id);

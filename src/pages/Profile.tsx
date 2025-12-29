@@ -2,7 +2,6 @@ import Breadcrumb from '@/components/Breadcrumb'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import LoaderUltra from '@/components/ui/loaderUltra'
-import { BaseUrl } from '@/config'
 import { useAuth } from '@/context/authContext'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { getUserById } from '@/store/slices/user.slice'
@@ -77,7 +76,7 @@ function Profile() {
                     <Avatar className='inline-flex w-[75px] h-[75px] border-2 p-1 object-cover object-top rounded-full items-center justify-center overflow-hidden align-middle'>
                         <AvatarImage
                             className="AvatarImage bg-gray-50 object-cover"
-                            src={BaseUrl + userConnected?.profile}
+                            // src={BaseUrl + userConnected?.profile}
                             alt={userConnected?.username ? userConnected?.username : userConnected?.nom}
                         />
                         <AvatarFallback className="AvatarFallback flex h-full w-full items-center justify-center bg-gray-100 text-sm font-semibold text-gray-800" delayMs={100}>

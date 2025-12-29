@@ -4,60 +4,70 @@ import {
   Filter,
   Eye,
   Plus,
+  MoreHorizontal,
+  Trash2,
+  Edit2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { TransactionDetailModal } from "@/components/modal/TransactionDetailModal";
 import Pagination from "@/components/Pagination";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
-import { getAllVehicleType } from "@/store/slices/catalogue/vehicleType.slice";
+import {
+  deleteVehiculeType,
+  getAllVehicleType,
+  VehicleT,
+} from "@/store/slices/catalogue/vehicleType.slice";
 import { Switch } from "@/components/ui/switch";
 import LoaderUltra from "@/components/ui/loaderUltra";
-
-interface Transaction {
-  id: string;
-  type: "payment" | "refund" | "payout" | "commission";
-  amount: number;
-  user: string;
-  description: string;
-  date: string;
-  status: "completed" | "pending" | "failed";
-  paymentMethod?: string;
-  rideId?: string;
-}
+import VehiculeTypeModal from "@/components/modal/catalogue/VehiculeTypeModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ConfirmModal } from "@/components/modal/ConfirmModal";
+import { useToast } from "@/hook/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function VehicleType() {
   const [searchQuery, setSearchQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [duration, setDuration] = useState(0);
   const [page, setPage] = useState(1);
-  const dispatch=useAppDispatch()
+  const dispatch = useAppDispatch();
   const { vehicleTypes } = useAppSelector((state) => state.vehicleType);
+  const {toast}=useToast()
   const pageSize = 6;
-  const [selectedTransaction, setSelectedTransaction] =
-    useState<Transaction | null>(null);
+  const [selectedTypeVehicle, setSelectedTypeVehicle] =
+    useState<VehicleT | null>(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-          const start = performance.now();
-          await dispatch(getAllVehicleType());
-          const end = performance.now();
-          const elapsed = end - start;
-          setDuration(elapsed);
-          setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
-        };
-        fetchData();
-      }, [dispatch]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const start = performance.now();
+      await dispatch(getAllVehicleType());
+      const end = performance.now();
+      const elapsed = end - start;
+      setDuration(elapsed);
+      setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
+    };
+    fetchData();
+  }, [dispatch]);
 
   const filteredTransactions = vehicleTypes.filter(
-    (transaction) =>
-      transaction.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      transaction.code
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
+    (transaction) =>{
+      const matchSearch = transaction.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      transaction.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
       transaction.id.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      const matchesStatus =
+      statusFilter === "all" || transaction.active.toString() === statusFilter;
+       return matchSearch && matchesStatus;
+  });
 
   const totalAppPages = Math.ceil(filteredTransactions.length / pageSize);
   const paginatedTransaction = filteredTransactions.slice(
@@ -65,9 +75,46 @@ export default function VehicleType() {
     page * pageSize
   );
 
-  const handleViewTransaction = (transaction: Transaction) => {
-    setSelectedTransaction(transaction);
+  const handleOpen = () => {
+    setSelectedTypeVehicle(null);
     setModalOpen(true);
+  };
+
+  const handleViewDetailVehicleType = (data: VehicleT) => {
+    setSelectedTypeVehicle(data);
+    setModalOpen(true);
+  };
+
+  const handleViewVehicleType = (data: VehicleT) => {
+    setSelectedTypeVehicle(data);
+    setModalOpen(true);
+  };
+
+  const handleOpenDelete = (data:VehicleT) => {
+    setSelectedTypeVehicle(data);
+    setDeleteOpen(true);
+  };
+
+  const handleDelete = async() => {
+    setLoading(true)
+    try {
+      await dispatch(deleteVehiculeType(selectedTypeVehicle?.id)).unwrap();
+      toast({
+        title: "Mise à jour du statut",
+        description:
+          "Le Statut du type de vehicule " + selectedTypeVehicle.code + " a été mis à jour avec success!",
+      });
+      setDeleteOpen(false);
+      setSelectedTypeVehicle(null);
+      dispatch(getAllVehicleType()).unwrap();
+    } catch (error) {
+      toast({
+        description: error?.toString(),
+        variant: "destructive",
+      });
+    }finally{
+      setLoading(false)
+    }
   };
 
   if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
@@ -85,11 +132,30 @@ export default function VehicleType() {
                 className="pl-10 bg-card border-border"
               />
             </div>
-            <Button variant="outline" size="icon" className="border-border">
-              <Filter className="w-4 h-4" />
-            </Button>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full md:w-44 border-border text-foreground">
+                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Tous les statut" />
+              </SelectTrigger>
+              <SelectContent className="border-border">
+                <SelectItem value="all" className="text-foreground">
+                  Tous les statuts
+                </SelectItem>
+                <SelectItem value={"true"} className="text-success">
+                  ACTIVE
+                </SelectItem>
+                <SelectItem value={"false"} className="text-destructive">
+                  INACTIVE
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Button variant="outline" className="border-border bg-primary text-white">
+          <Button
+            type="button"
+            onClick={() => handleOpen()}
+            variant="outline"
+            className="border-border bg-primary text-white"
+          >
             <Plus className="w-4 h-4 mr-0.5" />
             Nouveau Type
           </Button>
@@ -131,12 +197,8 @@ export default function VehicleType() {
                       key={transaction.id}
                       className="border-b text-sm border-border/50 hover:bg-muted/20 transition-colors cursor-pointer"
                     >
-                      <td className="py-3 px-6">
-                        {transaction?.code}
-                      </td>
-                      <td className="py-3 px-6">
-                        {transaction?.name}
-                      </td>
+                      <td className="py-3 px-6">{transaction?.code}</td>
+                      <td className="py-3 px-6">{transaction?.name}</td>
                       <td className="py-3 px-6">
                         {transaction?.seatCapacityMin}
                       </td>
@@ -147,12 +209,13 @@ export default function VehicleType() {
                         {transaction?.active}
                         <Switch
                           checked={transaction?.active}
-                        //   onCheckedChange={(checked) => handleUpdateStatus(species?.id,checked ? 1 : 0)}
                           className={`
                             transition duration-300
-                            ${transaction?.active
-                              ? "data-[state=checked]:bg-green-500" 
-                              : "data-[state=unchecked]:bg-red-500"}
+                            ${
+                              transaction?.active
+                                ? "data-[state=checked]:bg-green-500"
+                                : "data-[state=unchecked]:bg-red-500"
+                            }
                           `}
                         />
                       </td>
@@ -160,17 +223,46 @@ export default function VehicleType() {
                         {transaction.sortOrder}
                       </td>
                       <td className="py-3 px-6 text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewTransaction(transaction);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="border-border w-48"
+                          >
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleViewDetailVehicleType(transaction)
+                              }
+                              className="text-foreground hover:bg-muted cursor-pointer"
+                            >
+                              <Eye className="h-4 w-4 mr-2" />
+                              Voir détails
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="" />
+                            <DropdownMenuItem
+                              onClick={() => handleViewVehicleType(transaction)}
+                              className="text-secondary hover:!bg-secondary/10 cursor-pointer"
+                            >
+                              <Edit2 className="h-4 w-4 mr-2" />
+                              Modifier
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleOpenDelete(transaction)}
+                              className="text-destructive hover:!bg-destructive/10 cursor-pointer"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Supprimer
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </td>
                     </tr>
                   );
@@ -188,23 +280,23 @@ export default function VehicleType() {
         </div>
       </div>
 
-      {selectedTransaction && (
-        <TransactionDetailModal
-          open={modalOpen}
-          onOpenChange={setModalOpen}
-          transaction={{
-            ...selectedTransaction,
-            userEmail: "lionelfotso@gmail.com",
-            rideDetails: selectedTransaction.rideId
-              ? {
-                  from: "Douala",
-                  to: "Yaounde",
-                  date: selectedTransaction.date,
-                }
-              : undefined,
-          }}
-        />
-      )}
+      <VehiculeTypeModal
+        open={modalOpen}
+        setOpen={setModalOpen}
+        dispatch={dispatch}
+        selectedTypeVehicle={selectedTypeVehicle}
+        setSelectedTypeVehicle={setSelectedTypeVehicle}
+      />
+
+      <ConfirmModal
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title={"Suppression d'un type de véhicule"}
+        description={"Voulez vous supprimé le type de véhicule avec pour code: "+selectedTypeVehicle?.code+" et pour nom: "+selectedTypeVehicle?.name+ ' ?'}
+        onConfirm={handleDelete}
+        variant='danger'
+        loading={loading}
+      />
     </>
   );
 }

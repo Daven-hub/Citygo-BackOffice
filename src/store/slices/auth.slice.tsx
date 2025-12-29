@@ -2,6 +2,36 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authService from '@/services/authService';
 import { RootState } from '..';
 
+export interface UserProfile {
+  displayName: string;
+  avatarUrl: string;
+  locale: string;
+  bio: string;
+  driverVerified: boolean;
+}
+export interface User {
+  userId: string;
+  email: string;
+  phone: string;
+  roles: string[];
+  profile: UserProfile;
+}
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: string;
+  user: User;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  timestamp: string; // ISO string
+  data: T;
+}
+
+export type refreshResponse = ApiResponse<AuthResponse>;
+export type LogoutResponse = ApiResponse<string>;
+
 const userFromStorage= localStorage.getItem("user")
 
 const initialState = {
@@ -12,6 +42,7 @@ const initialState = {
   // users:[],
   authStatus: "ndle",
 }
+
 
 export const registerApp = createAsyncThunk(
   'auth/register',
@@ -61,7 +92,11 @@ export const login = createAsyncThunk(
   }
 );
 
-export const refreshTokenAsync = createAsyncThunk<unknown, void, { state: RootState }>(
+
+// export const refreshTokenAsync = createAsyncThunk<unknown, void, { state: RootState }>(
+
+export const refreshTokenAsync = createAsyncThunk<refreshResponse, void, { state: RootState }>(
+
   'auth/refreshToken',
   async (_, thunkAPI) => {
     const state= thunkAPI.getState().auth;
@@ -80,7 +115,10 @@ export const refreshTokenAsync = createAsyncThunk<unknown, void, { state: RootSt
   }
 );
 
-export const logoutAsync = createAsyncThunk<unknown, void, { state: RootState }>(
+
+
+export const logoutAsync = createAsyncThunk<LogoutResponse, void, { state: RootState }>(
+
   'auth/Logout',
   async (_, thunkAPI) => {
     const state= thunkAPI.getState().auth;
@@ -104,6 +142,7 @@ export const authSlice = createSlice({
   },
   extraReducers: builder => {
     builder
+
       .addCase(registerApp.pending, state => {
         state.authStatus = "loading";
       })
@@ -113,6 +152,7 @@ export const authSlice = createSlice({
       .addCase(registerApp.rejected, (state) => {
         state.authStatus = "error";
       })
+
       .addCase(login.pending, (state) => {
         state.authStatus = "loading";
       })

@@ -4,14 +4,13 @@ import { Toaster } from "./components/ui/toaster";
 import ProtectedRoute from "./route/protectedRoute";
 import LinkProtected from "./route/LinkProtected";
 import LoaderUltra from "./components/ui/loaderUltra";
-import { useAuth } from "./context/authContext";
-import LayoutSetting from "./components/header/LayoutSetting";
+// import LayoutSetting from "./components/header/LayoutSetting";
 import Notifications from "./pages/Notifications";
-import Transactions from "./pages/Transactions";
-import Rides from "./pages/Rides";
-import Bookings from "./pages/Bookings";
-import Destinations from "./pages/Destinations";
-import Rapports from "./pages/Rapports";
+// import Transactions from "./pages/Transactions";
+// import Rides from "./pages/Rides";
+// import Bookings from "./pages/Bookings";
+// import Destinations from "./pages/Destinations";
+// import Rapports from "./pages/Rapports";
 import UserDetail from "./pages/UserDetail";
 // import KYC from "./pages/KYC";
 import BookingsDetail from "./pages/BookingsDetail";
@@ -25,7 +24,7 @@ import VehicleType from "./pages/catalogue/VehicleType";
 import Languages from "./pages/catalogue/Languages";
 import Currencies from "./pages/catalogue/Currencies";
 import LuggageType from "./pages/catalogue/LuggageType";
-// import { authChannel } from "./broadcast/authChannel";
+import { useAuth } from "./context/use-auth";
 
 // Lazy loading
 const Login = lazy(() => import("./pages/Login"));
@@ -33,12 +32,11 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const Layout = lazy(() => import("./components/header/Layout"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-const UsersAdministration = lazy(() => import("./pages/UsersAdministration"));
-const Profile = lazy(() => import("./pages/Profile"));
-const DetailUserAdmin = lazy(() => import("./pages/DetailUserAdmin"));
+// const UsersAdministration = lazy(() => import("./pages/UsersAdministration"));
+// const Profile = lazy(() => import("./pages/Profile"));
 
 const Users = lazy(() => import("./pages/Users"));
-const Settings = lazy(() => import("./pages/Settings"));
+// const Settings = lazy(() => import("./pages/Settings"));
 
 const App = () => {
   const {loading}=useAuth()

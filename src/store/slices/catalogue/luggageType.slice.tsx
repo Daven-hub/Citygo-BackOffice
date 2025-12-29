@@ -73,7 +73,7 @@ export const updateLuggage = createAsyncThunk(
   }
 );
 
-export const getAllLuggage = createAsyncThunk<any, void, { state: RootState }>(
+export const getAllLuggage = createAsyncThunk(
   "Luggage/getAll",
   async (_, thunkAPI) => {
     try {
@@ -96,9 +96,9 @@ export const getAllLuggage = createAsyncThunk<any, void, { state: RootState }>(
   }
 );
 
-export const getLuggageById = createAsyncThunk<any, string, { state: RootState }>(
+export const getLuggageById = createAsyncThunk(
   "Luggage/getById",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
     //   const token = thunkAPI.getState().auth.accessToken.trim();
       return await dataService.getById(id);
@@ -116,7 +116,7 @@ export const getLuggageById = createAsyncThunk<any, string, { state: RootState }
 
 export const deleteLuggage = createAsyncThunk(
   "Luggage/delete",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
       // const token = thunkAPI.getState ().auth.user.token;
       return await dataService.deleteById(id);
