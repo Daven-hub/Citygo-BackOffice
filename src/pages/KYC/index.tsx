@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { 
   FileText,
+  Send,
   UserCheck,
 } from "lucide-react";
 
@@ -14,6 +15,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { DriverApplication, getAllDriverApp, getAllKycRequest, KycRequest, updateDriverApp, updateKycRequest } from "@/store/slices/kyc.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
 import { GetAllUsers } from "@/store/slices/user.slice";
+import Documents from "./Documents";
 
 export default function KYC() {
   const { toast } = useToast();
@@ -163,8 +165,12 @@ export default function KYC() {
               Candidatures Chauffeurs
             </TabsTrigger>
             <TabsTrigger value="requests" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary-foreground">
-              <FileText className="w-4 h-4 mr-2" />
+              <Send className="w-4 h-4 mr-2" />
               Demandes KYC
+            </TabsTrigger>
+            <TabsTrigger value="documents" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary-foreground">
+              <FileText className="w-4 h-4 mr-2" />
+              Documents
             </TabsTrigger>
           </TabsList>
 
@@ -186,6 +192,23 @@ export default function KYC() {
           </TabsContent>
           <TabsContent value="requests" className="space-y-4">
             <Request
+                kycStats={kycStats}
+                users={users}
+                page={kycPage}
+                pageSize={pageSize}
+                statusFilter={requestFilter}
+                setStatusFilter={setRequestFilter}
+                paginatedKYCRequests={paginatedKYCRequests}
+                searchQuery={searchQuery}
+                setKycStatusModalOpen={setKycStatusModalOpen}
+                setPage={setKycPage}
+                setSearchQuery={setSearchQuery}
+                setSelectedKYCRequest={setSelectedKYCRequest}
+                totalPages={totalKYCPages}
+            />
+          </TabsContent>
+          <TabsContent value="documents" className="space-y-4">
+            <Documents
                 kycStats={kycStats}
                 users={users}
                 page={kycPage}
