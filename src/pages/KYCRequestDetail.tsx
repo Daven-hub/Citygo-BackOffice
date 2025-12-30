@@ -293,7 +293,7 @@ export default function KYCRequestDetail() {
         onOpenChange={setStatusModalOpen}
         requestId={request.id}
         currentStatus={request.status}
-        onSubmit={handleStatusSubmit}
+        // onSubmit={handleStatusSubmit}
       />
     </>
   );
