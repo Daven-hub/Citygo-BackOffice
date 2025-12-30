@@ -8,6 +8,7 @@ import languageReducer from '@/store/slices/catalogue/language.slice';
 import luggageTypeReducer from '@/store/slices/catalogue/luggageType.slice';
 import vehicleTypeReducer from '@/store/slices/catalogue/vehicleType.slice';
 import vehicleReducer from '@/store/slices/vehicles.slice';
+import documentReducer from '@/store/slices/document.slice';
 
 export const store = configureStore ({
   reducer: {
@@ -18,7 +19,8 @@ export const store = configureStore ({
     language: languageReducer,
     luggageType: luggageTypeReducer,
     vehicleType: vehicleTypeReducer,
-    vehicle: vehicleReducer
+    vehicle: vehicleReducer,
+    document: documentReducer
   },
   devTools: true,
 });
