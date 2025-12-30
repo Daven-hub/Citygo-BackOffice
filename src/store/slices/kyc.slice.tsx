@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import dataService from "../../services/kycService";
-import { RootState } from "..";
+// import { RootState } from "..";
 
 export interface EmergencyContact {
   name: string;

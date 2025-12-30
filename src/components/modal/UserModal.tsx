@@ -122,11 +122,7 @@ export function UserModal({ open, onOpenChange, user, mode }: UserModalProps) {
               </Label>
               <Select
                 value={formData.roles.join('')}
-
-                // onValueChange={(value) => setFormData({ ...formData, role: value })}
-
                 // onValueChange={(value) => setFormData({ ...formData, role: value as any })}
-
                 disabled={isViewMode}
               >
                 <SelectTrigger className="bg-background border-border">
@@ -147,11 +143,7 @@ export function UserModal({ open, onOpenChange, user, mode }: UserModalProps) {
               </Label>
               <Select
                 value={formData.status}
-
-                onValueChange={(value) => setFormData({ ...formData, status: value })}
-
                 // onValueChange={(value) => setFormData({ ...formData, status: value as any })}
-
                 disabled={isViewMode}
               >
                 <SelectTrigger className="bg-background border-border">

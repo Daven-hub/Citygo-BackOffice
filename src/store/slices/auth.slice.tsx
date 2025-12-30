@@ -44,30 +44,6 @@ const initialState = {
 }
 
 
-export const registerApp = createAsyncThunk(
-  'auth/register',
-  async (datas: unknown, thunkAPI) => {
-    try {
-      const response = await authService.register(datas);
-      if (!response.success) {
-        return thunkAPI.rejectWithValue(response.error);
-      } else {
-        return response;
-      }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        String(err);
-      return thunkAPI.rejectWithValue(message);
-    }
-  }
-);
-
-
 export const login = createAsyncThunk(
   'auth/login',
   async (payload, thunkAPI) => {
@@ -92,11 +68,7 @@ export const login = createAsyncThunk(
   }
 );
 
-
-// export const refreshTokenAsync = createAsyncThunk<unknown, void, { state: RootState }>(
-
 export const refreshTokenAsync = createAsyncThunk<refreshResponse, void, { state: RootState }>(
-
   'auth/refreshToken',
   async (_, thunkAPI) => {
     const state= thunkAPI.getState().auth;
@@ -115,10 +87,7 @@ export const refreshTokenAsync = createAsyncThunk<refreshResponse, void, { state
   }
 );
 
-
-
 export const logoutAsync = createAsyncThunk<LogoutResponse, void, { state: RootState }>(
-
   'auth/Logout',
   async (_, thunkAPI) => {
     const state= thunkAPI.getState().auth;
@@ -142,17 +111,6 @@ export const authSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-
-      .addCase(registerApp.pending, state => {
-        state.authStatus = "loading";
-      })
-      .addCase(registerApp.fulfilled, (state) => {
-        state.authStatus = "success";
-      })
-      .addCase(registerApp.rejected, (state) => {
-        state.authStatus = "error";
-      })
-
       .addCase(login.pending, (state) => {
         state.authStatus = "loading";
       })

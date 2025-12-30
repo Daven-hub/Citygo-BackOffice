@@ -40,7 +40,13 @@ import { useToast } from "@/hook/use-toast";
 import { UserSuspendModal } from "@/components/modal/UserSuspendModal";
 // import { useAuth } from "@/context/authContext";
 import { BulkActionModal } from "@/components/modal/BulkActionModal";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/context/use-auth";
 
@@ -54,7 +60,7 @@ const roleConfig = {
     className: "bg-secondary/10 text-secondary border-border",
   },
   both: {
-    label: "Les deux",
+    label: "Conducteur",
     className: "bg-green-100 text-green-700 border-grenn-200",
   },
   ROLE_ADMIN: {
@@ -100,17 +106,16 @@ export default function Users() {
   const { toast } = useToast();
   const { userConnected } = useAuth();
 
-  const filteredUsers = users.filter(
-    (user) =>{
-      const matchesSearch=
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
       user?.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user?.phone?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === "all" || user.status === statusFilter;
-      const matchesRole = roleFilter === "all" || user.roles.includes(roleFilter);
-      return matchesSearch && matchesStatus && matchesRole;
-    }
-  );
+    const matchesStatus =
+      statusFilter === "all" || user.status === statusFilter;
+    const matchesRole = roleFilter === "all" || user.roles.includes(roleFilter);
+    return matchesSearch && matchesStatus && matchesRole;
+  });
 
   const handleViewFullDetail = (userId: string) =>
     navigate(`/utilisateurs/${userId}`);
@@ -152,19 +157,18 @@ export default function Users() {
 
   const handleBulkAction = () => setBulkActionModalOpen(true);
 
-  const handleBulkActionSubmit = (data: {
-    userIds: string[];
-    operation: string;
-    reason: string;
-  }) => {
-      setSelectedUserIds([])
-  };
+  // const handleBulkActionSubmit = (data: {
+  //   userIds: string[];
+  //   operation: string;
+  //   reason: string;
+  // }) => {
+  //     setSelectedUserIds([])
+  // };
 
   const allSelected =
     filteredUsers.length > 0 && selectedUserIds.length === filteredUsers.length;
   const someSelected =
     selectedUserIds.length > 0 && selectedUserIds.length < filteredUsers.length;
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -178,74 +182,75 @@ export default function Users() {
     fetchData();
   }, [dispatch]);
 
-  const actifUser=users.filter((x)=>x.status==='ACTIVE')?.length
-  const pendingUser=users.filter((x)=>x.status==='PENDING_VERIFICATION')?.length
-  const suspendUser=users.filter((x)=>x.status==='SUSPENDED')?.length
+  const actifUser = users.filter((x) => x.status === "ACTIVE")?.length;
+  const pendingUser = users.filter(
+    (x) => x.status === "PENDING_VERIFICATION"
+  )?.length;
+  const suspendUser = users.filter((x) => x.status === "SUSPENDED")?.length;
 
-  const statCard=[
-  {
-    key: "total",
-    label: "Total",
-    value: users?.length,
-    icon: User,
-    colorClass: "text-primary",
-    bgColorClass: "bg-primary/10",
-  },
-  {
-    key: "approved",
-    label: "Approuvés",
-    value: actifUser,
-    icon: CheckCircle,
-    colorClass: "text-success",
-    bgColorClass: "bg-success/10",
-  },
-  {
-    key: "pending",
-    label: "En attente",
-    value: pendingUser,
-    icon: FileText,
-    colorClass: "text-warning",
-    bgColorClass: "bg-warning/10",
-  },
-  {
-    key: "suspended",
-    label: "Suspendus",
-    value: suspendUser,
-    icon: Ban,
-    colorClass: "text-destructive",
-    bgColorClass: "bg-destructive/10",
-  },
-];
+  const statCard = [
+    {
+      key: "total",
+      label: "Total",
+      value: users?.length,
+      icon: User,
+      colorClass: "text-primary",
+      bgColorClass: "bg-primary/10",
+    },
+    {
+      key: "approved",
+      label: "Approuvés",
+      value: actifUser,
+      icon: CheckCircle,
+      colorClass: "text-success",
+      bgColorClass: "bg-success/10",
+    },
+    {
+      key: "pending",
+      label: "En attente",
+      value: pendingUser,
+      icon: FileText,
+      colorClass: "text-warning",
+      bgColorClass: "bg-warning/10",
+    },
+    {
+      key: "suspended",
+      label: "Suspendus",
+      value: suspendUser,
+      icon: Ban,
+      colorClass: "text-destructive",
+      bgColorClass: "bg-destructive/10",
+    },
+  ];
 
   if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
 
   return (
     <>
       <div className="space-y-4">
-
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {statCard?.map((x,index)=>
-          <Card key={index} className="bg-card border-border shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">{x.label}</p>
-                  <p className={cn("text-2xl font-bold", x.colorClass)}>
-                    {x.value}
-                  </p>
+          {statCard?.map((x, index) => (
+            <Card key={index} className="bg-card border-border shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">{x.label}</p>
+                    <p className={cn("text-2xl font-bold", x.colorClass)}>
+                      {x.value}
+                    </p>
+                  </div>
+                  <div
+                    className={cn(
+                      "h-10 w-10 rounded-xl flex items-center justify-center",
+                      x.bgColorClass
+                    )}
+                  >
+                    <x.icon className={cn("h-5 w-5", x.colorClass)} />
+                  </div>
                 </div>
-                <div
-                  className={cn(
-                    "h-10 w-10 rounded-xl flex items-center justify-center",
-                    x.bgColorClass
-                  )}
-                >
-                  <x.icon className={cn("h-5 w-5", x.colorClass)} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          )}
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-between">
@@ -260,28 +265,45 @@ export default function Users() {
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full md:w-44 border-border text-foreground">
-                    <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <SelectValue placeholder="Statut" />
-                  </SelectTrigger>
-                  <SelectContent className="border-border">
-                    <SelectItem value="all" className="text-foreground">Tous les statuts</SelectItem>
-                    <SelectItem value="ACTIVE" className="text-success">Active</SelectItem>
-                    <SelectItem value="PENDING_VERIFICATION" className="text-warning">En attente</SelectItem>
-                    <SelectItem value="SUSPENDED" className="text-destructive">Suspendu</SelectItem>
-                    <SelectItem value="INACTIVE" className="text-primary">Inactif</SelectItem>
-                  </SelectContent>
-                </Select>
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="w-full md:w-44 border-border text-foreground">
-                    <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <SelectValue placeholder="Statut" />
-                  </SelectTrigger>
-                  <SelectContent className="border-border">
-                    <SelectItem value="all" className="text-foreground">Tous les roles</SelectItem>
-                    <SelectItem value="ROLE_DRIVER" className="text-foreground">Chauffeur</SelectItem>
-                  </SelectContent>
-                </Select>
+              <SelectTrigger className="w-full md:w-44 border-border text-foreground">
+                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent className="border-border">
+                <SelectItem value="all" className="text-foreground">
+                  Tous les statuts
+                </SelectItem>
+                <SelectItem value="ACTIVE" className="text-success">
+                  Active
+                </SelectItem>
+                <SelectItem
+                  value="PENDING_VERIFICATION"
+                  className="text-warning"
+                >
+                  En attente
+                </SelectItem>
+                <SelectItem value="SUSPENDED" className="text-destructive">
+                  Suspendu
+                </SelectItem>
+                <SelectItem value="INACTIVE" className="text-primary">
+                  Inactif
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <SelectTrigger className="w-full md:w-44 border-border text-foreground">
+                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent className="border-border">
+                <SelectItem value="all" className="text-foreground">
+                  Tous les roles
+                </SelectItem>
+                <SelectItem value="ROLE_DRIVER" className="text-foreground">
+                  Conducteur
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {selectedUserIds.length > 0 && (
@@ -361,7 +383,10 @@ export default function Users() {
                       </td>
                       <td className="py-3 px-5 flex items-center gap-3">
                         <Avatar className="w-10 h-10">
-                          <AvatarImage src={user?.avatarUrl} className="w-full h-full object-cover" />
+                          <AvatarImage
+                            src={user?.avatarUrl}
+                            className="w-full h-full object-cover"
+                          />
                           <AvatarFallback className="bg-primary/10 text-primary font-medium">
                             {user?.displayName
                               ?.split(" ")
@@ -376,10 +401,12 @@ export default function Users() {
                       <td className="py-3 px-5">
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2 text-muted-foreground">
-                            <Mail className="w-3.5 h-3.5" /> {user.email?user.email:'N/A'}
+                            <Mail className="w-3.5 h-3.5" />{" "}
+                            {user.email ? user.email : "N/A"}
                           </div>
                           <div className="flex items-center gap-2 text-muted-foreground">
-                            <Phone className="w-3.5 h-3.5" /> {user.phone?user.phone:'N/A'}
+                            <Phone className="w-3.5 h-3.5" />{" "}
+                            {user.phone ? user.phone : "N/A"}
                           </div>
                         </div>
                       </td>
@@ -501,7 +528,7 @@ export default function Users() {
         userIds={selectedUserIds}
         open={bulkActionModalOpen}
         onOpenChange={setBulkActionModalOpen}
-        // onSubmit={handleBulkActionSubmit}
+      // onSubmit={handleBulkActionSubmit}
       />
     </>
   );

@@ -25,6 +25,7 @@ interface bulkType {
 
 export interface TrendData {
   date: string;
+  label?: string;
   registrations: number;
   activeUsers: number;
   driverApplications: number;

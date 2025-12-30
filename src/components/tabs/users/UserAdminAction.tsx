@@ -41,7 +41,7 @@ export default function UserAdminActions({ user }) {
     <>
       <div className="flex gap-2">
         {user.status === "ACTIVE" && (
-          <Button type="button" onClick={()=>handleSuspendUser(user)} className="text-destructive" variant="outline">
+          <Button type="button" onClick={()=>handleSuspendUser(user)} className="text-destructive border-destructive" variant="outline">
             <Ban className="w-4 h-4 mr-1" />
             Suspendre
           </Button>

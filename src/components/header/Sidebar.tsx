@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import $ from "jquery";
 import {
   Bell,
+  Book,
   Calendar,
   Car,
   CarFront,
@@ -46,40 +47,40 @@ function Sidebar({ setIsSidebarOpen }) {
       corps: [
         {
           title: "Tableau de Bord",
-          icon: <Grid size={20} />,
+          icon: <Grid size={22} />,
           path: "/",
           children: [],
           alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Catalogue",
-          icon: <User size={20} />,
+          icon: <Book size={22} />,
           path: "",
           children: [
             {
               title: "Type de vehicules",
-              icon: <CarFront size={20} />,
+              icon: <CarFront size={22} />,
               path: "/type-de-vehicule",
               children: [],
               alowed: ["ROLE_ADMIN"],
             },
             {
               title: "Type de bagages",
-              icon: <Bell size={20} />,
+              icon: <Bell size={22} />,
               path: "/type-de-bagage",
               children: [],
               alowed: ["ROLE_ADMIN"],
             },
             {
               title: "Langues",
-              icon: <Bell size={20} />,
+              icon: <Bell size={22} />,
               path: "/langues",
               children: [],
               alowed: ["ROLE_ADMIN"],
             },
             {
               title: "Monnaies",
-              icon: <Bell size={20} />,
+              icon: <Bell size={22} />,
               path: "/monnaies",
               children: [],
               alowed: ["ROLE_ADMIN"],
@@ -87,31 +88,31 @@ function Sidebar({ setIsSidebarOpen }) {
           ],
           alowed: ["ROLE_ADMIN"],
         },
-        { title: 'Vehicules', icon: <CarFront size={20} />, path: '/vehicules', children: [], alowed:["ROLE_ADMIN"] },
+        { title: 'Vehicules', icon: <CarFront size={22} />, path: '/vehicules', children: [], alowed:["ROLE_ADMIN"] },
         {
           title: "Trajets",
-          icon: <CarFront size={20} />,
+          icon: <CarFront size={22} />,
           path: "/trajets",
           children: [],
           alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Reservations",
-          icon: <Calendar size={20} />,
+          icon: <Calendar size={22} />,
           path: "/reservations",
           children: [],
           alowed: ["ROLE_ADMIN"],
         },
         {
           title: "KYC",
-          icon: <ShieldCheck size={20} />,
+          icon: <ShieldCheck size={22} />,
           path: "/kyc",
           children: [],
           alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Transactions",
-          icon: <CreditCard size={20} />,
+          icon: <CreditCard size={22} />,
           path: "/transactions",
           children: [],
           alowed: ["ROLE_ADMIN"],
@@ -119,19 +120,19 @@ function Sidebar({ setIsSidebarOpen }) {
         // { title: 'Destination', icon: <MapPin size={18} />, path: '/destinations', children: [], alowed:['admin','super'], },
         {
           title: "Utilisateurs",
-          icon: <User size={20} />,
+          icon: <User size={22} />,
           path: "",
           children: [
             {
               title: "Utilisateurs",
-              icon: <CarFront size={20} />,
+              icon: <CarFront size={22} />,
               path: "/utilisateurs",
               children: [],
               alowed: ["ROLE_ADMIN"],
             },
             {
               title: "Administrations",
-              icon: <Bell size={20} />,
+              icon: <Bell size={22} />,
               path: "/utilisateurs-admin",
               children: [],
               alowed: ["ROLE_ADMIN"],
@@ -141,35 +142,35 @@ function Sidebar({ setIsSidebarOpen }) {
         },
         {
           title: "Notifications",
-          icon: <Bell size={20} />,
+          icon: <Bell size={22} />,
           path: "/notifications",
           children: [],
           alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Messages",
-          icon: <Mail size={20} />,
+          icon: <Mail size={22} />,
           path: "/messages",
           children: [],
           alowed: ["ROLE_ADMIN"],
         },
-        {
-          title: "Profile",
-          icon: <UserIcon size={20} />,
-          path: "/profile",
-          children: [],
-          alowed: ["ROLE_ADMIN"],
-        },
+        // {
+        //   title: "Profile",
+        //   icon: <UserIcon size={20} />,
+        //   path: "/profile",
+        //   children: [],
+        //   alowed: ["ROLE_ADMIN"],
+        // },
         {
           title: "Rapports",
-          icon: <ChartBar size={20} />,
+          icon: <ChartBar size={22} />,
           path: "/rapports",
           children: [],
           alowed: ["ROLE_ADMIN"],
         },
         {
           title: "Paramètres",
-          icon: <Settings size={20} />,
+          icon: <Settings size={22} />,
           path: "/settings",
           children: [],
           alowed: ["ROLE_ADMIN"],
@@ -198,7 +199,7 @@ function Sidebar({ setIsSidebarOpen }) {
       </div>
 
       <div className="px-3 relative pb-3 pt-5 flex flex-col gap-8 overflow-y-auto sidebb h-[calc(100vh-69px)]">
-        <div className="sidebare-admin text-[1.05rem] md:text-[.95rem] font-medium text-gray-400 flex flex-col gap-2.5">
+        <div className="sidebare-admin text-[1.05rem] md:text-[.99rem] font-medium text-gray-400 flex flex-col gap-2.5">
           {sideLink?.map((x, indexi) => (
             <div key={indexi}>
               <p

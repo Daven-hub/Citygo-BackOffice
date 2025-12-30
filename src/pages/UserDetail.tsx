@@ -5,58 +5,17 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
 import { GetUserById, GetUsetActivityLogById } from "@/store/slices/user.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import LoaderUltra from "@/components/ui/loaderUltra";
 import UserHeader from "@/components/tabs/users/UserHeader";
-// import UserKpis from "@/components/tabs/users/UserKpsi";
-// import UserTabs from "@/components/tabs/users/UserTabs";
 import {
   UnderlineTabs,
   UnderlineTabsContent,
 } from "@/components/ui/underline-tabs";
 import Overview from "@/components/tabs/users/Overview";
 import ActivityTab from "@/components/tabs/users/ActivityTab";
-
-// const userActivities = [
-//   {
-//     id: "1",
-//     type: "ride",
-//     description: "Trajet Paris → Lyon complété",
-//     date: "02/12/2024",
-//     amount: "+25.00 €",
-//   },
-//   {
-//     id: "2",
-//     type: "booking",
-//     description: "Réservation confirmée Marseille → Nice",
-//     date: "01/12/2024",
-//     amount: "-18.50 €",
-//   },
-//   {
-//     id: "3",
-//     type: "review",
-//     description: "Note reçue: ★★★★★",
-//     date: "30/11/2024",
-//     amount: null,
-//   },
-//   {
-//     id: "4",
-//     type: "ride",
-//     description: "Trajet Bordeaux → Toulouse annulé",
-//     date: "28/11/2024",
-//     amount: "Remboursé",
-//   },
-//   {
-//     id: "5",
-//     type: "payment",
-//     description: "Paiement reçu",
-//     date: "25/11/2024",
-//     amount: "+45.00 €",
-//   },
-// ];
+import { PersonnalInfo } from "@/components/tabs/users/PersonnalInfo";
 
 // const userTransactions = [
 //   {
@@ -148,7 +107,6 @@ export default function UserDetail() {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);
-  // const [activeTab, setActiveTab] = useState("overview");
   const { usersId, userLogId } = useAppSelector((state) => state.users);
 
   const user = usersId;
@@ -167,20 +125,6 @@ export default function UserDetail() {
     };
     fetchData();
   }, [dispatch, userId]);
-
-  const isDriver = user?.roles?.includes("ROLE_DRIVER");
-  const isPassengerOnly = user?.roles?.includes("ROLE_USER");
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), "dd MMMM yyyy à HH:mm", {
-        locale: fr,
-      });
-    } catch {
-      return dateString;
-    }
-  };
-  
 
   if (isLoading) {
     return <LoaderUltra loading={isLoading} duration={duration} />;
@@ -213,7 +157,7 @@ export default function UserDetail() {
         </UnderlineTabsContent>
 
         <UnderlineTabsContent value="info">
-         information personnelle
+         <PersonnalInfo user={user} />
         </UnderlineTabsContent>
 
         <UnderlineTabsContent value="activites">
@@ -226,9 +170,6 @@ export default function UserDetail() {
           Trajets
         </UnderlineTabsContent>
       </UnderlineTabs>
-      {/* <UserKpis user={user} /> */}
-
-      {/* <UserTabs user={user} activities={userLogId} /> */}
     </div>
   );
 }

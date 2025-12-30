@@ -37,7 +37,7 @@ function Dashboard() {
   const statsCard = [
     {
       title: "Revenus totaux",
-      value: "FCFA 90,847",
+      value: "CFA 90,847",
       change: "+12.5% ce mois",
       changeTyp: "positive",
       icon: Users,
@@ -61,7 +61,7 @@ function Dashboard() {
     },
     {
       title: "Revenus mensuels",
-      value: "FCFA 42,300",
+      value: "CFA 42,300",
       change: "+18.7% vs mois dernier",
       changeTyp: "positive",
       icon: TrendingUp,

@@ -108,7 +108,7 @@ export function UserSuspendModal({
                 Suspendre l'utilisateur
               </DialogTitle>
               <DialogDescription className="text-sm truncate text-muted-foreground">
-                {user?.displayName} - {user?.email}
+                {user?.displayName} - {user?.phone}
               </DialogDescription>
             </div>
           </div>

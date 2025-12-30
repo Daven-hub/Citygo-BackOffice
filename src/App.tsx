@@ -25,6 +25,7 @@ import Languages from "./pages/catalogue/Languages";
 import Currencies from "./pages/catalogue/Currencies";
 import LuggageType from "./pages/catalogue/LuggageType";
 import { useAuth } from "./context/use-auth";
+import Destinations from "./pages/Destinations";
 
 // Lazy loading
 const Login = lazy(() => import("./pages/Login"));
@@ -79,6 +80,7 @@ const App = () => {
                 <Route path="trajets/:rideId" element={<RidesDetail />} />
                 <Route path="notifications" element={<Notifications />} />
                 {/* <Route path="transactions" element={<Transactions />} /> */}
+                {/* <Route path="destinations" element={<Destinations />} /> */}
                 {/* <Route path="profile" element={<Profile />} /> */}
                 <Route path="*" element={<NotFound />} />
               </Route>

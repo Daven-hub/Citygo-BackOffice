@@ -1,33 +1,33 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Activity, BookCheck, Car, CheckCircle, Eye, User2 } from "lucide-react";
 import { roleConfig, statusConfig } from "@/types/user";
 import { cn } from "@/lib/utils";
 import UserAdminActions from "./UserAdminAction";
-import { UnderlineTabs, UnderlineTabsContent, UnderlineTabsList, UnderlineTabsTrigger } from "@/components/ui/underline-tabs";
+import { UnderlineTabsList, UnderlineTabsTrigger } from "@/components/ui/underline-tabs";
 
 export default function UserHeader({ user }) {
   const initials = user.displayName
     .split(" ")
     .map((n) => n[0])
     .join("");
-    
 
   return (
-    <div className="bg-white/95 backdrop-blur border overflow-hidden rounded-xl">
+    <div className="bg-white/95 backdrop-blur border overflow-hidden rounded-[6px]">
       <div className="p-6 border-b flex items-center justify-between">
         <div className="flex items-center gap-5">
           <Avatar className="w-20 h-20">
+            <AvatarImage src={user?.avatarUrl} alt="#12" className="w-full h-full object-cover"></AvatarImage>
             <AvatarFallback className="bg-primary/10 text-primary text-2xl font-semibold">
               {initials}
             </AvatarFallback>
           </Avatar>
 
           <div>
-            <h1 className="text-xl font-semibold">{user.displayName}</h1>
-            <p className="text-sm text-muted-foreground">{user.email?user.email:user.phone}</p>
+            <h1 className="text-[1.15rem] font-semibold">{user.displayName}</h1>
+            <p className="text-[.8rem] text-muted-foreground">{user.email?user.email:user.phone}</p>
 
-            <div className="flex gap-2 mt-2 flex-wrap">
+            <div className="flex gap-2 mt-1 flex-wrap">
               {user.roles
                 .filter((r) => r !== "ROLE_ADMIN")
                 .map((role) => (

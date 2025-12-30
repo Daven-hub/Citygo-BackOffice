@@ -3,7 +3,6 @@ import UserKpis from "./UserKpsi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Activity,
-  Badge,
   BookCheck,
   Calendar,
   CheckCircle,
@@ -24,8 +23,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Separator } from "@radix-ui/react-dropdown-menu";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 function Overview({ user, userLog }) {
   const formatRelativeTime = (dateString: string) => {
@@ -87,21 +86,20 @@ function Overview({ user, userLog }) {
     }
     return <Monitor className="w-4 h-4" />;
   };
+
+  console.log('user',user)
   return (
-    <div className="space-y-4">
-      <div className="border rounded-xl bg-white p-4">
-        <UserKpis />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Activities */}
-        <Card className="lg:col-span-2 border-0 shadow-md">
-          <CardHeader className="pb-3">
+    <div className="rounded-[6px] space-y-5 bg-white p-6">
+      <UserKpis />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <Card className="lg:col-span-2 border shadow-none">
+          <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-[1.3rem] flex items-center gap-2">
                 <Activity className="w-5 h-5 text-primary" />
                 Activités récentes
               </CardTitle>
-              <Button variant="ghost" size="sm" className="text-primary">
+              <Button size="sm" className="text-primary bg-transparent">
                 Voir tout
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
@@ -109,7 +107,7 @@ function Overview({ user, userLog }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {userLog?.slice(0,5).map((activity) => {
+              {userLog?.slice(0, 5).map((activity) => {
                 const config = actionConfig[activity.action] || {
                   icon: CircleDot,
                   label: activity.action,
@@ -119,15 +117,15 @@ function Overview({ user, userLog }) {
                 return (
                   <div
                     key={activity.id}
-                    className="flex items-start gap-4 p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
+                    className="flex items-start gap-4 px-1.5 py-2 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
                   >
                     <div
                       className={cn(
-                        "h-10 w-10 rounded-xl flex items-center justify-center bg-background border border-border",
+                        "h-8 w-8 rounded-[6px] flex items-center justify-center bg-background border border-border",
                         config.color
                       )}
                     >
-                      <IconComponent className="w-5 h-5" />
+                      <IconComponent className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
@@ -161,53 +159,46 @@ function Overview({ user, userLog }) {
           </CardContent>
         </Card>
 
-        {/* User Info */}
-        <Card className="border-0 shadow-md">
+        <Card className="border-border shadow-none">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <UserIcon className="w-5 h-5 text-primary" />
+            <CardTitle className="text-[1.3rem] flex items-center gap-2">
+              <UserIcon className="w-6 h-6 text-primary" />
               Informations
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-                <Mail className="w-4 h-4 text-muted-foreground" />
+          <CardContent className="space-y-2 pb-2.5 px-4">
+            <div className="space-y-2 pb-2 border-b border-gray-300/30">
+              <div className="flex items-center gap-3 px-3 py-1 rounded-xl bg-muted/30">
+                <Mail className="w-6 h-6 text-muted-foreground" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground">Email</p>
                   <p className="font-medium text-foreground truncate">
                     {user.email || "Non renseigné"}
                   </p>
                 </div>
-                {user.email && (
-                  <Badge
-                    className="bg-success/10 text-success border-success/20 text-xs"
-                  >
-                    Vérifié
+                  <Badge className={`${user.emailVerified?'bg-success/10 text-success border-success/20':'bg-error/10 text-error border-error/20'} text-[0.6rem]`}>
+                    {user.emailVerified?'Vérifié':'Non verifié'}
                   </Badge>
-                )}
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-                <Phone className="w-4 h-4 text-muted-foreground" />
+              <div className="flex items-center gap-3 px-3 py-1 rounded-xl bg-muted/30">
+                <Phone className="w-6 h-6 text-muted-foreground" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground">Téléphone</p>
                   <p className="font-medium text-foreground">{user.phone}</p>
                 </div>
-                <Badge
-                  className="bg-success/10 text-success border-success/20 text-xs"
-                >
-                  Vérifié
+                <Badge className={`${user.phoneVerified?'bg-success/10 text-success border-success/20':'bg-error/10 text-error border-error/20'} text-[0.6rem]`}>
+                  {user.phoneVerified?'Vérifié':'Non verifié'}
                 </Badge>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
+              <div className="flex items-center gap-3 px-3 py-1 rounded-xl bg-muted/30">
+                <Calendar className="w-6 h-6 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Inscription</p>
-                  <p className="font-medium text-foreground">{user.joinedAt}</p>
+                  <p className="font-medium text-foreground">{formatRelativeTime(user.createdAt)}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30">
-                <Globe className="w-4 h-4 text-muted-foreground" />
+              <div className="flex items-center gap-3 px-3 py-1 rounded-xl bg-muted/30">
+                <Globe className="w-6 h-6 text-muted-foreground" />
                 <div>
                   <p className="text-xs text-muted-foreground">Langue</p>
                   <p className="font-medium text-foreground">
@@ -217,34 +208,15 @@ function Overview({ user, userLog }) {
               </div>
             </div>
 
-            {user.profile?.bio && (
-              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
-                <p className="text-xs text-muted-foreground mb-1">Bio</p>
-                <p className="text-sm text-foreground">{user.profile.bio}</p>
-              </div>
-            )}
-
-            <Separator />
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-muted/30 text-center">
-                <p className="text-xs text-muted-foreground mb-1">
+            <div className="grid grid-cols-1 gap-0">
+              <div className={`p-3 rounded-xl border ${user.driverVerified?'bg-success/5 border-success':'bg-destructive/5 border-destructive'} text-center`}>
+                <p className="text-sm text-muted-foreground mb-1">
                   Conducteur vérifié
                 </p>
-                {user.profile?.driverVerified ? (
+                {user.driverVerified ? (
                   <CheckCircle className="w-6 h-6 text-success mx-auto" />
                 ) : (
-                  <XCircle className="w-6 h-6 text-muted-foreground mx-auto" />
-                )}
-              </div>
-              <div className="p-3 rounded-xl bg-muted/30 text-center">
-                <p className="text-xs text-muted-foreground mb-1">
-                  Peut publier
-                </p>
-                {user.flags?.canPublishRides ? (
-                  <CheckCircle className="w-6 h-6 text-success mx-auto" />
-                ) : (
-                  <XCircle className="w-6 h-6 text-muted-foreground mx-auto" />
+                  <XCircle className="w-6 h-6 text-destructive mx-auto" />
                 )}
               </div>
             </div>

@@ -80,7 +80,7 @@ const statusConfig = {
 
 export function RecentRidesTable() {
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden animate-slide-up" style={{ animationDelay: "300ms" }}>
+    <div className="rounded-[6px] border border-border bg-card overflow-hidden animate-slide-up" style={{ animationDelay: "300ms" }}>
       <div className="px-6 py-4 border-b border-border">
         <h3 className="text-lg font-semibold text-foreground">Trajets récents</h3>
       </div>
