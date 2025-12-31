@@ -42,7 +42,7 @@ export interface KycRequest {
 interface kycState {
   requests: KycRequest[];
   driverApplications: DriverApplication[];
-  requestId: KycRequest | null;
+  requestsId: KycRequest | null;
   driverAppId: DriverApplication | null;
   status: "idle" | "loading" | "success" | "error";
   errors?: string | null;
@@ -50,7 +50,7 @@ interface kycState {
 const initialState: kycState = {
   requests: [],
   driverApplications: [],
-  requestId:null,
+  requestsId:null,
   driverAppId: null,
   status: "idle",
   errors: null,
@@ -67,7 +67,7 @@ export const updateKycRequest = createAsyncThunk(
     try {
       const response = await dataService.updateRequest(id, datas);
       if (!response.success) {
-        return thunkAPI.rejectWithValue(response.error);
+        return thunkAPI.rejectWithValue(response.error.message);
       } else {
         return response;
       }
@@ -75,7 +75,8 @@ export const updateKycRequest = createAsyncThunk(
       const message =
         (error.response &&
           error.response.data &&
-          error.response.data.message) ||
+          error.response.data.error &&
+          error.response.data.error.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
@@ -98,7 +99,8 @@ export const getAllKycRequest = createAsyncThunk(
       const message =
         (error.response &&
           error.response.data &&
-          error.response.data.message) ||
+          error.response.data.error &&
+          error.response.data.error.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
@@ -108,7 +110,7 @@ export const getAllKycRequest = createAsyncThunk(
 
 export const getKycRequestById = createAsyncThunk(
   "kycRequest/getById",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
     //   const token = thunkAPI.getState().auth.accessToken.trim();
       return await dataService.getRequestById(id);
@@ -230,7 +232,7 @@ export const kycSlice = createSlice({
       })
       .addCase(getKycRequestById.fulfilled, (state, action) => {
         state.status = "success";
-        state.requestId = action.payload.data;
+        state.requestsId = action.payload.data;
       })
       .addCase(getKycRequestById.rejected, (state, action) => {
         state.status = "error";

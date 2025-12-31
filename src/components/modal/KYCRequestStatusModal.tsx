@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, X, Plus, Trash2 } from "lucide-react";
 import {
   Dialog,
@@ -13,53 +13,78 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
+import { Document } from "@/store/slices/document.slice";
 
+export interface KYCType {
+    documentId: string;
+    state: string;
+    reviewNote: string;
+  }
 interface KYCRequestStatusModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   requestId: string;
+  loading: boolean;
+  doc: Document[];
+  userId:string;
   currentStatus: "PENDING" | "APPROVED" | "REJECTED";
-  // onSubmit: (data: {
-  //   status: "APPROVED" | "REJECTED";
-  //   reasons: string[];
-  // }) => void;
+  onSubmit: (data: {
+    status: "APPROVED" | "REJECTED";
+    rejectionReasons: string[];
+    documentUpdates:KYCType[]
+  }) => void;
 }
 
 export function KYCRequestStatusModal({
   open,
+  loading,
   onOpenChange,
   requestId,
+  doc,
+  userId,
   currentStatus,
-  // onSubmit,
+  onSubmit,
 }: KYCRequestStatusModalProps) {
   const [status, setStatus] = useState<"APPROVED" | "REJECTED">("APPROVED");
-  const [reasons, setReasons] = useState<string[]>([]);
+  const [rejectionReasons, setReason] = useState<string[]>([]);
   const [newReason, setNewReason] = useState("");
+  const [documentUpdates, setDocumentUpdates] = useState<KYCType[]>([]);
 
   const addReason = () => {
     const value = newReason.trim();
-    if (!value || reasons.includes(value)) return;
+    if (!value || rejectionReasons.includes(value)) return;
 
-    setReasons((prev) => [...prev, value]);
+    setReason((prev) => [...prev, value]);
     setNewReason("");
   };
+  useEffect(() => {
+    const updates = doc
+        .filter((x) => x?.ownerId === userId)
+        .map((y) => ({
+          documentId: y.documentId,
+          state: y.state,
+          reviewNote: y.reviewNote,
+        }));
+    setDocumentUpdates(updates);
+  }, [doc, userId]);
 
   const removeReason = (index: number) => {
-    setReasons((prev) => prev.filter((_, i) => i !== index));
+    setReason((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = () => {
-    // onSubmit({
-    //   status,
-    //   reasons,
-    // });
+    onSubmit({
+      status,
+      rejectionReasons,
+      documentUpdates
+    });
 
-    setReasons([]);
-    setNewReason("");
-    onOpenChange(false);
+    // setReason([]);
+    // setNewReason("");
+    // onOpenChange(false);
   };
 
-  const isRejectInvalid = status === "REJECTED" && reasons.length === 0;
+  const isRejectInvalid = status === "REJECTED" && rejectionReasons.length === 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -71,7 +96,7 @@ export function KYCRequestStatusModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5 py-1">
+        <div className="space-y-3 py-1">
           {/* STATUS */}
           <div className="space-y-1">
             <Label>Nouveau statut</Label>
@@ -102,7 +127,6 @@ export function KYCRequestStatusModal({
                 </Label>
               </div>
 
-              {/* REJECTED */}
               <div>
                 <RadioGroupItem
                   value="REJECTED"
@@ -125,7 +149,8 @@ export function KYCRequestStatusModal({
 
           {/* REASONS INPUT */}
           {status === "REJECTED" && (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
+              <div className="space-y-0.5">
               <Label>
                 Raisons du rejet <span className="text-destructive">*</span>
               </Label>
@@ -133,30 +158,33 @@ export function KYCRequestStatusModal({
               <div className="flex gap-2">
                 <Input
                   placeholder="Entrer une raison"
+                  className="py-2 h-8"
                   value={newReason}
                   onChange={(e) => setNewReason(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addReason()}
                 />
-                <Button type="button" onClick={addReason} size="icon">
+                <Button type="button" className="h-8 text-white" onClick={addReason} size="icon">
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
+              </div>
 
               {/* REASONS LIST */}
-              {reasons.length > 0 && (
-                <ul className="space-y-2">
-                  {reasons.map((reason, index) => (
+              {rejectionReasons.length > 0 && (
+                <ul className="space-y-0.5">
+                  {rejectionReasons.map((reason, index) => (
                     <li
                       key={index}
-                      className="flex items-center justify-between rounded-md border p-3 bg-card"
+                      className="flex items-center justify-between rounded-md border p-1.5 bg-card"
                     >
                       <span className="text-sm">{reason}</span>
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="h-6 !px-1"
                         onClick={() => removeReason(index)}
                       >
-                        <Trash2 className="w-4 h-4 text-destructive" />
+                        <Trash2 className="w-3 h-3 text-destructive" />
                       </Button>
                     </li>
                   ))}
@@ -180,7 +208,7 @@ export function KYCRequestStatusModal({
                 : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
             )}
           >
-            {status === "APPROVED" ? "Valider" : "Rejeter"}
+            {loading?'Traitement...':status === "APPROVED" ? "Valider" : "Rejeter"}
           </Button>
         </DialogFooter>
       </DialogContent>

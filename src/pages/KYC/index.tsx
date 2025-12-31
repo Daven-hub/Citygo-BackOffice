@@ -7,7 +7,7 @@ import {
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DriverApplicationStatusModal } from "@/components/modal/DriverApplicationStatusModal";
-import { KYCRequestStatusModal } from "@/components/modal/KYCRequestStatusModal";
+import { KYCRequestStatusModal, KYCType } from "@/components/modal/KYCRequestStatusModal";
 import { useToast } from "@/hook/use-toast";
 import DriverApplications from "./DriverApplications";
 import Request from "./Request";
@@ -19,6 +19,7 @@ import Documents from "./Documents";
 import { Document, getAllDocuments, updateDocument } from "@/store/slices/document.slice";
 import { DocumentStatusModal } from "@/components/modal/DocumentStatusModal";
 
+
 export default function KYC() {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,6 +29,7 @@ export default function KYC() {
   const [isLoading, setIsLoading] = useState(true);
   const [appLoading, setAppLoading] = useState(false);
   const [docLoading, setDocLoading] = useState(false);
+  const [kycLoading, setKycLoading] = useState(false);
   const dispatch = useAppDispatch();
   const { driverApplications,requests } = useAppSelector((state) => state.kyc);
   const { users } = useAppSelector((state) => state.users);
@@ -167,27 +169,27 @@ export default function KYC() {
           setAppLoading(false);
         }
   }
-  const handleKYCStatusSubmit = async(data: { status: "APPROVED" | "REJECTED"; rejectionReasons: string[]; }) => {
-      // setKycLoading(true);
-      //   try {
-      //     const datas={
-      //       id:selectedKYCRequest.kycRequestId,
-      //       datas:data
-      //     }
-      //     await dispatch(updateKycRequest(datas)).unwrap();
-      //     setAppStatusModalOpen(false)
-      //     toast({
-      //       title: data.status === "APPROVED" ? "Demande validée" : "Demande rejetée",
-      //       description: `La demande KYC de ${selectedKYCRequest?.user.displayName} a été mise à jour.`,
-      //     });
-      //   } catch (error) {
-      //     toast({
-      //       description: error?.toString(),
-      //       variant: "destructive",
-      //     });
-      //   } finally {
-      //     setKycLoading(false);
-      //   }
+  const handleKYCStatusSubmit = async(data: { status: "APPROVED" | "REJECTED"; rejectionReasons: string[]; documentUpdates:KYCType[] }) => {
+      setKycLoading(true);
+        try {
+          const datas={
+            id:selectedKYCRequest.kycRequestId,
+            datas:data
+          }
+          await dispatch(updateKycRequest(datas)).unwrap();
+          setAppStatusModalOpen(false)
+          toast({
+            title: data.status === "APPROVED" ? "Demande validée" : "Demande rejetée",
+            description: `La demande KYC de ${selectedKYCRequest?.user.displayName} a été mise à jour.`,
+          });
+        } catch (error) {
+          toast({
+            description: error?.toString(),
+            variant: "destructive",
+          });
+        } finally {
+          setKycLoading(false);
+        }
   };
 
   const handleUpdateDocumentStatus = async(datas: { state: string; reviewNote: string }) => {
@@ -297,11 +299,14 @@ export default function KYC() {
 
       {selectedKYCRequest && (
         <KYCRequestStatusModal
+          doc={documents}
+          loading={kycLoading}
           open={kycStatusModalOpen}
+          userId={selectedKYCRequest?.userId}
           onOpenChange={setKycStatusModalOpen}
           requestId={selectedKYCRequest.kycRequestId}
           currentStatus={selectedKYCRequest.status}
-          // onSubmit={handleKYCStatusSubmit}
+          onSubmit={handleKYCStatusSubmit}
         />
       )}
 

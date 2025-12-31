@@ -63,10 +63,10 @@ function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setS
                   <thead>
                     <tr className="border-b border-border bg-muted/30">
                       <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Utilisateur</th>
-                      <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Raison</th>
                       <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Soumis le</th>
                       <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Gerer Par</th>
                       <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Statut</th>
+                      <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">Examiné le</th>
                       <th className="text-right py-4 px-6 text-sm font-medium text-muted-foreground">Actions</th>
                     </tr>
                   </thead>
@@ -85,7 +85,6 @@ function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setS
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-6 font-mono text-sm text-foreground">{req.rejectionReasons?req.rejectionReasons:'N/A'}</td>
                         <td className="py-3 px-6 text-muted-foreground text-sm">{formatDate(req.submittedAt)}</td>
                         <td className="py-3 px-6 text-muted-foreground text-sm">{req.reviewedBy?getNameUser(req.reviewedBy):'N/A'}</td>
                         <td className="py-3 px-6">
@@ -93,6 +92,7 @@ function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setS
                             {kycStatusConfig[req.status].label}
                           </Badge>
                         </td>
+                        <td className="py-3 px-6 text-sm text-muted-foreground">{req.reviewedAt?formatDate(req.reviewedAt):'N/A'}</td>
                         <td className="py-3 px-6">
                           <div className="flex items-center justify-end gap-2">
                             <Button
@@ -104,7 +104,7 @@ function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setS
                               <Eye className="w-4 h-4 mr-1" />
                               Détails
                             </Button>
-                            {req.status === "PENDING" && (
+                            {/* {req.status === "PENDING" && ( */}
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -113,7 +113,7 @@ function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setS
                               >
                                 Traiter
                               </Button>
-                            )}
+                            {/* )} */}
                           </div>
                         </td>
                       </tr>
