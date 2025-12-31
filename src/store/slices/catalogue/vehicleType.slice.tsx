@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { RootState } from "../..";
 import dataService from '../../../services/catalogue/vehicleTypeService'
 
 interface paramType{

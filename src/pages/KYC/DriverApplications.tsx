@@ -1,6 +1,5 @@
 import Pagination from "@/components/Pagination";
 import { StatsCard } from "@/components/StatsCard";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DriverApplication, kycStatusConfig } from "@/data/mockKYC";
-// import { useToast } from "@/hook/use-toast";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/utilis/formatDate";
 import {
