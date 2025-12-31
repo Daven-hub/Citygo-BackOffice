@@ -7,7 +7,7 @@ import {
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DriverApplicationStatusModal } from "@/components/modal/DriverApplicationStatusModal";
-import { KYCRequestStatusModal } from "@/components/modal/KYCRequestStatusModal";
+import { KYCRequestStatusModal, KYCType } from "@/components/modal/KYCRequestStatusModal";
 import { useToast } from "@/hook/use-toast";
 import DriverApplications from "./DriverApplications";
 import Request from "./Request";
@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { DriverApplication, getAllDriverApp, getAllKycRequest, KycRequest, updateDriverApp, updateKycRequest } from "@/store/slices/kyc.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
 import { GetAllUsers } from "@/store/slices/user.slice";
+import { getAllDocuments } from "@/store/slices/document.slice";
 
 export default function KYC() {
   const { toast } = useToast();
@@ -23,9 +24,11 @@ export default function KYC() {
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [appLoading, setAppLoading] = useState(false);
+  const [kycLoading, setKycLoading] = useState(false);
   const dispatch = useAppDispatch();
   const { driverApplications,requests } = useAppSelector((state) => state.kyc);
   const { users } = useAppSelector((state) => state.users);
+  const { documents } = useAppSelector((state) => state.document);
 
   useEffect(() => {
       const fetchData = async () => {
@@ -33,7 +36,8 @@ export default function KYC() {
         await Promise.all([
           dispatch(getAllDriverApp()),
           dispatch(getAllKycRequest()),
-          dispatch(GetAllUsers())
+          dispatch(GetAllUsers()),
+          dispatch(getAllDocuments())
         ]);
         const end = performance.now();
         const elapsed = end - start;
@@ -132,24 +136,27 @@ export default function KYC() {
           setAppLoading(false);
         }
   }
-  const handleKYCStatusSubmit = async(data: { status: "APPROVED" | "REJECTED"; reason: string[] }) => {
-    // console.log('data',data)
-      // setAppLoading(true);
-      //   try {
-      //     // await dispatch(updateKycRequest(data)).unwrap();
-      //     setAppStatusModalOpen(false)
-      //     toast({
-      //       title: data.status === "APPROVED" ? "Demande validée" : "Demande rejetée",
-      //       description: `La demande KYC de ${selectedKYCRequest?.user.displayName} a été mise à jour.`,
-      //     });
-      //   } catch (error) {
-      //     toast({
-      //       description: error?.toString(),
-      //       variant: "destructive",
-      //     });
-      //   } finally {
-      //     setAppLoading(false);
-      //   }
+  const handleKYCStatusSubmit = async(data: { status: "APPROVED" | "REJECTED"; rejectionReasons: string[]; documentUpdates:KYCType[] }) => {
+      setKycLoading(true);
+        try {
+          const datas={
+            id:selectedKYCRequest.kycRequestId,
+            datas:data
+          }
+          await dispatch(updateKycRequest(datas)).unwrap();
+          setAppStatusModalOpen(false)
+          toast({
+            title: data.status === "APPROVED" ? "Demande validée" : "Demande rejetée",
+            description: `La demande KYC de ${selectedKYCRequest?.user.displayName} a été mise à jour.`,
+          });
+        } catch (error) {
+          toast({
+            description: error?.toString(),
+            variant: "destructive",
+          });
+        } finally {
+          setKycLoading(false);
+        }
   };
 
    if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
@@ -218,11 +225,14 @@ export default function KYC() {
 
       {selectedKYCRequest && (
         <KYCRequestStatusModal
+          doc={documents}
+          loading={kycLoading}
           open={kycStatusModalOpen}
+          userId={selectedKYCRequest?.userId}
           onOpenChange={setKycStatusModalOpen}
           requestId={selectedKYCRequest.kycRequestId}
           currentStatus={selectedKYCRequest.status}
-          // onSubmit={handleKYCStatusSubmit}
+          onSubmit={handleKYCStatusSubmit}
         />
       )}
     </>
