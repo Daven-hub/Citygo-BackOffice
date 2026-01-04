@@ -1,5 +1,5 @@
 import LoaderUltra from "@/components/ui/loaderUltra";
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { Car, Users, MapPin, TrendingUp } from "lucide-react";
 import { TopDestinations } from "@/components/TopDestinations";
 import { RecentRidesTable } from "@/components/RecentRidesTable";

@@ -1,5 +1,4 @@
 import { Settings } from "lucide-react";
-import React from "react";
 import Breadcrumb from "../Breadcrumb";
 
 function LayoutSetting() {

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   Trash2,
@@ -8,13 +8,13 @@ import {
 } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { useToast } from '@/hook/use-toast'
-import { deleteuser, getAllUsers, updateUser } from '@/store/slices/user.slice'
+import { Deleteuser, GetAllUsers, UpdateUser } from '@/store/slices/user.slice'
 import LoaderUltra from '@/components/ui/loaderUltra'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import dayjs from "dayjs";
 import Breadcrumb from '@/components/Breadcrumb'
-import UserModal from '@/components/modal/UserModale'
+// import UserModal from '@/components/modal/UserModale'
 import { Switch } from '@/components/ui/switch'
 
 function UsersAdministration () {
@@ -30,7 +30,7 @@ function UsersAdministration () {
     const fetchData = async () => {
       const start = performance.now()
       try {
-        await Promise.all([dispatch(getAllUsers()).unwrap()])
+        await Promise.all([dispatch(GetAllUsers()).unwrap()])
         const end = performance.now()
         const duration = end - start
         setLoadTime(parseInt(duration.toFixed(0)))
@@ -56,7 +56,7 @@ function UsersAdministration () {
   const handleUpdateStatus = async (id, x) => {
     try {
       const datas = { status: x }
-      await dispatch(updateUser({ id, datas })).unwrap()
+      await dispatch(UpdateUser({ id, datas })).unwrap()
       toast({
         title: 'Modification',
         description: `status ${x === 1 ? 'activé' : 'désactivé'} avec succes`
@@ -71,7 +71,7 @@ function UsersAdministration () {
 
   const handleDelete = async (id) => {
     try {
-      await dispatch(deleteuser(id)).unwrap()
+      await dispatch(Deleteuser(id)).unwrap()
       toast({
         title: 'Supprimer',
         description: `Utilisateur supprimé`
@@ -117,7 +117,7 @@ function UsersAdministration () {
             <button onClick={()=>setOpen(true)} className='py-2 px-4 flex items-center gap-1.5 text-[.85rem] rounded-[7px] border border-gray-600 bg-white font-semibold text-gray-600'>
                 <Plus size={16}/> Nouveau
             </button>
-            <UserModal toast={toast} dispatch={dispatch} open={open} setOpen={()=>setOpen(false)} />
+            {/* <UserModal toast={toast} dispatch={dispatch} open={open} setOpen={()=>setOpen(false)} /> */}
           </div>
         </div>
         <div className='rounded-[5px] overflow-hidden bg-white border'>

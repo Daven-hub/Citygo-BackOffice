@@ -7,10 +7,8 @@ import { Provider } from 'react-redux';
 import { TooltipProvider } from './components/ui/tooltip.tsx';
 import { injectStore } from './services/api.ts';
 import { AuthProvider } from './provider/auth-provider.tsx';
-// import { initAuthSync } from './broadcast/initAuthSync.ts';
 
 injectStore(store);
-// initAuthSync();
 
 createRoot(document.getElementById("root")!).render(
 <Provider store={store}>

@@ -99,6 +99,8 @@ export default function Vehicles() {
     return matchesSearch && matchesStatus;
   });
 
+  console.log('vehicles',vehicles)
+
   const stats = {
     total: vehicles.length,
     approved: vehicles.filter((v) => v.status === "APPROVED").length,
@@ -349,10 +351,10 @@ export default function Vehicles() {
                         variant="outline"
                         className={cn(
                           "font-medium",
-                          comfortLevelConfig[vehicle.comfortLevel].className
+                          comfortLevelConfig[vehicle.comfortLevel]?.className
                         )}
                       >
-                        {comfortLevelConfig[vehicle.comfortLevel].label}
+                        {comfortLevelConfig[vehicle.comfortLevel]?.label}
                       </Badge>
                     </td>
                     <td className="py-3 px-6">
@@ -360,10 +362,10 @@ export default function Vehicles() {
                         variant="outline"
                         className={cn(
                           "font-medium",
-                          vehicleStatusConfig[vehicle.status].className
+                          vehicleStatusConfig[vehicle.status]?.className
                         )}
                       >
-                        {vehicleStatusConfig[vehicle.status].label}
+                        {vehicleStatusConfig[vehicle.status]?.label}
                       </Badge>
                     </td>
                     <td className="py-3 px-6">

@@ -6,7 +6,7 @@ import { useAuth } from '@/context/authContext'
 import { useAppDispatch, useAppSelector } from '@/store/hook'
 import { getUserById } from '@/store/slices/user.slice'
 import { Edit, UserIcon } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function Profile() {
     const { userConnected } = useAuth()

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom';
 import * as Avatar from "@radix-ui/react-avatar";
 import { ChevronDown, LayoutDashboard, LogOut, Settings, UserCircle } from 'lucide-react';

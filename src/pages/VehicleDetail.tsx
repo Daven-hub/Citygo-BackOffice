@@ -120,15 +120,15 @@ export default function VehicleDetail() {
                   <div className="flex items-center gap-3 mt-3">
                     <Badge
                       variant="outline"
-                      className={cn("font-medium", vehicleStatusConfig[vehicle.status].className)}
+                      className={cn("font-medium", vehicleStatusConfig[vehicle.status]?.className)}
                     >
-                      {vehicleStatusConfig[vehicle.status].label}
+                      {vehicleStatusConfig[vehicle.status]?.label}
                     </Badge>
                     <Badge
                       variant="outline"
-                      className={cn("font-medium", comfortLevelConfig[vehicle.comfortLevel].className)}
+                      className={cn("font-medium", comfortLevelConfig[vehicle.comfortLevel]?.className)}
                     >
-                      {comfortLevelConfig[vehicle.comfortLevel].label}
+                      {comfortLevelConfig[vehicle.comfortLevel]?.label}
                     </Badge>
                   </div>
                 </div>

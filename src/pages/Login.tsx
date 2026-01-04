@@ -2,7 +2,7 @@ import { useToast } from "@/hook/use-toast";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { login } from "@/store/slices/auth.slice";
 import { Loader2 } from "lucide-react";
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink } from "react-router-dom";
 
