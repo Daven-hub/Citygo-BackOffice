@@ -6,15 +6,19 @@ interface paramType{
     status:string,
     datas:object
 }
+interface OwnerType{
+  userId:string,
+  displayName:string,
+  rating:number | null,
+  avatarUrl:string
+}
 
 type VehicleStatus = "SUSPENDED" | "PENDING" | "APPROVED" | "REJECTED";
 type ComfortLevel = "STANDARD" | "PREMIUM" | "LUXE";
 
 export type Vehicle = {
   vehicleId: string;
-  ownerId: string;
-  ownerName: string;
-  ownerPhone: string;
+  owner:OwnerType;
   make: string;
   model: string;
   color: string;
@@ -135,7 +139,7 @@ export const getAllPendingReview = createAsyncThunk(
 
 export const getvehicleById = createAsyncThunk(
   "vehicles/getById",
-  async (id, thunkAPI) => {
+  async (id:string, thunkAPI) => {
     try {
     //   const token = thunkAPI.getState().auth.accessToken.trim();
       return await dataService.getById(id);

@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { mockVehicles, vehicleStatusConfig, comfortLevelConfig } from "@/data/mockVehicles";
+import { vehicleStatusConfig, comfortLevelConfig } from "@/data/mockVehicles";
 import { VehicleStatusModal } from "@/components/modal/VehicleStatusModal";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -225,17 +225,17 @@ export default function VehicleDetail() {
                   <User className="h-7 w-7 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-lg text-foreground">{vehicle.ownerName}</p>
+                  <p className="font-semibold text-lg text-foreground">{vehicle.owner.displayName}</p>
                   <p className="text-sm text-muted-foreground flex items-center gap-2">
                     <Phone className="w-4 h-4" />
-                    {vehicle.ownerPhone}
+                    {vehicle.owner.rating}
                   </p>
                 </div>
               </div>
               <Button 
                 variant="outline" 
                 className="w-full border-border text-foreground hover:bg-muted"
-                onClick={() => navigate(`/utilisateurs/${vehicle.ownerId}`)}
+                onClick={() => navigate(`/utilisateurs/${vehicle.owner.userId}`)}
               >
                 Voir le profil du propriétaire
               </Button>
@@ -260,7 +260,7 @@ export default function VehicleDetail() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-foreground">Véhicule créé</p>
-                  <p className="text-sm text-muted-foreground">{formatDate(vehicle.createdAt)}</p>
+                  <p className="text-sm text-muted-foreground">{formatDate(vehicle.createdAt.toString())}</p>
                 </div>
               </div>
 
@@ -270,7 +270,7 @@ export default function VehicleDetail() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-foreground">Soumis pour vérification</p>
-                  <p className="text-sm text-muted-foreground">{formatDate(vehicle.submittedAt)}</p>
+                  <p className="text-sm text-muted-foreground">{formatDate(vehicle.submittedAt.toString())}</p>
                 </div>
               </div>
 
@@ -298,7 +298,7 @@ export default function VehicleDetail() {
                        vehicle.status === "REJECTED" ? "Rejeté" :
                        vehicle.status === "SUSPENDED" ? "Suspendu" : "Examiné"}
                     </p>
-                    <p className="text-sm text-muted-foreground">{formatDate(vehicle.reviewedAt)}</p>
+                    <p className="text-sm text-muted-foreground">{formatDate(vehicle.reviewedAt.toString())}</p>
                     {vehicle.reviewedBy && (
                       <p className="text-xs text-muted-foreground">Par: {vehicle.reviewedBy}</p>
                     )}
