@@ -118,7 +118,8 @@ export const getKycRequestById = createAsyncThunk(
       const message =
         (error.response &&
           error.response.data &&
-          error.response.data.message) ||
+          error.response.data.error &&
+          error.response.data.error.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
@@ -140,7 +141,8 @@ export const updateDriverApp = createAsyncThunk(
       const message =
         (error.response &&
           error.response.data &&
-          error.response.data.message) ||
+          error.response.data.error &&
+          error.response.data.error.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
@@ -163,7 +165,8 @@ export const getAllDriverApp = createAsyncThunk(
       const message =
         (error.response &&
           error.response.data &&
-          error.response.data.message) ||
+          error.response.data.error &&
+          error.response.data.error.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
@@ -181,7 +184,8 @@ export const getDriverAppById = createAsyncThunk(
       const message =
         (error.response &&
           error.response.data &&
-          error.response.data.message) ||
+          error.response.data.error &&
+          error.response.data.error.message) ||
         error.message ||
         error.toString();
       return thunkAPI.rejectWithValue(message);
