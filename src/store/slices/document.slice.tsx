@@ -58,11 +58,13 @@ export interface Document {
 
 interface DocumentStateType {
   documents: Document[];
+  previewDoc:string | null;
   status: "idle" | "loading" | "success" | "error";
   errors?: string | null;
 }
 const initialState: DocumentStateType = {
   documents: [],
+  previewDoc:null,
   status: "idle",
   errors: null,
 };
@@ -117,6 +119,30 @@ export const getAllDocuments = createAsyncThunk(
   }
 );
 
+export const previewDocument = createAsyncThunk(
+  "document/preview",
+  async (id:string, thunkAPI) => {
+    try {
+    //   const token = thunkAPI.getState().auth.accessToken;
+      const response = await dataService.previewDoc(id);
+      if (!response.success) {
+        return thunkAPI.rejectWithValue(response.error.message);
+      } else {
+        return response;
+      }
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.error &&
+          error.response.data.error.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 
 export const documentSlice = createSlice({
   name: "document",
@@ -153,6 +179,16 @@ export const documentSlice = createSlice({
         state.documents = action.payload?.data.content;
       })
       .addCase(getAllDocuments.rejected, (state, action) => {
+        state.status = "error";
+      })
+      .addCase(previewDocument.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(previewDocument.fulfilled, (state, action) => {
+        state.status = "success";
+        state.previewDoc = action.payload?.data;
+      })
+      .addCase(previewDocument.rejected, (state, action) => {
         state.status = "error";
       })
       ;

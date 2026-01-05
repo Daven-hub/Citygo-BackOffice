@@ -10,6 +10,15 @@ const getAll = async () => {
   }
 };
 
+const previewDoc = async (docId) => {
+  try {
+    const response = await axios.get(API_URL+'/'+docId+'/download');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 const updateById = async (id, userData) => {
   const response = await axios.patch(API_URL + "/" + id, userData);
   return response.data;
@@ -19,7 +28,8 @@ const updateById = async (id, userData) => {
 
 const documentService = {
   getAll,
-  updateById
+  updateById,
+  previewDoc
 };
 
 export default documentService;
