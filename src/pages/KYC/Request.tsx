@@ -5,21 +5,53 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { KYCRequest, kycStatusConfig } from "@/data/mockKYC";
+import { kycStatusConfig } from "@/data/mockKYC";
 import { cn } from "@/lib/utils";
+import { KycRequest } from "@/store/slices/kyc.slice";
+import { UserType } from "@/store/slices/user.slice";
 import { formatDate } from "@/utilis/formatDate";
 import { CheckCircle, Clock, Eye, FileText, Filter, Search, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setSearchQuery,paginatedKYCRequests,totalPages, setPage,page, pageSize,setSelectedKYCRequest,setKycStatusModalOpen}) {
+export interface StatsKyc{
+    total:number,
+    approved:number,
+    pending:number,
+    rejected:number
+}
+export interface KycProps {
+  kycStats: StatsKyc;
+  users: UserType[];
+  statusFilter:string;
+  setStatusFilter: React.Dispatch<React.SetStateAction<string>>;
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+  paginatedKYCRequests: KycRequest[];
+  totalPages: number;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  pageSize: number;
+  setSelectedKYCRequest: React.Dispatch<React.SetStateAction<KycRequest | null>>;
+  setKycStatusModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setSearchQuery,paginatedKYCRequests,totalPages, setPage,page, pageSize,setSelectedKYCRequest,setKycStatusModalOpen}:KycProps) {
     const navigate=useNavigate()
-    const handleUpdateKYCStatus = (req: KYCRequest) => {
+    const handleUpdateKYCStatus = (req: KycRequest) => {
     setSelectedKYCRequest(req);
     setKycStatusModalOpen(true);
+    return;
   };
 
+  // console.log('users',users?.find((x)=>x.id==='cd5d5e24-ac73-4c4d-aedb-cd4d98bb90b4'))
+
+  console.log('usersrequest',users)
+  console.log('paginatedKYCRequests',paginatedKYCRequests)
+  
   const getNameUser=(y)=>{
-    return users?.find((x)=>x.id===y).displayName
+    const resu=users?.find((x)=>x.id===y)
+    console.log('resu',resu)
+    return resu?.displayName
   }
   return (
     <>
