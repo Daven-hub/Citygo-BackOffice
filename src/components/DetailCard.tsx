@@ -50,7 +50,7 @@ export function DetailCard({ title,docs, icon, children, className, variant = "d
                     </div> */}
         </CardTitle>
       </CardHeader>
-      <CardContent className="max-md:pt-2.5">{children}</CardContent>
+      <CardContent className="!pt-3 max-md:pt-2.5">{children}</CardContent>
     </Card>
   );
 }

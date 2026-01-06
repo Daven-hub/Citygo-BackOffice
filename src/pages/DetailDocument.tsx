@@ -100,24 +100,24 @@ export default function DetailDocument() {
 
     const handleStatusSubmit = async(datas: { state: string; reviewNote: string }) => {
         console.log('datas',datas)
-    // setDocLoading(true);
-    //         try {
-    //           const id=docId
-    //           const data={id,datas}
-    //           await dispatch(updateDocument(data)).unwrap();
-    //           setStatusModalOpen(false)
-    //           toast({
-    //             title: datas.state === "APPROVED" ? "Document validé" : "Document rejeté",
-    //             description:`Le statut du document ${docs.fileName} de l'utilisateur ${docs.owner.displayName} a été mise à jour.`,
-    //           });
-    //         } catch (error) {
-    //           toast({
-    //             description: error?.toString(),
-    //             variant: "destructive",
-    //           });
-    //         } finally {
-    //           setDocLoading(false);
-    //         }
+    setDocLoading(true);
+            try {
+              const id=docId
+              const data={id,datas}
+              await dispatch(updateDocument(data)).unwrap();
+              setStatusModalOpen(false)
+              toast({
+                title: datas.state === "APPROVED" ? "Document validé" : "Document rejeté",
+                description:`Le statut du document ${docs.fileName} de l'utilisateur ${docs.owner.displayName} a été mise à jour.`,
+              });
+            } catch (error) {
+              toast({
+                description: error?.toString(),
+                variant: "destructive",
+              });
+            } finally {
+              setDocLoading(false);
+            }
   };
   const StatusIcon =
     docs.state === "APPROVED"
@@ -156,7 +156,7 @@ export default function DetailDocument() {
                         <img
                           src={docs.url}
                           alt={docs.fileName}
-                          className="w-full bg-black h-[450px] object-contain 
+                          className="w-full bg-black h-[505px] object-contain 
              transition-transform duration-300 
              group-hover:scale-[1.02]"
                           loading="lazy"
@@ -165,7 +165,7 @@ export default function DetailDocument() {
                         <embed
                           src={docs.url}
                           type={docs.mimeType}
-                          className="w-full object-cover h-[450px] scrollbar-thin"
+                          className="w-full object-cover h-[505px] scrollbar-thin"
                         />
                       )}
 
@@ -183,7 +183,7 @@ export default function DetailDocument() {
                       </div> */}
                     </div>
                   ) : (
-                    <div className="text-center p-8">
+                    <div className="text-center px-8 py-4">
                       <FileText className="w-16 h-16 text-muted-foreground/40 mx-auto mb-3" />
                       <p className="text-muted-foreground text-sm">
                         Document non disponible
@@ -214,7 +214,7 @@ export default function DetailDocument() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-4">
+          <div className="space-y-2">
             <DetailCard
               title="Informations"
               icon={<Shield className="w-4 h-4 text-primary" />}
@@ -259,30 +259,49 @@ export default function DetailDocument() {
                   </DetailCard>
                 )} */}
 
-            {docs.state === "PENDING" && (
               <DetailCard
                 title="Actions"
                 icon={<CheckCircle className="w-4 h-4 text-primary" />}
               >
                 <div className="space-y-2">
-                  <Button
+                  {docs.state !== "APPROVED" && (<Button
                     className="w-full bg-success hover:bg-success/90 text-white"
                     onClick={() => handleUpdateStatus('APPROVED')}
                   >
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Approuver
-                  </Button>
-                  <Button
+                  </Button>)}
+                  {docs.state !== "REJECTED" && (<Button
                     variant="outline"
                     className="w-full bg-destructive text-white hover:bg-destructive/80"
                     onClick={() => handleUpdateStatus('REJECTED')}
                   >
                     <XCircle className="w-4 h-4 mr-2" />
                     Rejeter
-                  </Button>
+                  </Button>)}
                 </div>
               </DetailCard>
-            )}
+              <DetailCard
+              title="Informations de l'utilisateur"
+              icon={<Shield className="w-4 h-4 text-primary" />}
+            >
+              <div className="space-y-2.5">
+                <InfoRow
+                  label="Nom complet"
+                  className="text-sm"
+                  value={
+                    docs.owner.displayName
+                  }
+                />
+                <InfoRow
+                  label="Identifiant"
+                  className="text-xs"
+                  value={docs.owner.userId}
+                  icon={<Hash className="w-3 h-3 text-muted-foreground" />}
+                />
+              </div>
+            </DetailCard>
+            {/* )} */}
           </div>
         </div>
       </div>

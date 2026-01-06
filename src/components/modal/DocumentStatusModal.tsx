@@ -128,13 +128,13 @@ export function DocumentStatusModal({
           <Button
             onClick={handleSubmit}
             disabled={state === "REJECTED" && !reviewNote.trim()}
-            className={cn(
+            className={cn("flex items-center-gap-2",
               state === "APPROVED" || state === "EXPIRED"
                 ? "bg-success hover:bg-success/90 text-white"
                 : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
             )}
           >
-            {appLoading ? <Loader2 /> : statusR[state]}
+            {appLoading ? <><Loader2 />Traitement ...</>: statusR[state]}
           </Button>
         </DialogFooter>
       </DialogContent>
