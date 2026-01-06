@@ -41,7 +41,7 @@ export default function KYC() {
         await Promise.all([
           dispatch(getAllDriverApp()),
           dispatch(getAllKycRequest()),
-          dispatch(GetAllUsers()),
+          dispatch(GetAllUsers({page:0,size:10000})),
           dispatch(getAllDocuments())
         ]);
         const end = performance.now();
@@ -52,14 +52,6 @@ export default function KYC() {
       fetchData();
     }, [dispatch]);
 
-    // useEffect(() => {
-    //   await Promise.all([
-    //       dispatch(getAllDriverApp()),
-    //       dispatch(getAllKycRequest()),
-    //       dispatch(GetAllUsers()),
-    //       dispatch(getAllDocuments())
-    //     ]);
-    // }, [input])
   // Pagination state
   const [appPage, setAppPage] = useState(1);
   const [kycPage, setKycPage] = useState(1);
@@ -331,4 +323,3 @@ export default function KYC() {
     </>
   )
 }
-cd

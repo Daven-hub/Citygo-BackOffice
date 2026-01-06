@@ -37,22 +37,17 @@ export interface KycProps {
 
 function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setSearchQuery,paginatedKYCRequests,totalPages, setPage,page, pageSize,setSelectedKYCRequest,setKycStatusModalOpen}:KycProps) {
     const navigate=useNavigate()
+    
     const handleUpdateKYCStatus = (req: KycRequest) => {
-    setSelectedKYCRequest(req);
-    setKycStatusModalOpen(true);
-    return;
-  };
-
-  // console.log('users',users?.find((x)=>x.id==='cd5d5e24-ac73-4c4d-aedb-cd4d98bb90b4'))
-
-  console.log('usersrequest',users)
-  console.log('paginatedKYCRequests',paginatedKYCRequests)
+      setSelectedKYCRequest(req);
+      setKycStatusModalOpen(true);
+    };
   
   const getNameUser=(y)=>{
     const resu=users?.find((x)=>x.id===y)
-    console.log('resu',resu)
     return resu?.displayName
   }
+
   return (
     <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
