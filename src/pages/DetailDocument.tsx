@@ -29,6 +29,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hook";
 import {
   getAllDocuments,
   previewDocument,
+  updateDocument,
 } from "@/store/slices/document.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
 import { DocumentStatusModal } from "@/components/modal/DocumentStatusModal";
@@ -40,6 +41,7 @@ export default function DetailDocument() {
   const dispatch = useAppDispatch();
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [docLoading, setDocLoading] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);
@@ -77,13 +79,6 @@ export default function DetailDocument() {
       setStatusModalOpen(true)
   }
 
-  const handleStatusSubmit = (data: { state: string; reviewNote: string }) => {
-    toast({
-      title: data.state === "APPROVED" ? "Document validé" : "Document rejeté",
-      description: `Le statut du document ${docs.fileName} de l'utilisateur ${docs.owner.displayName} a été mise à jour.`,
-    });
-  };
-
   if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
   if (!docs) {
     return (
@@ -102,6 +97,28 @@ export default function DetailDocument() {
       </>
     );
   }
+
+    const handleStatusSubmit = async(datas: { state: string; reviewNote: string }) => {
+        console.log('datas',datas)
+    // setDocLoading(true);
+    //         try {
+    //           const id=docId
+    //           const data={id,datas}
+    //           await dispatch(updateDocument(data)).unwrap();
+    //           setStatusModalOpen(false)
+    //           toast({
+    //             title: datas.state === "APPROVED" ? "Document validé" : "Document rejeté",
+    //             description:`Le statut du document ${docs.fileName} de l'utilisateur ${docs.owner.displayName} a été mise à jour.`,
+    //           });
+    //         } catch (error) {
+    //           toast({
+    //             description: error?.toString(),
+    //             variant: "destructive",
+    //           });
+    //         } finally {
+    //           setDocLoading(false);
+    //         }
+  };
   const StatusIcon =
     docs.state === "APPROVED"
       ? CheckCircle
@@ -271,7 +288,7 @@ export default function DetailDocument() {
       </div>
 
       <DocumentStatusModal
-        appLoading={loading}
+        appLoading={docLoading}
         open={statusModalOpen}
         onOpenChange={setStatusModalOpen}
         documentId={docs.documentId}
