@@ -23,8 +23,8 @@ import { Vehicle } from "@/store/slices/vehicles.slice";
 interface VehicleStatusModalProps {
   vehicle: Vehicle | null;
   open: boolean;
-  isSubmitting: boolean;
-  defaultStatus: string;
+  isSubmitting?: boolean;
+  defaultStatus?: string;
   onOpenChange: (open: boolean) => void;
   onStatusUpdate?: (vehicleId: string,confortLevel:string, note: string) => void;
 }

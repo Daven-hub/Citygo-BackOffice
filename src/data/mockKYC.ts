@@ -194,7 +194,8 @@ export const mockKYCRequests: KYCRequest[] = [
 export const documentTypeConfig = {
   identity: { label: "Pièce d'identité", className: "bg-primary/10 text-primary border-primary/20" },
   address: { label: "Justificatif de domicile", className: "bg-accent/10 text-accent border-accent/20" },
-  driver_license: { label: "Permis de conduire", className: "bg-warning/10 text-warning border-warning/20" }
+  driver_license: { label: "Permis de conduire", className: "bg-warning/10 text-warning border-warning/20" },
+  VEHICLE_PHOTO_INTERIOR:{ label: "Photo Intérieur du véhicule", className: "bg-warning/10 text-warning border-warning/20" }
 };
 
 export const kycStatusConfig = {

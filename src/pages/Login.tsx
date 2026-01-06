@@ -1,3 +1,4 @@
+import { useAuth } from "@/context/use-auth";
 import { useToast } from "@/hook/use-toast";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { login } from "@/store/slices/auth.slice";
@@ -11,6 +12,7 @@ function Login() {
   const dispatch=useAppDispatch()
   const [loading, setLoading] = useState(false);
   const {toast}=useToast()
+  const {userConnected}=useAuth()
 
   const {
     register,
@@ -29,11 +31,11 @@ function Login() {
   const handleLogin = async (data) => {
     setLoading(true);
     try {
-      await dispatch(login(data)).unwrap();
-      window.location.replace('/')
+      const response= await dispatch(login(data)).unwrap();
+      console.log('response',response)
       toast({
         title: "Connexion reussie",
-        // description: "Bienvenue "+userConnected?.displayName,
+        description: "Bienvenue "+response?.data?.user?.profile?.displayName,
       });
     } catch (error) {
       toast({

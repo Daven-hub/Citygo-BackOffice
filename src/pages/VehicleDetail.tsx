@@ -15,14 +15,15 @@ import {
   Palette,
   Hash,
   Clock,
-  MessageSquare
+  MessageSquare,
+  MoveLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { mockVehicles, vehicleStatusConfig, comfortLevelConfig } from "@/data/mockVehicles";
+import { vehicleStatusConfig, comfortLevelConfig } from "@/data/mockVehicles";
 import { VehicleStatusModal } from "@/components/modal/VehicleStatusModal";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -98,10 +99,10 @@ export default function VehicleDetail() {
 
   return (
     <>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Back button */}
-        <Button variant="ghost" onClick={() => navigate("/vehicules")} className="gap-2 text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="w-4 h-4" />
+        <Button variant="ghost" onClick={() => navigate("/vehicules")} className="gap-2 bg-transparent border-transparent text-muted-foreground hover:text-foreground">
+          <MoveLeft className="w-4 h-4" />
           Retour
         </Button>
 
@@ -111,13 +112,13 @@ export default function VehicleDetail() {
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
               <div className="flex items-start gap-5">
-                <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center shadow-sm">
-                  <Car className="h-10 w-10 text-primary" />
+                <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center shadow-sm">
+                  <Car className="h-7 w-7 text-primary" />
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-foreground">{vehicle.make} {vehicle.model}</h2>
-                  <p className="text-muted-foreground font-mono text-lg">{vehicle.plate}</p>
-                  <div className="flex items-center gap-3 mt-3">
+                <div className="space-y-0">
+                  <h2 className="text-xl font-bold text-foreground">{vehicle.make} {vehicle.model}</h2>
+                  <p className="text-muted-foreground font-mono text-sm">{vehicle.plate}</p>
+                  <div className="flex items-center gap-2 mt-3">
                     <Badge
                       variant="outline"
                       className={cn("font-medium", vehicleStatusConfig[vehicle.status]?.className)}
@@ -128,7 +129,7 @@ export default function VehicleDetail() {
                       variant="outline"
                       className={cn("font-medium", comfortLevelConfig[vehicle.comfortLevel]?.className)}
                     >
-                      {comfortLevelConfig[vehicle.comfortLevel]?.label}
+                      {!vehicle.comfortLevel?'N/A':comfortLevelConfig[vehicle.comfortLevel]?.label}
                     </Badge>
                   </div>
                 </div>
@@ -153,39 +154,39 @@ export default function VehicleDetail() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Vehicle Info */}
           <Card className="bg-card border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2 text-foreground">
+              <CardTitle className="text-xl flex items-center gap-2 text-foreground">
                 <Car className="w-5 h-5 text-primary" />
                 Informations du véhicule
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-muted/50 border border-border">
+            <CardContent className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="px-4 py-2.5 rounded-xl bg-muted/50 border border-border">
                   <div className="flex items-center gap-2 text-muted-foreground mb-1">
                     <Hash className="w-4 h-4" />
                     <span className="text-sm">Marque</span>
                   </div>
                   <p className="font-semibold text-foreground">{vehicle.make}</p>
                 </div>
-                <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                <div className="px-4 py-2.5 rounded-xl bg-muted/50 border border-border">
                   <div className="flex items-center gap-2 text-muted-foreground mb-1">
                     <Car className="w-4 h-4" />
                     <span className="text-sm">Modèle</span>
                   </div>
                   <p className="font-semibold text-foreground">{vehicle.model}</p>
                 </div>
-                <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                <div className="px-4 py-2.5 rounded-xl bg-muted/50 border border-border">
                   <div className="flex items-center gap-2 text-muted-foreground mb-1">
                     <Palette className="w-4 h-4" />
                     <span className="text-sm">Couleur</span>
                   </div>
                   <p className="font-semibold text-foreground">{vehicle.color}</p>
                 </div>
-                <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                <div className="px-4 py-2.5 rounded-xl bg-muted/50 border border-border">
                   <div className="flex items-center gap-2 text-muted-foreground mb-1">
                     <Armchair className="w-4 h-4" />
                     <span className="text-sm">Places</span>
@@ -193,15 +194,15 @@ export default function VehicleDetail() {
                   <p className="font-semibold text-foreground">{vehicle.seats} sièges</p>
                 </div>
               </div>
-              <Separator className="bg-border" />
-              <div className="p-4 rounded-xl bg-muted/50 border border-border">
+              <Separator className="bg-black/5" />
+              <div className="px-4 py-2.5 rounded-xl bg-muted/50 border border-border">
                 <div className="flex items-center gap-2 text-muted-foreground mb-1">
                   <FileText className="w-4 h-4" />
                   <span className="text-sm">Type de véhicule</span>
                 </div>
                 <p className="font-semibold text-foreground">{vehicle.vehicleTypeName}</p>
               </div>
-              <div className="p-4 rounded-xl bg-muted/50 border border-border">
+              <div className="px-4 py-2.5 rounded-xl bg-muted/50 border border-border">
                 <div className="flex items-center gap-2 text-muted-foreground mb-1">
                   <FileText className="w-4 h-4" />
                   <span className="text-sm">Documents soumis</span>
@@ -225,17 +226,17 @@ export default function VehicleDetail() {
                   <User className="h-7 w-7 text-primary" />
                 </div>
                 <div>
-                  <p className="font-semibold text-lg text-foreground">{vehicle.ownerName}</p>
+                  <p className="font-semibold text-lg text-foreground">{vehicle.owner.displayName}</p>
                   <p className="text-sm text-muted-foreground flex items-center gap-2">
                     <Phone className="w-4 h-4" />
-                    {vehicle.ownerPhone}
+                    {vehicle.owner.rating}
                   </p>
                 </div>
               </div>
               <Button 
                 variant="outline" 
                 className="w-full border-border text-foreground hover:bg-muted"
-                onClick={() => navigate(`/utilisateurs/${vehicle.ownerId}`)}
+                onClick={() => navigate(`/utilisateurs/${vehicle.owner.userId}`)}
               >
                 Voir le profil du propriétaire
               </Button>
@@ -260,7 +261,7 @@ export default function VehicleDetail() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-foreground">Véhicule créé</p>
-                  <p className="text-sm text-muted-foreground">{formatDate(vehicle.createdAt)}</p>
+                  <p className="text-sm text-muted-foreground">{formatDate(vehicle.createdAt.toString())}</p>
                 </div>
               </div>
 
@@ -270,7 +271,7 @@ export default function VehicleDetail() {
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-foreground">Soumis pour vérification</p>
-                  <p className="text-sm text-muted-foreground">{formatDate(vehicle.submittedAt)}</p>
+                  <p className="text-sm text-muted-foreground">{formatDate(vehicle.submittedAt?.toString())}</p>
                 </div>
               </div>
 
@@ -298,7 +299,7 @@ export default function VehicleDetail() {
                        vehicle.status === "REJECTED" ? "Rejeté" :
                        vehicle.status === "SUSPENDED" ? "Suspendu" : "Examiné"}
                     </p>
-                    <p className="text-sm text-muted-foreground">{formatDate(vehicle.reviewedAt)}</p>
+                    <p className="text-sm text-muted-foreground">{formatDate(vehicle.reviewedAt.toString())}</p>
                     {vehicle.reviewedBy && (
                       <p className="text-xs text-muted-foreground">Par: {vehicle.reviewedBy}</p>
                     )}

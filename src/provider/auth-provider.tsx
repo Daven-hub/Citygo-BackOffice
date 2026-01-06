@@ -1,6 +1,6 @@
 // AuthContext.js
 import { useEffect, useMemo, useState } from "react";
-import { GetAllUsers } from "@/store/slices/user.slice";
+import { GetAllUsers, GetUserById } from "@/store/slices/user.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { logoutAsync } from "@/store/slices/auth.slice";
 import { useToast } from "@/hook/use-toast";
@@ -12,19 +12,18 @@ export const AuthProvider = ({ children }) => {
   const dispatch = useAppDispatch();
   const {toast}=useToast()
 
-  const {users } = useAppSelector((state) => state.users);
+  const {usersId } = useAppSelector((state) => state.users);
   const { user } = useAppSelector((state) => state.auth);
 
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState(0);
 
   const detail = useMemo(() => user, [user]);
-
   useEffect(() => {
     const fetchData = async () => {
       const start = performance.now();
       await Promise.all([
-        dispatch(GetAllUsers())
+        dispatch(GetUserById(detail?.userId))
       ]);
       const end = performance.now();
       const elapsed = end - start;
@@ -33,17 +32,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     fetchData();
-  }, [dispatch]);
+  }, [dispatch,detail?.userId]);
 
-  const userConnected = useMemo(() => {
-      if (!detail || !users ) return null;
-      const oneUser = users?.find((x)=>x.id===user?.userId) || null;
-      if (!oneUser) return null;
-      return oneUser;
-    }, [users, detail,user?.userId]);
-
-  // console.log('userConnected',userConnected)
-
+  const userConnected=usersId
 
   const handleLogout = async () => {
       setIsLoading(true);
