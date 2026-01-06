@@ -5,12 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { documentTypeConfig, DriverApplication, KYCRequest, kycStatusConfig } from "@/data/mockKYC";
-import { useToast } from "@/hook/use-toast";
+import { KYCRequest, kycStatusConfig } from "@/data/mockKYC";
 import { cn } from "@/lib/utils";
 import { formatDate } from "@/utilis/formatDate";
-import { CheckCircle, Clock, Eye, FileText, Filter, Search, UserCheck, XCircle } from "lucide-react";
-import React from "react";
+import { CheckCircle, Clock, Eye, FileText, Filter, Search, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 function Request({kycStats,users, statusFilter,setStatusFilter ,searchQuery,setSearchQuery,paginatedKYCRequests,totalPages, setPage,page, pageSize,setSelectedKYCRequest,setKycStatusModalOpen}) {
