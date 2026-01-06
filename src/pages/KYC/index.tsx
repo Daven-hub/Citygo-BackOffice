@@ -52,6 +52,14 @@ export default function KYC() {
       fetchData();
     }, [dispatch]);
 
+    // useEffect(() => {
+    //   await Promise.all([
+    //       dispatch(getAllDriverApp()),
+    //       dispatch(getAllKycRequest()),
+    //       dispatch(GetAllUsers()),
+    //       dispatch(getAllDocuments())
+    //     ]);
+    // }, [input])
   // Pagination state
   const [appPage, setAppPage] = useState(1);
   const [kycPage, setKycPage] = useState(1);

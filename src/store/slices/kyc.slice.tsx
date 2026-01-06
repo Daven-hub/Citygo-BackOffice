@@ -61,6 +61,11 @@ interface paramsType{
     datas:object
 }
 
+interface paginate{
+  page?:number | 0,
+  size?:number | 20
+}
+
 export const updateKycRequest = createAsyncThunk(
   "kycRequest/updatye",
   async ({ id, datas }: paramsType, thunkAPI) => {
