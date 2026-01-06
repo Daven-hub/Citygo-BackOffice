@@ -11,6 +11,8 @@ import {
   Image,
   Download,
   Phone,
+  MoveLeft,
+  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -61,6 +63,10 @@ export default function KYCRequestDetail() {
     };
     fetchData();
   }, [dispatch, requestId]);
+
+  const myDocument=documents?.filter((x)=>x.owner.userId===requestsId?.userId)
+    console.log('myDocument',myDocument)
+     console.log('requestsId',requestsId)
 
   const handleKYCStatusSubmit = async(data: { status: "APPROVED" | "REJECTED"; rejectionReasons: string[]; documentUpdates:KYCType[] }) => {
         setLoading(true);
@@ -126,7 +132,7 @@ export default function KYCRequestDetail() {
           onClick={() => navigate("/kyc")}
           className="bg-transparent"
         >
-          <ArrowLeft className="w-4 h-4 mr-0.5" />
+          <MoveLeft className="w-4 h-4 mr-0.5" />
           Retour aux demandes KYC
         </Button>
 
@@ -161,15 +167,15 @@ export default function KYCRequestDetail() {
                       <StatusIcon className="w-3 h-3 mr-1" />
                       {kycStatusConfig[requestsId.status].label}
                     </Badge>
-                    {/* <Badge
+                    <Badge
                       variant="outline"
                       className={cn(
-                        "font-medium",
-                        documentTypeConfig[requestsId.documentType].className
+                        "font-medium"
                       )}
                     >
-                      {documentTypeConfig[requestsId.documentType].label}
-                    </Badge> */}
+                      <FileText className="w-3 h-3 mr-1" />
+                      Document(s) soumis : {myDocument.length}
+                    </Badge>
                   </div>
                 </div>
               </div>
@@ -200,13 +206,13 @@ export default function KYCRequestDetail() {
             {/* Document Info */}
             <Card className="border-border bg-card">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-foreground">
+                <CardTitle className="flex text-xl items-center gap-2 text-foreground">
                   <FileText className="w-5 h-5 text-primary" />
-                  Informations du document
+                  Document Soumis
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                {/* <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">
                       Type de document
@@ -229,45 +235,38 @@ export default function KYCRequestDetail() {
                       {requestsId?.documentNumber}
                     </p>
                   </div>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
 
-            {/* Document Preview */}
-            <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="flex text-xl items-center gap-2 text-foreground">
-                  <Image className="w-5 h-5 text-primary" />
-                  Aperçu du document
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-muted/30 rounded-lg px-8 py-5 flex flex-col items-center justify-center min-h-[200px] border-2 border-dashed border-border">
-                  <FileText className="w-16 h-16 text-muted-foreground mb-2" />
-                  <p className="text-muted-foreground mb-2">
-                    Document soumis par l'utilisateur
-                  </p>
-                  <Button variant="outline">
-                    <Download className="w-4 h-4 mr-2" />
-                    Télécharger le document
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Rejection Reason (if rejected) */}
-            {requestsId.status === "REJECTED" && requestsId.rejectionReason && (
+            {requestsId.status === "REJECTED" && requestsId.rejectionReasons.length>0 && (
               <Card className="border-destructive/30 bg-destructive/5">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-destructive">
+                  <CardTitle className="flex text-xl items-center gap-2 text-destructive">
                     <AlertCircle className="w-5 h-5" />
                     Raison du rejet
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-foreground">
-                    {requestsId.rejectionReason}
-                  </p>
+                <CardContent className="pt-0 pb-4">
+                 <ol className="relative border-l border-border pl-6 space-y-6">
+                  {requestsId.rejectionReasons.map((reason, index) => (
+                    <li key={index} className="relative">
+                      {/* Timeline dot */}
+                      <span className="absolute -left-[1.9rem] top-1.5 h-3 w-3 rounded-full border-2 border-destructive bg-background" />
+
+                      {/* Content */}
+                      <div className="space-y-0.5">
+                        <p className="text-sm text-foreground first-letter:uppercase leading-relaxed">
+                          {reason}
+                        </p>
+
+                        <span className="text-xs text-muted-foreground">
+                          Rejet #{index + 1}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
                 </CardContent>
               </Card>
             )}
@@ -283,7 +282,7 @@ export default function KYCRequestDetail() {
                   Informations utilisateur
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-2 pt-0">
                 <div className="flex items-center gap-3">
                   <User className="w-5 h-5 text-muted-foreground" />
                   <div>
@@ -311,7 +310,6 @@ export default function KYCRequestDetail() {
                 </Button>
               </CardContent>
             </Card>
-
             {/* Timeline */}
             <Card className="border-border bg-card">
               <CardHeader>
@@ -369,7 +367,6 @@ export default function KYCRequestDetail() {
                 </div>
               </CardContent>
             </Card>
-
             {/* IDs */}
             <Card className="border-border bg-card">
               <CardHeader>
@@ -402,7 +399,7 @@ export default function KYCRequestDetail() {
       <KYCRequestStatusModal
         open={statusModalOpen}
         onOpenChange={setStatusModalOpen}
-        requestId={requestsId.id}
+        requestId={requestId}
         userId={requestsId?.userId}
         currentStatus={requestsId.status}
         loading={loading}
