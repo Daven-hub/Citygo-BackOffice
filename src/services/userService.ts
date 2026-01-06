@@ -1,9 +1,9 @@
 import axios from "./api";
 const API_URL = "/admin";
 
-const getAllUser = async () => {
+const getAllUser = async (page=0,size=20) => {
   try {
-    const response = await axios.get(API_URL+'/users');
+    const response = await axios.get(API_URL+'/users?page='+page+'&size='+size);
     return response.data;
   } catch (error) {
     // console.error("Erreur lors de la récupération des utilisateurs:", error);

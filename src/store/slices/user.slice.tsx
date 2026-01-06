@@ -51,6 +51,11 @@ export interface UserType {
   updatedAt: string; // ISO date string
 }
 
+interface paginate{
+  page?:number,
+  size?:number
+}
+
 interface UsersState {
   users: UserType[];
   userLogId: object[];
@@ -97,10 +102,12 @@ export const UpdateUser = createAsyncThunk(
 
 export const GetAllUsers = createAsyncThunk(
   "users/getAll",
-  async (_, thunkAPI) => {
+  async (params:paginate, thunkAPI) => {
     try {
+      const page = params?.page ?? 0;
+      const size = params?.size ?? 20;
       // const token = thunkAPI.getState().auth.accessToken;
-      const response = await userService.getAllUser();
+      const response = await userService.getAllUser(page,size);
       if (!response.success) {
         return thunkAPI.rejectWithValue(response.error.message);
       } else {
