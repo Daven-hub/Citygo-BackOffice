@@ -51,7 +51,7 @@ import { ConfirmModal } from "@/components/modal/ConfirmModal";
 const vehicleStatusConfig = {
   UNSUSPENDED: { label: "Reactivé", className: "bg-muted text-muted-foreground border-border" },
   PENDING: { label: "En attente", className: "bg-warning/10 text-warning border-warning/20" },
-  DRAFT: { label: "En attente", className: "bg-white/10 text-muted-foreground border-gray-700/20" },
+  DRAFT: { label: "Brouillon", className: "bg-white/10 text-muted-foreground border-gray-700/20" },
   APPROVED: { label: "Approuvé", className: "bg-success/10 text-success border-success/20" },
   REJECTED: { label: "Rejeté", className: "bg-destructive/10 text-destructive border-destructive/20" },
   SUSPENDED: { label: "Suspendu", className: "bg-destructive/10 text-destructive border-destructive/20" },
@@ -99,8 +99,6 @@ export default function Vehicles() {
       statusFilter === "all" || vehicle.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
-  console.log('vehicles',vehicles)
 
   const stats = {
     total: vehicles.length,
@@ -275,7 +273,7 @@ export default function Vehicles() {
                     Plaque
                   </th>
                   <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">
-                    Type
+                    Type (nbre de places)
                   </th>
                   <th className="text-left py-4 px-6 text-sm font-medium text-muted-foreground">
                     Confort
@@ -325,8 +323,8 @@ export default function Vehicles() {
                           <p className="font-medium text-foreground">
                             {vehicle.owner.displayName}
                           </p>
-                          <p className="text-xs text-muted-foreground">
-                            {vehicle.owner.displayName}
+                          <p className="text-xs truncate overflow-hidden text-muted-foreground">
+                            {vehicle.owner.rating}
                           </p>
                         </div>
                       </div>
