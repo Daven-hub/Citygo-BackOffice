@@ -282,9 +282,6 @@ export default function KYCRequestDetail() {
                 <CardTitle className="flex items-center gap-1 text-xl">
                   <FileText className="h-5 w-5 text-primary" />
                   Documents soumis
-                  <span className="text-sm text-muted-foreground">
-                    ({myDocument.length})
-                  </span>
                 </CardTitle>
               </CardHeader>
 
@@ -354,15 +351,11 @@ export default function KYCRequestDetail() {
                   <ol className="relative border-l border-border pl-6 space-y-6">
                     {requestsId.rejectionReasons.map((reason, index) => (
                       <li key={index} className="relative">
-                        {/* Timeline dot */}
                         <span className="absolute -left-[1.9rem] top-1.5 h-3 w-3 rounded-full border-2 border-destructive bg-background" />
-
-                        {/* Content */}
                         <div className="space-y-0.5">
                           <p className="text-sm text-foreground first-letter:uppercase leading-relaxed">
                             {reason}
                           </p>
-
                           <span className="text-xs text-muted-foreground">
                             Rejet #{index + 1}
                           </span>
@@ -377,43 +370,6 @@ export default function KYCRequestDetail() {
 
           {/* Sidebar */}
           <div className="space-y-4">
-            {/* <Card className="border-border bg-card">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex text-xl items-center gap-2 text-foreground">
-                  <User className="w-5 h-5 text-primary" />
-                  Informations utilisateur
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 !pt-0">
-                <div className="space-y-1.5 pt-3 border-t border-gray-100">
-                  <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Nom</p>
-                      <p className="font-medium text-sm text-terciary">
-                        {requestsId.user.displayName}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">Phone</p>
-                      <p className="font-medium text-sm text-foreground">
-                        {getUser(requestsId.userId).phone}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full !text-xs mt-5"
-                  onClick={() => navigate(`/users/${requestsId.userId}`)}
-                >
-                  Voir le profil complet
-                </Button>
-              </CardContent>
-            </Card> */}
 
             <Card className="border-border bg-card">
               <CardHeader className="pb-3">
