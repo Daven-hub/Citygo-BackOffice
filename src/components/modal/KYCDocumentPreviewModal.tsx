@@ -193,7 +193,7 @@ export function KYCDocumentPreviewModal({
                   <img 
                     src={document.url} 
                     alt={document.fileName}
-                    className="max-w-full max-h-full object-contain rounded-lg shadow-lg transition-transform duration-200"
+                    className="max-w-full max-h-full object-contain rounded-lg transition-transform duration-200"
                     style={{ 
                       transform: `scale(${zoom / 100}) rotate(${rotation}deg)`,
                     }}
