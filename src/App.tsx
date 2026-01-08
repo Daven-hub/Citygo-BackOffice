@@ -10,7 +10,7 @@ import Notifications from "./pages/Notifications";
 // import Rides from "./pages/Rides";
 // import Bookings from "./pages/Bookings";
 // import Destinations from "./pages/Destinations";
-// import Rapports from "./pages/Rapports";
+import Rapports from "./pages/Rapports";
 import UserDetail from "./pages/UserDetail";
 // import KYC from "./pages/KYC";
 import BookingsDetail from "./pages/BookingsDetail";
@@ -61,7 +61,7 @@ const App = () => {
                   <Route index element={<UsersAdministration />} />
                   <Route path=":userId" element={<DetailUserAdmin />} />
                 </Route> */}
-                {/* <Route path="rapports" element={<Rapports />} /> */}
+                <Route path="rapports" element={<Rapports />} />
                 {/* <Route path="destinations" element={<Destinations />} /> */}
                 <Route path="vehicules" element={<Vehicles />} />
                 <Route path="type-de-vehicule" element={<VehicleType />} />

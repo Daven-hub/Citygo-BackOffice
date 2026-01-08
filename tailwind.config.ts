@@ -33,7 +33,15 @@ module.exports = {
         },
         success: '#38b000',
         warning: '#ffb703',
-        error: '#e63946'
+        error: '#e63946',
+         accent: {
+          DEFAULT: "rgba(118,118,118,.2)",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
       },
 
       fontSize: {

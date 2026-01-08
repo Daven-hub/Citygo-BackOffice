@@ -85,8 +85,10 @@ function DriverApplications({
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full md:w-44 border-border text-foreground">
-            <Filter className="h-4 w-4 mr-0.5 text-muted-foreground" />
-            <SelectValue placeholder="Statut" />
+            <div className="flex items-center gap-1">
+              {/* <Filter className="h-4 w-4 mr-0.5 text-muted-foreground" /> */}
+              <SelectValue placeholder="Statut" />
+            </div>
           </SelectTrigger>
           <SelectContent className="border-border">
             <SelectItem value="all" className="text-foreground">
