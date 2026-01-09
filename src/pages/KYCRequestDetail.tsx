@@ -11,59 +11,6 @@ import {
   MoveLeft,
 } from "lucide-react";
 
-const DocumentPreview = ({ doc }) => {
-  return (
-    <div className="rounded-xl border bg-muted/30 p-4 space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-semibold">
-            {documentTypeConfig[doc.type]?.label}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Soumis le {new Date(doc.createdAt).toLocaleDateString()}
-          </p>
-        </div>
-        <Badge variant="outline">{doc.state}</Badge>
-      </div>
-
-      {/* Preview */}
-      <div className="rounded-lg border bg-black p-2 flex justify-center">
-        {doc.mimeType.startsWith("image/") ? (
-          <img
-            src={doc.url}
-            alt={doc.fileName}
-            className="max-h-[320px] rounded object-contain"
-          />
-        ) : doc.mimeType === "application/pdf" ? (
-          <iframe
-            src={doc.url}
-            className="h-[320px] w-full rounded"
-          />
-        ) : (
-          <a
-            href={doc.url}
-            target="_blank"
-            className="text-primary underline"
-          >
-            Télécharger le document
-          </a>
-        )}
-      </div>
-
-      {/* Meta infos */}
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <p className="text-muted-foreground">Propriétaire</p>
-          <p>{doc.owner?.displayName}</p>
-        </div>
-        <div>
-          <p className="text-muted-foreground">Taille</p>
-          <p>{(doc.fileSize / 1024).toFixed(1)} KB</p>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -81,7 +28,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { getKycRequestById, updateKycRequest } from "@/store/slices/kyc.slice";
 import LoaderUltra from "@/components/ui/loaderUltra";
 import { formatDate } from "@/utilis/formatDate";
-import { Document, getAllDocuments } from "@/store/slices/document.slice";
+import { Document, getAllDocuments, updateDocument } from "@/store/slices/document.slice";
 import { GetAllUsers } from "@/store/slices/user.slice";
 import { KYCDocumentPreviewModal } from "@/components/modal/KYCDocumentPreviewModal";
 
@@ -91,7 +38,8 @@ export default function KYCRequestDetail() {
   const dispatch = useAppDispatch();
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [docLoading, setDocLoading] = useState(false);
   const { toast } = useToast();
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [documentPreviewOpen, setDocumentPreviewOpen] = useState(false);
@@ -102,6 +50,7 @@ export default function KYCRequestDetail() {
   const { documents } = useAppSelector((state) => state.document);
   const { users } = useAppSelector((state) => state.users);
   const [selectedDoc, setSelectedDoc] = useState(documents?.[0] || null);
+  const [showRejectForm, setShowRejectForm] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,7 +68,7 @@ export default function KYCRequestDetail() {
     fetchData();
   }, [dispatch, requestId]);
 
-  const myDocument = documents?.filter((x) => x.owner.userId === requestsId?.userId && x.category==='IDENTITY')
+  const myDocument = documents?.filter((x) => x.owner.userId === requestsId?.userId && x.category === 'IDENTITY')
 
   const handleKYCStatusSubmit = async (data: { status: "APPROVED" | "REJECTED"; rejectionReasons: string[]; documentUpdates: KYCType[] }) => {
     setLoading(true);
@@ -129,6 +78,7 @@ export default function KYCRequestDetail() {
         datas: data
       }
       await dispatch(updateKycRequest(datas)).unwrap();
+      dispatch(getKycRequestById(requestId))
       setStatusModalOpen(false)
       toast({
         title: data.status === "APPROVED" ? "Demande validée" : "Demande rejetée",
@@ -170,11 +120,28 @@ export default function KYCRequestDetail() {
     );
   }
 
-  const handleDocumentStatusChange = (documentId: string, status: "APPROVED" | "REJECTED", reason?: string) => {
-    toast({
-      title: status === "APPROVED" ? "Document approuvé" : "Document rejeté",
-      description: `Le document a été ${status === "APPROVED" ? "approuvé" : "rejeté"}.`,
-    });
+  const handleDocumentStatusChange = async (datas: { state: string; reviewNote: string }) => {
+    setDocLoading(true);
+    try {
+      const id = selectedDocument.documentId
+      const data = { id, datas }
+      await dispatch(updateDocument(data)).unwrap();
+      dispatch(getAllDocuments())
+      setStatusModalOpen(false)
+      setDocumentPreviewOpen(false)
+      toast({
+        title: datas.state === "APPROVED" ? "Document validé" : "Document rejeté",
+        description: `Le document a été ${datas.state === "APPROVED" ? "approuvé" : "rejeté"}.`,
+      });
+    } catch (error) {
+      toast({
+        description: error?.toString(),
+        variant: "destructive",
+      });
+    } finally {
+      setDocLoading(false);
+      setShowRejectForm(false)
+    }
   };
 
   const openDocumentPreview = (doc: Document, index: number) => {
@@ -184,7 +151,7 @@ export default function KYCRequestDetail() {
   };
 
   const navigateDocument = (direction: "prev" | "next") => {
-    const newIndex = direction === "prev" 
+    const newIndex = direction === "prev"
       ? Math.max(0, activeDocumentIndex - 1)
       : Math.min(myDocument.length - 1, activeDocumentIndex + 1);
     setActiveDocumentIndex(newIndex);
@@ -289,7 +256,7 @@ export default function KYCRequestDetail() {
                 <div className="grid pt-4 border-t border-gray-100 grid-cols-12 gap-6">
                   {/* Liste */}
                   <div className="col-span-12 space-y-2">
-                    {myDocument.map((doc,index) => (
+                    {myDocument.map((doc, index) => (
                       <button
                         key={doc.documentId}
                         onClick={() => openDocumentPreview(doc, index)}
@@ -473,6 +440,9 @@ export default function KYCRequestDetail() {
 
       <KYCDocumentPreviewModal
         open={documentPreviewOpen}
+        loading={docLoading}
+        showRejectForm={showRejectForm}
+        setShowRejectForm={setShowRejectForm}
         onOpenChange={setDocumentPreviewOpen}
         document={selectedDocument}
         onStatusChange={handleDocumentStatusChange}

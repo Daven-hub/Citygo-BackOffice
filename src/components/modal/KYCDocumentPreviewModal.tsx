@@ -17,7 +17,8 @@ import {
   Clock,
   ChevronLeft,
   ChevronRight,
-  FileImage
+  FileImage,
+  Loader2
 } from "lucide-react";
 import {
   Dialog,
@@ -38,9 +39,12 @@ import { Document } from "@/store/slices/document.slice";
 
 interface KYCDocumentPreviewModalProps {
   open: boolean;
+  showRejectForm:boolean;
   onOpenChange: (open: boolean) => void;
+  setShowRejectForm:(showRejectForm: boolean) => void;
   document: Document | null;
-  onStatusChange?: (documentId: string, status: "APPROVED" | "REJECTED", reason?: string) => void;
+  loading: boolean;
+  onStatusChange?: (data:{state: string; reviewNote: string}) => void;
   onNavigate?: (direction: "prev" | "next") => void;
   currentIndex?: number;
   totalDocuments?: number;
@@ -51,8 +55,11 @@ export function KYCDocumentPreviewModal({
   open,
   onOpenChange,
   document,
+  loading,
   onStatusChange,
   onNavigate,
+  showRejectForm,
+  setShowRejectForm,
   currentIndex = 0,
   totalDocuments = 1,
   readonly = false
@@ -60,7 +67,7 @@ export function KYCDocumentPreviewModal({
   const [zoom, setZoom] = useState(100);
   const [rotation, setRotation] = useState(0);
   const [rejectionReason, setRejectionReason] = useState("");
-  const [showRejectForm, setShowRejectForm] = useState(false);
+  
 
   if (!document) return null;
 
@@ -78,18 +85,17 @@ export function KYCDocumentPreviewModal({
   const handleRotate = () => setRotation(prev => (prev + 90) % 360);
 
   const handleApprove = () => {
-    onStatusChange?.(document.documentId, "APPROVED");
-    onOpenChange(false);
+    onStatusChange?.({state:"APPROVED",reviewNote:rejectionReason});
+    setRejectionReason("");
+    // onOpenChange(false);}
   };
 
   const handleReject = () => {
+    setShowRejectForm(true);
     if (showRejectForm && rejectionReason.trim()) {
-      onStatusChange?.(document.documentId, "REJECTED", rejectionReason);
+      onStatusChange?.({state:"REJECTED",reviewNote:rejectionReason});
       setRejectionReason("");
-      setShowRejectForm(false);
-      onOpenChange(false);
-    } else {
-      setShowRejectForm(true);
+      // onOpenChange(false);
     }
   };
 
@@ -319,19 +325,21 @@ export function KYCDocumentPreviewModal({
                     <h3 className="font-semibold text-foreground">Actions</h3>
                     
                     {showRejectForm ? (
-                      <div className="space-y-2">
-                        <Label className="text-sm text-muted-foreground">Raison du rejet</Label>
-                        <Textarea 
-                          value={rejectionReason}
-                          onChange={(e) => setRejectionReason(e.target.value)}
-                          placeholder="Expliquez pourquoi le document est rejeté..."
-                          className="min-h-[100px] bg-background"
-                        />
+                      <div className="space-y-2.5">
+                        <div className="space-y-0.5">
+                          <Label className="text-sm text-muted-foreground">Raison du rejet</Label>
+                          <Textarea 
+                            value={rejectionReason}
+                            onChange={(e) => setRejectionReason(e.target.value)}
+                            placeholder="Expliquez pourquoi le document est rejeté..."
+                            className="min-h-[100px] bg-background"
+                          />
+                        </div>
                         <div className="flex gap-2">
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="flex-1"
+                            className="flex-1 py-4"
                             onClick={() => setShowRejectForm(false)}
                           >
                             Annuler
@@ -339,11 +347,11 @@ export function KYCDocumentPreviewModal({
                           <Button 
                             variant="destructive" 
                             size="sm"
-                            className="flex-1"
+                            className="flex items-center py-4 justify-center gap-2"
                             onClick={handleReject}
                             disabled={!rejectionReason.trim()}
                           >
-                            Confirmer
+                            {loading?<><Loader2/> Traitement ...</>:'Confirmer'}
                           </Button>
                         </div>
                       </div>
@@ -360,11 +368,12 @@ export function KYCDocumentPreviewModal({
                         </Button>
                         <Button 
                           size="sm"
-                          className="flex-1 py-4 bg-success hover:bg-success/90 text-white"
+                          className="flex gap-2 items-center justify-center py-4 bg-success hover:bg-success/90 text-white"
                           onClick={handleApprove}
                         >
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Approuver
+                          {loading?<><Loader2/> Traitement ...</>:<>
+                          <CheckCircle className="w-4 h-4 mr-0.5" />
+                          Approuver</>}
                         </Button>
                       </div>
                     )}
