@@ -27,6 +27,8 @@ import LuggageType from "./pages/catalogue/LuggageType";
 import { useAuth } from "./context/use-auth";
 import Destinations from "./pages/Destinations";
 import DetailDocument from "./pages/DetailDocument";
+import PlatformFees from "./pages/PlatformFees";
+import PlatformFeeByType from "./pages/PlatformFeesByType";
 
 // Lazy loading
 const Login = lazy(() => import("./pages/Login"));
@@ -64,6 +66,8 @@ const App = () => {
                 <Route path="rapports" element={<Rapports />} />
                 {/* <Route path="destinations" element={<Destinations />} /> */}
                 <Route path="vehicules" element={<Vehicles />} />
+                <Route path="frais-de-platforme" element={<PlatformFees />} />
+                <Route path="types-de-frais" element={<PlatformFeeByType />} />
                 <Route path="type-de-vehicule" element={<VehicleType />} />
                 <Route path="langues" element={<Languages />} />
                 <Route path="monnaies" element={<Currencies />} />

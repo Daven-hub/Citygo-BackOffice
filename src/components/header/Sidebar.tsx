@@ -11,7 +11,9 @@ import {
   ChevronRight,
   CreditCard,
   Grid,
+  Layers,
   Mail,
+  Percent,
   Settings,
   ShieldCheck,
   SidebarClose,
@@ -88,6 +90,8 @@ function Sidebar({ setIsSidebarOpen }) {
           alowed: ["ROLE_ADMIN"],
         },
         { title: 'Vehicules', icon: <CarFront size={22} />, path: '/vehicules', children: [], alowed:["ROLE_ADMIN"] },
+        { title: 'Frais de plateforme', icon: <Percent size={22} />, path: '/frais-de-platforme', children: [], alowed:["ROLE_ADMIN"] },
+        { title: 'Types de frais', icon: <Layers size={22} />, path: '/types-de-frais', children: [], alowed:["ROLE_ADMIN"] },
         {
           title: "Trajets",
           icon: <CarFront size={22} />,
