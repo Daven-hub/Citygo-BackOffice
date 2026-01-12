@@ -1,23 +1,21 @@
-import { useAuth } from "@/context/use-auth";
 import { useToast } from "@/hook/use-toast";
-import { useAppDispatch, useAppSelector } from "@/store/hook";
+import { useAppDispatch } from "@/store/hook";
 import { login } from "@/store/slices/auth.slice";
 import { Loader2 } from "lucide-react";
 import  { useState } from "react";
 import { useForm } from "react-hook-form";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 
 function Login() {
   const dispatch=useAppDispatch()
   const [loading, setLoading] = useState(false);
   const {toast}=useToast()
-  const {userConnected}=useAuth()
+  const location= useLocation()
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors: errorLog },
   } = useForm({
     defaultValues: {
@@ -32,7 +30,9 @@ function Login() {
     setLoading(true);
     try {
       const response= await dispatch(login(data)).unwrap();
-      console.log('response',response)
+      if(location.pathname!=='/connexion'){
+        window.location.replace('/')
+      }
       toast({
         title: "Connexion reussie",
         description: "Bienvenue "+response?.data?.user?.profile?.displayName,
@@ -50,11 +50,11 @@ function Login() {
 
 
   return (
-    <div className="flex px-[34.5%] bg-gray-200 items-center min-h-screen">
+    <div className="flex px-[5%] md:px-[21%] lg:px-[35%] bg-gray-200 items-center min-h-screen">
         <div className="w-full flex flex-col gap-2.5 items-center">
           {/* <img className="w-[95px]" src={'/images/shortLogo.png'} alt="logo_citygo" /> */}
-          <div className="bg-white w-full items-center shadow-sm shadow-gray-300 border-gray-300/85 flex flex-col gap-7 px-9 py-8 rounded-[10px] border">
-            <img className="w-[190px]" src={'/images/FullLogo.png'} alt="logo_citygo" />
+          <div className="bg-white w-full items-center shadow-sm shadow-gray-300 border-gray-300/85 flex flex-col gap-7 px-6 md:px-9 py-6 md:py-8 rounded-[10px] border">
+            <img className="w-[50%] md:w-[190px]" src={'/images/FullLogo.png'} alt="logo_citygo" />
             <form onSubmit={handleSubmit(handleLogin)}
               className="flex w-full text-[.85rem] flex-col gap-3"
             >
@@ -77,7 +77,7 @@ function Login() {
                 />
               </div>
               <div className="flex items-center justify-between">
-                <label className="flex items-center space-x-2 text-[.8rem] text-gray-700">
+                <label className="flex items-center space-x-2 text-[.7rem] md:text-[.8rem] text-gray-700">
                   <input
                     {...register("rememberMe")}
                     type="checkbox"
@@ -93,7 +93,7 @@ function Login() {
                   Mot de passe oublié ?
                 </NavLink>
               </div>
-              <div className="flex flex-col justify-center items-center gap-3.5 my-2">
+              <div className="flex flex-col justify-center items-center gap-3.5 my-1">
                 <button
                   type="submit"
                   disabled={loading}

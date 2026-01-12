@@ -115,10 +115,10 @@ export default function VehicleDetail() {
                 <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center shadow-sm">
                   <Car className="h-7 w-7 text-primary" />
                 </div>
-                <div className="space-y-0">
+                <div className="space-y-0.5">
                   <h2 className="text-xl font-bold text-foreground">{vehicle.make} {vehicle.model}</h2>
                   <p className="text-muted-foreground font-mono text-sm">{vehicle.plate}</p>
-                  <div className="flex items-center gap-2 mt-3">
+                  <div className="flex items-center gap-2 mt-0">
                     <Badge
                       variant="outline"
                       className={cn("font-medium", vehicleStatusConfig[vehicle.status]?.className)}

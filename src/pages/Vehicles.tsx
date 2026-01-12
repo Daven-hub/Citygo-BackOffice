@@ -14,6 +14,11 @@ import {
   Armchair,
   CircleCheck,
   PlayCircle,
+  Smile,
+  Edit,
+  XCircleIcon,
+  SmilePlus,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,19 +47,41 @@ import { cn } from "@/lib/utils";
 import { VehicleStatusModal } from "@/components/modal/VehicleStatusModal";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { getAllVehicles, updateVehicleStatus, Vehicle } from "@/store/slices/vehicles.slice";
+import { getAllVehicles, updateVehicleStatus, Vehicle, vehiculeMetric } from "@/store/slices/vehicles.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import LoaderUltra from "@/components/ui/loaderUltra";
 import { toast } from "@/hook/use-toast";
 import { ConfirmModal } from "@/components/modal/ConfirmModal";
 
 const vehicleStatusConfig = {
-  UNSUSPENDED: { label: "Reactivé", className: "bg-muted text-muted-foreground border-border" },
-  PENDING: { label: "En attente", className: "bg-warning/10 text-warning border-warning/20" },
-  DRAFT: { label: "Brouillon", className: "bg-white/10 text-muted-foreground border-gray-700/20" },
-  APPROVED: { label: "Approuvé", className: "bg-success/10 text-success border-success/20" },
-  REJECTED: { label: "Rejeté", className: "bg-destructive/10 text-destructive border-destructive/20" },
-  SUSPENDED: { label: "Suspendu", className: "bg-destructive/10 text-destructive border-destructive/20" },
+  UNSUSPENDED: {
+    label: "Réactivé",
+    className: "bg-blue-100 text-blue-700 border-blue-200"
+  },
+  PENDING: {
+    label: "En attente",
+    className: "bg-yellow-100 text-yellow-700 border-yellow-200"
+  },
+  DRAFT: {
+    label: "Brouillon",
+    className: "bg-gray-100 text-gray-700 border-gray-200"
+  },
+  APPROVED: {
+    label: "Approuvé",
+    className: "bg-green-100 text-green-700 border-green-200"
+  },
+  REJECTED: {
+    label: "Rejeté",
+    className: "bg-red-100 text-red-700 border-red-200"
+  },
+  SUSPENDED: {
+    label: "Suspendu",
+    className: "bg-orange-100 text-orange-700 border-orange-200"
+  },
+  PENDING_REVIEW: {
+    label: "Attente de validation",
+    className: "bg-yellow-100 text-yellow-700 border-yellow-200"
+  }
 };
 
 const comfortLevelConfig = {
@@ -63,12 +90,65 @@ const comfortLevelConfig = {
   PREMIUM: { label: "Premium", className: "bg-warning/10 text-warning border-warning/20" },
 };
 
+const iconMap = {
+  Car: Car,
+  CheckCircle: CheckCircle,
+  FileText: FileText,
+  Ban: Ban,
+  XCircle: XCircle,
+  Edit: Edit,
+  Smile: Smile,
+  SmilePlus: SmilePlus,
+  Star: Star,
+};
+
+const colorMap = {
+  primary: "text-primary",
+  success: "text-green-600",
+  warning: "text-yellow-600",
+  destructive: "text-red-500",
+  "gray-500": "text-gray-600",
+  "blue-500": "text-blue-600",
+  "cyan-500": "text-cyan-600",
+  "amber-500": "text-amber-600",
+};
+
+const bgColorMap = {
+  primary: "bg-primary/10",
+  success: "bg-green-100",
+  warning: "bg-yellow-100",
+  destructive: "bg-red-100",
+  "gray-500": "bg-gray-100",
+  "blue-500": "bg-blue-50",
+  "cyan-500": "bg-cyan-50",
+  "amber-500": "bg-amber-50",
+};
+
+export function StatCard({ title, value, icon, color }) {
+  const Icon = iconMap[icon];
+  return (
+    <Card className="bg-card border-border shadow-sm">
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">{title}</p>
+            <p className={`text-2xl font-bold ${colorMap[color]}`}>{value}</p>
+          </div>
+          <div className={`h-10 w-10 rounded-xl ${bgColorMap[color]} flex items-center justify-center`}>
+            <Icon className={`h-5 w-5 ${colorMap[color]}`} />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function Vehicles() {
   const navigate = useNavigate();
   const dispatch=useAppDispatch();
   const [duration,setDuration]=useState(0)
   const [isLoading,setIsLoading]=useState(true)
-  const {vehicles} = useAppSelector((state) => state.vehicle);
+  const {vehicles,metricVehicule} = useAppSelector((state) => state.vehicle);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
@@ -80,7 +160,10 @@ export default function Vehicles() {
   useEffect(() => {
     const fetchData = async () => {
           const start = performance.now();
-          await dispatch(getAllVehicles());
+          await Promise.all([
+                   dispatch(getAllVehicles()),
+                    dispatch(vehiculeMetric()),
+                  ]);
           const end = performance.now();
           const elapsed = end - start;
           setDuration(elapsed);
@@ -99,13 +182,6 @@ export default function Vehicles() {
       statusFilter === "all" || vehicle.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
-  const stats = {
-    total: vehicles.length,
-    approved: vehicles.filter((v) => v.status === "APPROVED").length,
-    pending: vehicles.filter((v) => v.status === "PENDING").length,
-    suspended: vehicles.filter((v) => v.status === "SUSPENDED").length,
-  };
 
   const formatDate = (dateString: string) => {
     try {
@@ -155,71 +231,88 @@ export default function Vehicles() {
 
   if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
 
+  const stats = {
+    total: metricVehicule.totalVehicles,
+    approved: metricVehicule.approvedCount,
+    draft: metricVehicule.draftCount,
+    pending: metricVehicule.pendingReviewCount,
+    suspended: metricVehicule.suspendedCount,
+    rejected:metricVehicule.rejectedCount,
+    premium:metricVehicule.rejectedCount,
+    standard:metricVehicule.rejectedCount,
+    comfort:metricVehicule.rejectedCount,
+  };
+  const statsData = [
+  {
+    title: "Total",
+    valueKey: "total",
+    icon: "Car",
+    color: "primary",       // Couleur principale
+  },
+  {
+    title: "Approuvés",
+    valueKey: "approved",
+    icon: "CheckCircle",
+    color: "success",       // Vert
+  },
+  {
+    title: "En attente",
+    valueKey: "pending",
+    icon: "FileText",
+    color: "warning",       // Jaune
+  },
+  {
+    title: "Suspendus",
+    valueKey: "suspended",
+    icon: "Ban",
+    color: "destructive",   // Rouge
+  },
+  {
+    title: "Réjété",
+    valueKey: "rejected",
+    icon: "XCircle",
+    color: "destructive",   // Rouge
+  },
+  {
+    title: "Brouillon",
+    valueKey: "draft",
+    icon: "Edit",
+    color: "gray-500",          // Gris
+  },
+  {
+    title: "Confort Standard",
+    valueKey: "standard",
+    icon: "Smile",
+    color: "blue-500",          // Bleu
+  },
+  {
+    title: "Confort Comfort",
+    valueKey: "comfort",
+    icon: "SmilePlus",
+    color: "cyan-500",          // Cyan
+  },
+  {
+    title: "Confort Premium",
+    valueKey: "premium",
+    icon: "Star",
+    color: "amber-500",         // Jaune/or
+  },
+];
+
   return (
     <>
       <div className="space-y-4">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-card border-border shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Total</p>
-                  <p className="text-2xl font-bold text-foreground">
-                    {stats.total}
-                  </p>
-                </div>
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Car className="h-5 w-5 text-primary" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-border shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Approuvés</p>
-                  <p className="text-2xl font-bold text-success">
-                    {stats.approved}
-                  </p>
-                </div>
-                <div className="h-10 w-10 rounded-xl bg-success/10 flex items-center justify-center">
-                  <CheckCircle className="h-5 w-5 text-success" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-border shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">En attente</p>
-                  <p className="text-2xl font-bold text-warning">
-                    {stats.pending}
-                  </p>
-                </div>
-                <div className="h-10 w-10 rounded-xl bg-warning/10 flex items-center justify-center">
-                  <FileText className="h-5 w-5 text-warning" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-card border-border shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Suspendus</p>
-                  <p className="text-2xl font-bold text-destructive">
-                    {stats.suspended}
-                  </p>
-                </div>
-                <div className="h-10 w-10 rounded-xl bg-destructive/10 flex items-center justify-center">
-                  <Ban className="h-5 w-5 text-destructive" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {statsData.map((stat) => (
+            <StatCard
+              key={stat.valueKey}
+              title={stat.title}
+              value={stats[stat.valueKey]}
+              icon={stat.icon}
+              color={stat.color}
+            />
+          ))}
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-between">

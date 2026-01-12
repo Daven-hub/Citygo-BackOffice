@@ -104,18 +104,7 @@ export default function Users() {
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { userConnected } = useAuth();
-
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user?.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user?.phone?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus =
-      statusFilter === "all" || user.status === statusFilter;
-    const matchesRole = roleFilter === "all" || user.roles.includes(roleFilter);
-    return matchesSearch && matchesStatus && matchesRole;
-  });
+  const { userConnected } = useAuth()
 
   const handleViewFullDetail = (userId: string) =>
     navigate(`/utilisateurs/${userId}`);
@@ -157,23 +146,10 @@ export default function Users() {
 
   const handleBulkAction = () => setBulkActionModalOpen(true);
 
-  // const handleBulkActionSubmit = (data: {
-  //   userIds: string[];
-  //   operation: string;
-  //   reason: string;
-  // }) => {
-  //     setSelectedUserIds([])
-  // };
-
-  const allSelected =
-    filteredUsers.length > 0 && selectedUserIds.length === filteredUsers.length;
-  const someSelected =
-    selectedUserIds.length > 0 && selectedUserIds.length < filteredUsers.length;
-
   useEffect(() => {
     const fetchData = async () => {
       const start = performance.now();
-      await dispatch(GetAllUsers());
+      await dispatch(GetAllUsers({}));
       const end = performance.now();
       const elapsed = end - start;
       setDuration(elapsed);
@@ -224,6 +200,21 @@ export default function Users() {
   ];
 
   if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
+
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      user?.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user?.phone?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || user.status === statusFilter;
+    const matchesRole = roleFilter === "all" || user.roles.includes(roleFilter);
+    return matchesSearch && matchesStatus && matchesRole;
+  });
+    const allSelected =
+    filteredUsers.length > 0 && selectedUserIds.length === filteredUsers.length;
+  const someSelected =
+    selectedUserIds.length > 0 && selectedUserIds.length < filteredUsers.length;
 
   return (
     <>
