@@ -1,6 +1,5 @@
-import { useAuth } from "@/context/use-auth";
 import { useToast } from "@/hook/use-toast";
-import { useAppDispatch, useAppSelector } from "@/store/hook";
+import { useAppDispatch } from "@/store/hook";
 import { login } from "@/store/slices/auth.slice";
 import { Loader2 } from "lucide-react";
 import  { useState } from "react";
@@ -12,13 +11,10 @@ function Login() {
   const dispatch=useAppDispatch()
   const [loading, setLoading] = useState(false);
   const {toast}=useToast()
-  const {userConnected}=useAuth()
 
   const {
     register,
     handleSubmit,
-    watch,
-    formState: { errors: errorLog },
   } = useForm({
     defaultValues: {
       phoneNumber: "",
@@ -50,65 +46,83 @@ function Login() {
 
 
   return (
-    <div className="flex px-[34.5%] bg-gray-200 items-center min-h-screen">
-        <div className="w-full flex flex-col gap-2.5 items-center">
-          {/* <img className="w-[95px]" src={'/images/shortLogo.png'} alt="logo_citygo" /> */}
-          <div className="bg-white w-full items-center shadow-sm shadow-gray-300 border-gray-300/85 flex flex-col gap-7 px-9 py-8 rounded-[10px] border">
-            <img className="w-[190px]" src={'/images/FullLogo.png'} alt="logo_citygo" />
-            <form onSubmit={handleSubmit(handleLogin)}
-              className="flex w-full text-[.85rem] flex-col gap-3"
-            >
-              <div className="flex flex-col gap-0">
-                <input
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        <div className="bg-white shadow-lg shadow-gray-200/50 border border-gray-200 rounded-xl px-6 py-8 sm:px-10 sm:py-10">
+          {/* Logo */}
+          <div className="flex justify-center mb-8">
+            <img
+              className="w-40 sm:w-48 h-auto"
+              src={'/images/FullLogo.png'}
+              alt="CityGo"
+            />
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit(handleLogin)} className="space-y-4">
+            {/* Phone Input */}
+            <div>
+              <input
                 {...register('phoneNumber')}
-                  autoComplete="off"
-                  type="text"
-                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary/60 w-full px-3 py-3 rounded-[5px] outline-0"
-                  placeholder="Téléphone (+237) *"
-                />
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <input
+                autoComplete="off"
+                type="text"
+                className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-lg outline-none transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-gray-400"
+                placeholder="Téléphone (+237) *"
+              />
+            </div>
+
+            {/* Password Input */}
+            <div>
+              <input
                 {...register('password')}
                 autoComplete="off"
-                  type="password"
-                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary/60 w-full px-3 py-3 rounded-[5px] outline-0"
-                  placeholder="Password *"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <label className="flex items-center space-x-2 text-[.8rem] text-gray-700">
-                  <input
-                    {...register("rememberMe")}
-                    type="checkbox"
-                    className="w-3 h-3 accent-blue-600 rounded cursor-pointer"
-                  />
-                  <span>Se souvenir de moi</span>
-                </label>
+                type="password"
+                className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-lg outline-none transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-gray-400"
+                placeholder="Mot de passe *"
+              />
+            </div>
 
-                <NavLink
-                  to="/mot-de-passe-oublie"
-                  className="text-[.8rem] text-black/60 font-medium hover:text-secondary hover:underline"
-                >
-                  Mot de passe oublié ?
-                </NavLink>
-              </div>
-              <div className="flex flex-col justify-center items-center gap-3.5 my-2">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-secondary font-semibold w-full transition-all duration-500 hover:opacity-85 cursor-pointer py-3 px-5 flex items-center justify-center rounded-[5px] text-white disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <Loader2 className="animate-spin h-5 w-5 text-white" />
-                  ) : (
-                    "Se connecter"
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+            {/* Remember & Forgot - Stacks on mobile */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                <input
+                  {...register("rememberMe")}
+                  type="checkbox"
+                  className="w-4 h-4 accent-primary rounded cursor-pointer"
+                />
+                <span>Se souvenir de moi</span>
+              </label>
+
+              <NavLink
+                to="/mot-de-passe-oublie"
+                className="text-sm text-gray-500 font-medium hover:text-primary transition-colors"
+              >
+                Mot de passe oublié ?
+              </NavLink>
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-secondary hover:bg-secondary/90 text-white font-semibold py-3 px-5 rounded-lg transition-all duration-200 flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <Loader2 className="animate-spin h-5 w-5" />
+                ) : (
+                  "Se connecter"
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* Footer */}
+          <p className="mt-8 text-center text-xs text-gray-400">
+            CityGo Backoffice
+          </p>
         </div>
+      </div>
     </div>
   );
 }
