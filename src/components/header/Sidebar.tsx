@@ -4,9 +4,7 @@ import {
   Bell,
   Book,
   Calendar,
-  Car,
   CarFront,
-  CarIcon,
   ChartBar,
   ChevronRight,
   CreditCard,
@@ -15,13 +13,17 @@ import {
   Settings,
   ShieldCheck,
   SidebarClose,
+  Ticket,
   User,
-  UserIcon,
 } from "lucide-react";
 import { useAuth } from "@/context/use-auth";
 // import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
-function Sidebar({ setIsSidebarOpen }) {
+interface SidebarProps {
+  readonly setIsSidebarOpen: (open: boolean) => void;
+}
+
+function Sidebar({ setIsSidebarOpen }: SidebarProps) {
   $(function () {
     let toggleValue = false;
     $(document).on("click", ".settings-btn", function () {
@@ -153,6 +155,13 @@ function Sidebar({ setIsSidebarOpen }) {
           children: [],
           alowed: ["ROLE_ADMIN"],
         },
+        {
+          title: "Support",
+          icon: <Ticket size={22} />,
+          path: "/support",
+          children: [],
+          alowed: ["ROLE_ADMIN"],
+        },
         // {
         //   title: "Profile",
         //   icon: <UserIcon size={20} />,
@@ -218,7 +227,7 @@ function Sidebar({ setIsSidebarOpen }) {
                   return item.children.length === 0 ? (
                     item.alowed?.some(role => userConnected?.roles?.includes(role)) && (
                       <NavLink
-                        key={index}
+                        key={"nav-link-" + index}
                         to={item.path}
                         className={({ isActive }) =>
                           `flex items-center gap-2.5 w-full px-3.5 border border-transparent py-2.5 rounded-lg transition-colors duration-200 
@@ -234,7 +243,7 @@ function Sidebar({ setIsSidebarOpen }) {
                       </NavLink>
                     )
                   ) : (
-                    <div key={index} className="flex flex-col">
+                    <div key={"menu-item-" + index} className="flex flex-col">
                       <div
                         className={`settings-btn border border-transparent text-blue-600 flex items-center justify-between cursor-pointer px-3.5 py-2.5 w-full rounded-md transition-all
                           ${childIsActive
@@ -258,7 +267,7 @@ function Sidebar({ setIsSidebarOpen }) {
                         style={{ height: 0 }}
                       >
                         {item.children.map((child, i) => (
-                          <li key={i} className="">
+                          <li key={"nav-link-" + i} className="">
                             <NavLink
                               to={child.path}
                                onClick={() => setIsSidebarOpen(false)}

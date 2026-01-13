@@ -11,6 +11,15 @@ const getAllUser = async (page=0,size=20) => {
   }
 };
 
+const getAdminUsers = async (page=0, size=50) => {
+  try {
+    const response = await axios.get(API_URL+'/users?page='+page+'&size='+size+'&role=ROLE_ADMIN');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error;
+  }
+};
+
 const updateUser = async (id, userData) => {
   const response = await axios.put(API_URL + "?id=" + id, userData);
   return response.data;
@@ -71,6 +80,7 @@ const getAnalyticMetric = async (periode,metric) => {
 
 const authService = {
   getAllUser,
+  getAdminUsers,
   getUserId,
   updateUser,
   deleteUserId,
