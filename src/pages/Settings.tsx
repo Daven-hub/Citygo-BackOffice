@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { 
   Save, 
   Search, 
@@ -6,13 +6,13 @@ import {
   MessageSquare, 
   UserCheck, 
   Car, 
+  Settings,
   MapPin, 
   Wallet, 
   DollarSign, 
   Star, 
   Landmark, 
   Headphones,
-  Settings,
   Edit2,
   Check,
   X,
@@ -36,6 +36,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { getAllCategorie, getAllSettings } from "@/store/slices/settings.slice";
+import { useAppDispatch, useAppSelector } from "@/store/hook";
+import LoaderUltra from "@/components/ui/loaderUltra";
 
 const categoryIcons: Record<string, React.ElementType> = {
   "Booking": CalendarCheck,
@@ -65,12 +68,30 @@ const categoryColors: Record<string, string> = {
 
 export default function SettingsPage() {
   const { toast } = useToast();
-  const [settings, setSettings] = useState<SystemSetting[]>(mockSystemSettings);
+  const dispatch = useAppDispatch();
+  const [duration, setDuration] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingSetting, setEditingSetting] = useState<SystemSetting | null>(null);
   const [editValue, setEditValue] = useState("");
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const { settingCateg,settings } = useAppSelector((state) => state.setting);
+
+  useEffect(() => {
+      const fetchData = async () => {
+        const start = performance.now();
+        await Promise.all([
+          dispatch(getAllSettings()),
+          dispatch(getAllCategorie())
+        ]);
+        const end = performance.now();
+        const elapsed = end - start;
+        setDuration(elapsed);
+        setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
+      };
+      fetchData();
+    }, [dispatch])
 
   // Group settings by category
   const settingsByCategory = useMemo(() => {
@@ -83,6 +104,8 @@ export default function SettingsPage() {
     });
     return grouped;
   }, [settings]);
+
+  console.log('settingsByCategory',settingsByCategory)
 
   const categories = Object.keys(settingsByCategory).sort();
 
@@ -116,6 +139,10 @@ export default function SettingsPage() {
     return grouped;
   }, [settings, searchQuery, selectedCategory]);
 
+  if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
+
+    console.log('settings',settings)
+
   const handleEditSetting = (setting: SystemSetting) => {
     setEditingSetting(setting);
     setEditValue(setting.value);
@@ -125,13 +152,13 @@ export default function SettingsPage() {
   const handleSaveEdit = () => {
     if (!editingSetting) return;
 
-    setSettings((prev) =>
-      prev.map((s) =>
-        s.id === editingSetting.id
-          ? { ...s, value: editValue, updatedAt: new Date().toISOString(), updatedBy: "Admin" }
-          : s
-      )
-    );
+    // setSettings((prev) =>
+    //   prev.map((s) =>
+    //     s.id === editingSetting.id
+    //       ? { ...s, value: editValue, updatedAt: new Date().toISOString(), updatedBy: "Admin" }
+    //       : s
+    //   )
+    // );
 
     toast({
       title: "Paramètre mis à jour",
@@ -144,13 +171,13 @@ export default function SettingsPage() {
 
   const handleToggleBoolean = (setting: SystemSetting) => {
     const newValue = setting.value === "true" ? "false" : "true";
-    setSettings((prev) =>
-      prev.map((s) =>
-        s.id === setting.id
-          ? { ...s, value: newValue, updatedAt: new Date().toISOString(), updatedBy: "Admin" }
-          : s
-      )
-    );
+    // setSettings((prev) =>
+    //   prev.map((s) =>
+    //     s.id === setting.id
+    //       ? { ...s, value: newValue, updatedAt: new Date().toISOString(), updatedBy: "Admin" }
+    //       : s
+    //   )
+    // );
 
     toast({
       title: "Paramètre mis à jour",
@@ -320,7 +347,7 @@ export default function SettingsPage() {
 
             {Object.keys(filteredSettings).length === 0 && (
               <div className="rounded-xl border border-border bg-card p-12 text-center">
-                <Settings className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                {/* <Settings className="w-12 h-12 text-muted-foreground mx-auto mb-4" /> */}
                 <h3 className="text-lg font-medium text-foreground mb-2">Aucun paramètre trouvé</h3>
                 <p className="text-muted-foreground">
                   Essayez de modifier votre recherche ou sélectionnez une autre catégorie.
