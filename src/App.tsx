@@ -40,14 +40,19 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 // const Profile = lazy(() => import("./pages/Profile"));
 
 const Users = lazy(() => import("./pages/Users"));
-// const Settings = lazy(() => import("./pages/Settings"));
+const Settings = lazy(() => import("./pages/Settings"));
 
 const App = () => {
   const {loading}=useAuth()
   return (
     <>
       <Toaster />
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+        }}
+      >
         <Suspense fallback={<LoaderUltra loading={loading}/>}>
           <Routes>
             <Route element={<LinkProtected />}>
@@ -78,7 +83,7 @@ const App = () => {
                 <Route path="kyc" element={<KYC />} />
                 <Route path="kyc/demande/:requestId" element={<KYCRequestDetail />} />
                 <Route path="kyc/applications/:applicationId" element={<DriverApplicationDetail />} />
-                {/* <Route path="settings" element={<Settings />} /> */}
+                <Route path="settings" element={<Settings />} />
                 <Route path="utilisateurs" element={<Users />} />
                 <Route path="/utilisateurs/:userId" element={<UserDetail />} />
                 <Route path="/documents/:docId" element={<DetailDocument />} />
