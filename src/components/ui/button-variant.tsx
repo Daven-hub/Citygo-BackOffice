@@ -15,6 +15,10 @@ export const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         success:
           "bg-green-700 text-secondary-foreground hover:bg-green-700/80",
+        succes:
+          "bg-success/5 border border-success/40 text-success hover:bg-success/10",
+        error:
+          "bg-destructive/5 border border-destructive/40 text-destructive hover:bg-error/10",
         ghost: "border bg-primary/10 hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },

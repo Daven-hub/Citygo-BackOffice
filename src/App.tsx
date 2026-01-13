@@ -68,7 +68,7 @@ const App = () => {
                   <Route index element={<UsersAdministration />} />
                   <Route path=":userId" element={<DetailUserAdmin />} />
                 </Route> */}
-                <Route path="rapports" element={<Rapports />} />
+                {/* <Route path="rapports" element={<Rapports />} /> */}
                 {/* <Route path="destinations" element={<Destinations />} /> */}
                 <Route path="vehicules" element={<Vehicles />} />
                 <Route path="frais-de-platforme" element={<PlatformFees />} />

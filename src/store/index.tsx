@@ -9,6 +9,8 @@ import luggageTypeReducer from '@/store/slices/catalogue/luggageType.slice';
 import vehicleTypeReducer from '@/store/slices/catalogue/vehicleType.slice';
 import vehicleReducer from '@/store/slices/vehicles.slice';
 import documentReducer from '@/store/slices/document.slice';
+//
+import settingReducer from '@/store/slices/settings.slice';
 
 export const store = configureStore ({
   reducer: {
@@ -20,7 +22,8 @@ export const store = configureStore ({
     luggageType: luggageTypeReducer,
     vehicleType: vehicleTypeReducer,
     vehicle: vehicleReducer,
-    document: documentReducer
+    document: documentReducer,
+    setting: settingReducer
   },
   devTools: true,
 });

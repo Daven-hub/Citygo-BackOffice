@@ -1,9 +1,11 @@
 import axios from "./api";
 const API_URL = "/admin/documents";
 
-const getAll = async () => {
+const getAll = async (params: Record<string, object> = {}) => {
   try {
-    const response = await axios.get(API_URL);
+    const response = await axios.get(API_URL,{
+      params
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

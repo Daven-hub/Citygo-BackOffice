@@ -42,7 +42,7 @@ export default function KYC() {
           dispatch(getAllDriverApp()),
           dispatch(getAllKycRequest()),
           dispatch(GetAllUsers({page:0,size:10000})),
-          dispatch(getAllDocuments())
+          dispatch(getAllDocuments({}))
         ]);
         const end = performance.now();
         const elapsed = end - start;

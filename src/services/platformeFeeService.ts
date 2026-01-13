@@ -11,12 +11,8 @@ const getAll = async () => {
 };
 
 const getById = async (feedId) => {
-  try {
-    const response = await axios.get(API_URL +'/'+ feedId);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
+  const response = await axios.get(API_URL +'/'+ feedId);
+  return response.data;
 };
 
 const create = async (data) => {
@@ -29,9 +25,9 @@ const feesCacheEvict = async () => {
   return response.data;
 };
 
-const getByType = async () => {
+const getByType = async (type) => {
   try {
-    const response = await axios.get(API_URL +'/by-type');
+    const response = await axios.get(API_URL +'/by-type?type='+type);
     return response.data;
   } catch (error) {
     throw error.response?.data || error;

@@ -74,6 +74,17 @@ interface paramsType{
     datas:object
 }
 
+export interface DocumentQueryParams {
+  page?: number;
+  size?: number;
+  userId?: string;
+  vehicleId?: string;
+  type?: string;
+  category?: string;
+  state?:string;
+  ownerType?:string;
+}
+
 export const updateDocument = createAsyncThunk(
   "document/update",
   async ({ id, datas }: paramsType, thunkAPI) => {
@@ -98,10 +109,16 @@ export const updateDocument = createAsyncThunk(
 
 export const getAllDocuments = createAsyncThunk(
   "document/getAll",
-  async (_, thunkAPI) => {
+  async (params:DocumentQueryParams, thunkAPI) => {
     try {
-    //   const token = thunkAPI.getState().auth.accessToken;
-      const response = await dataService.getAll();
+      const page = params.page ?? 0;
+      const size = params.size ?? 20;
+      const queryParams = {
+        ...params,
+        page,
+        size,
+      };
+      const response = await dataService.getAll(queryParams);
       if (!response.success) {
         return thunkAPI.rejectWithValue(response.error.message);
       } else {
@@ -123,7 +140,6 @@ export const previewDocument = createAsyncThunk(
   "document/preview",
   async (id:string, thunkAPI) => {
     try {
-    //   const token = thunkAPI.getState().auth.accessToken;
       const response = await dataService.previewDoc(id);
       if (!response.success) {
         return thunkAPI.rejectWithValue(response.error.message);
