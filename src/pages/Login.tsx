@@ -61,14 +61,16 @@ function Login() {
               <div className="flex flex-col gap-0">
                 <input
                 {...register('phoneNumber')}
-                  autoComplete="off"
-                  type="text"
-                  className="flex border-2 border-gray-200 focus:ring-2 focus:ring-primary/60 w-full px-3 py-3 rounded-[5px] outline-0"
-                  placeholder="Téléphone (+237) *"
-                />
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <input
+                autoComplete="off"
+                type="text"
+                className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-lg outline-none transition-all duration-200 focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-gray-400"
+                placeholder="Téléphone (+237) *"
+              />
+            </div>
+
+            {/* Password Input */}
+            <div>
+              <input
                 {...register('password')}
                 autoComplete="off"
                   type="password"
@@ -109,6 +111,7 @@ function Login() {
             </form>
           </div>
         </div>
+      </div>
     </div>
   );
 }

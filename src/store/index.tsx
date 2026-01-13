@@ -2,7 +2,6 @@ import {configureStore} from '@reduxjs/toolkit';
 import authReducer from '@/store/slices/auth.slice';
 import usersReducer from '@/store/slices/user.slice';
 import kycReducer from '@/store/slices/kyc.slice';
-// import { injectStore } from '@/services/api';
 import currencieReducer from '@/store/slices/catalogue/currencie.slice';
 import languageReducer from '@/store/slices/catalogue/language.slice';
 import luggageTypeReducer from '@/store/slices/catalogue/luggageType.slice';
