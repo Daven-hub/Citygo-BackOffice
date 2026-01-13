@@ -1,17 +1,17 @@
 import { useState, useMemo, useEffect } from "react";
-import { 
-  Save, 
-  Search, 
-  CalendarCheck, 
-  MessageSquare, 
-  UserCheck, 
-  Car, 
+import {
+  Save,
+  Search,
+  CalendarCheck,
+  MessageSquare,
+  UserCheck,
+  Car,
   Settings,
-  MapPin, 
-  Wallet, 
-  DollarSign, 
-  Star, 
-  Landmark, 
+  MapPin,
+  Wallet,
+  DollarSign,
+  Star,
+  Landmark,
   Headphones,
   Edit2,
   Check,
@@ -36,7 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getAllCategorie, getAllSettings } from "@/store/slices/settings.slice";
+import { getAllCategorie, getAllSettings, updateSettingByKey } from "@/store/slices/settings.slice";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import LoaderUltra from "@/components/ui/loaderUltra";
 
@@ -71,27 +71,28 @@ export default function SettingsPage() {
   const dispatch = useAppDispatch();
   const [duration, setDuration] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editingSetting, setEditingSetting] = useState<SystemSetting | null>(null);
   const [editValue, setEditValue] = useState("");
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const { settingCateg,settings } = useAppSelector((state) => state.setting);
+  const { settings } = useAppSelector((state) => state.setting);
 
   useEffect(() => {
-      const fetchData = async () => {
-        const start = performance.now();
-        await Promise.all([
-          dispatch(getAllSettings()),
-          dispatch(getAllCategorie())
-        ]);
-        const end = performance.now();
-        const elapsed = end - start;
-        setDuration(elapsed);
-        setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
-      };
-      fetchData();
-    }, [dispatch])
+    const fetchData = async () => {
+      const start = performance.now();
+      await Promise.all([
+        dispatch(getAllSettings()),
+        // dispatch(getAllCategorie())
+      ]);
+      const end = performance.now();
+      const elapsed = end - start;
+      setDuration(elapsed);
+      setTimeout(() => setIsLoading(false), Math.max(400, elapsed));
+    };
+    fetchData();
+  }, [dispatch])
 
   // Group settings by category
   const settingsByCategory = useMemo(() => {
@@ -105,9 +106,9 @@ export default function SettingsPage() {
     return grouped;
   }, [settings]);
 
-  console.log('settingsByCategory',settingsByCategory)
-
   const categories = Object.keys(settingsByCategory).sort();
+
+  console.log('settingsByCategory',settingsByCategory)
 
   // Filter settings based on search and category
   const filteredSettings = useMemo(() => {
@@ -116,7 +117,6 @@ export default function SettingsPage() {
     if (selectedCategory) {
       filtered = filtered.filter((s) => s.category === selectedCategory);
     }
-
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -126,7 +126,6 @@ export default function SettingsPage() {
           s.value.toLowerCase().includes(query)
       );
     }
-
     // Group by category
     const grouped: Record<string, SystemSetting[]> = {};
     filtered.forEach((setting) => {
@@ -141,48 +140,58 @@ export default function SettingsPage() {
 
   if (isLoading) return <LoaderUltra loading={isLoading} duration={duration} />;
 
-    console.log('settings',settings)
-
   const handleEditSetting = (setting: SystemSetting) => {
     setEditingSetting(setting);
     setEditValue(setting.value);
     setShowEditDialog(true);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingSetting) return;
-
-    // setSettings((prev) =>
-    //   prev.map((s) =>
-    //     s.id === editingSetting.id
-    //       ? { ...s, value: editValue, updatedAt: new Date().toISOString(), updatedBy: "Admin" }
-    //       : s
-    //   )
-    // );
-
-    toast({
-      title: "Paramètre mis à jour",
-      description: `${editingSetting.key} a été modifié avec succès.`,
-    });
-
-    setShowEditDialog(false);
-    setEditingSetting(null);
+    setLoading(true);
+    try {
+      const key = editingSetting.key;
+      const datas = { value: editValue };
+      const data = { key, datas }
+      await dispatch(updateSettingByKey(data)).unwrap();
+      dispatch(getAllSettings())
+      toast({
+        title: "Paramètre mis à jour",
+        description: `${editingSetting.key} a été modifié avec succès.`,
+      });
+      setShowEditDialog(false);
+      setEditingSetting(null);
+    } catch (error) {
+      toast({
+        description: error?.toString(),
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleToggleBoolean = (setting: SystemSetting) => {
+  const handleToggleBoolean = async(setting: SystemSetting) => {
     const newValue = setting.value === "true" ? "false" : "true";
-    // setSettings((prev) =>
-    //   prev.map((s) =>
-    //     s.id === setting.id
-    //       ? { ...s, value: newValue, updatedAt: new Date().toISOString(), updatedBy: "Admin" }
-    //       : s
-    //   )
-    // );
-
-    toast({
+    setLoading(true);
+    try {
+      const key = setting.key;
+      const datas = { value: newValue };
+      const data = { key, datas }
+      await dispatch(updateSettingByKey(data)).unwrap();
+      dispatch(getAllSettings())
+      toast({
       title: "Paramètre mis à jour",
       description: `${setting.key} a été ${newValue === "true" ? "activé" : "désactivé"}.`,
     });
+    } catch (error) {
+      toast({
+        description: error?.toString(),
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getKeyName = (key: string) => {
@@ -206,7 +215,7 @@ export default function SettingsPage() {
 
     return (
       <div className="flex items-center gap-2">
-        <Badge variant="secondary" className="font-mono">
+        <Badge className="font-mono bg-gray-200">
           {setting.value || "(vide)"}
         </Badge>
         <Button
@@ -236,7 +245,7 @@ export default function SettingsPage() {
                   className={cn(
                     "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all",
                     !selectedCategory
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-primary/10 text-primary-foreground"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
@@ -315,14 +324,14 @@ export default function SettingsPage() {
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
+                            {/* <div className="flex items-center gap-2 mb-1">
                               <code className="text-xs font-mono text-primary bg-primary/10 px-2 py-0.5 rounded">
                                 {setting.key}
                               </code>
-                              <Badge variant="outline" className="text-xs">
+                              <Badge className="text-xs bg-gray-200">
                                 {setting.valueType}
                               </Badge>
-                            </div>
+                            </div> */}
                             <p className="text-sm text-muted-foreground mt-1">
                               {setting.description}
                             </p>
@@ -367,14 +376,14 @@ export default function SettingsPage() {
               {editingSetting?.description}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
+          <div className="space-y-3 py-3">
+            <div className="space-y-0.5">
               <Label className="text-muted-foreground">Clé</Label>
-              <code className="block text-sm font-mono bg-muted px-3 py-2 rounded-lg">
+              <code className="block text-sm font-mono bg-gray-100 px-3 py-2.5 rounded-lg">
                 {editingSetting?.key}
               </code>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-0.5">
               <Label htmlFor="editValue">Valeur ({editingSetting?.valueType})</Label>
               <Input
                 id="editValue"
@@ -390,13 +399,12 @@ export default function SettingsPage() {
               <X className="w-4 h-4 mr-2" />
               Annuler
             </Button>
-            <Button onClick={handleSaveEdit} className="gradient-primary text-primary-foreground">
-              <Check className="w-4 h-4 mr-2" />
-              Enregistrer
+            <Button onClick={handleSaveEdit} className="bg-green-600 flex items-center text-white">
+              {loading?'Enregistrement ...':<><Check className="w-4 h-4 mr-1" />Enregistrer</>}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      </>
+    </>
   );
 }
